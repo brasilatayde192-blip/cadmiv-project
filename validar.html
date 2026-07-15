@@ -1,0 +1,44 @@
+function consultarCredencial() {
+    const codigo = document.getElementById('codigoConsulta').value.trim();
+    const resultadoDiv = document.getElementById('resultado');
+
+    if(codigo === "") {
+        alert("Por favor, digite um código válido para consulta.");
+        return;
+    }
+
+    // Faz uma busca real dentro do nosso novo motor server.js
+    fetch('/api/consultar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ codigo: codigo })
+    })
+    .then(response => response.json())
+    .then(data => {
+        resultadoDiv.style.display = "block";
+        resultadoDiv.innerHTML = data.mensagem;
+
+        // Ajusta as cores corporativas de acordo com o status retornado
+        if (data.status === "REGULAR") {
+            resultadoDiv.style.backgroundColor = "#d4edda";
+            resultadoDiv.style.color = "#155724";
+            resultadoDiv.style.border = "1px solid #c3e6cb";
+        } else if (data.status === "ROUBO") {
+            resultadoDiv.style.backgroundColor = "#f8d7da";
+            resultadoDiv.style.color = "#721c24";
+            resultadoDiv.style.border = "1px solid #f5c6cb";
+        } else if (data.status === "ADORMECIDO") {
+            resultadoDiv.style.backgroundColor = "#fff3cd";
+            resultadoDiv.style.color = "#856404";
+            resultadoDiv.style.border = "1px solid #ffeeba";
+        } else {
+            resultadoDiv.style.backgroundColor = "#e2e3e5";
+            resultadoDiv.style.color = "#383d41";
+            resultadoDiv.style.border = "1px solid #d6d8db";
+        }
+    })
+    .catch(error => {
+        alert("Erro ao conectar com o servidor do CADMIV.");
+        console.error(error);
+    });
+}

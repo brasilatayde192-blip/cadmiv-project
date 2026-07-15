@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CADMIV - Credencial Digital Nacional</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f4f7f6 0%, #e3eae7 100%);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #2c3e50;
+        }
+        .page-container {
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+        }
+        /* Configuração Base da Frente e do Verso */
+        .card-cadmiv {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.1);
+            padding: 30px;
+            box-sizing: border-box;
+            border-top: 8px solid #1b5e20; /* Verde Imperial */
+            border-bottom: 4px solid #1b5e20;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 30px; /* Espaço entre Frente e Verso */
+        }
+        .gold-line {
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, #d4af37, #f3e5ab); /* Dourado Reluzente */
+            margin: 0 auto 20px auto;
+            border-radius: 2px;
+        }
+        .card-header h2 {
+            color: #1b5e20;
+            margin: 0;
+            font-size: 24px;
+            letter-spacing: 3px;
+            font-weight: 700;
+        }
+        .card-header p {
+            color: #7f8c8d;
+            margin: 5px 0 0 0;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 600;
+        }
+        .card-body {
+            display: flex;
+            gap: 25px;
+            margin-top: 30px;
+            align-items: center;
+            text-align: left;
+            position: relative;
+        }
+        .photo-space {
+            width: 110px;
+            height: 140px;
+            background-color: #f8fafc;
+            border: 2px dashed #bdc3c7;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 11px;
+            color: #95a5a6;
+            text-align: center;
+            padding: 10px;
+            box-sizing: border-box;
+            flex-shrink: 0;
+        }
+        .user-info {
+            flex-grow: 1;
+        }
+        .info-row {
+            margin-bottom: 12px;
+        }
+        .info-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            color: #95a5a6;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+            font-weight: 600;
+        }
+        .info-value {
+            font-size: 15px;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+        .code-highlight {
+            font-size: 18px;
+            color: #1b5e20;
+            font-weight: 700;
+            letter-spacing: 1px;
+            background-color: #e8f5e9;
+            padding: 4px 10px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+        /* Selo Parassematográfico Dourado no Canto Oposto */
+        .seal-authority {
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            width: 70px;
+            height: 70px;
+            border: 2px double #d4af37;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 8px;
+            color: #d4af37;
+            font-weight: bold;
+            text-align: center;
+            background: rgba(243,229,171,0.05);
+            transform: rotate(-15deg);
+            opacity: 0.8;
+        }
+        /* Estilos do Verso do Cartão */
+        .instructions-box {
+            text-align: left;
+            font-size: 13px;
+            line-height: 1.7;
+            color: #4a5568;
+            background-color: #f8fafc;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            margin-top: 15px;
+        }
+        .instructions-box ol {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .instructions-box li {
+            margin-bottom: 8px;
+        }
+        .slogan-cadmiv {
+            margin-top: 25px;
+            font-size: 16px;
+            font-weight: 700;
+            font-style: italic;
+            letter-spacing: 1px;
+            background: linear-gradient(45deg, #1b5e20, #d4af37);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .card-footer {
+            margin-top: 20px;
+            border-top: 1px solid #ecf0f1;
+            padding-top: 15px;
+            font-size: 10px;
+            color: #95a5a6;
+            letter-spacing: 0.5px;
+        }
+        .actions-area {
+            margin-top: 10px;
+            margin-bottom: 40px;
+        }
+        .btn-print {
+            background-color: #1b5e20;
+            color: white;
+            border: none;
+            padding: 14px 35px;
+            font-size: 15px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(27,94,32,0.2);
+            letter-spacing: 1px;
+        }
+        .btn-print:hover {
+            background-color: #2e7d32;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(27,94,32,0.3);
+        }
+        @media print {
+            body { background: none; padding: 0; }
+            .actions-area { display: none; }
+            .card-cadmiv {
+                box-shadow: none;
+                border: 2px solid #1b5e20;
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-container">
+    
+    <!-- LADO A: FRENTE DO CARTÃO -->
+    <div class="card-cadmiv">
+        <div class="gold-line"></div>
+        <div class="card-header">
+            <h2>CADMIV</h2>
+            <p>Credencial de Identificação e Proteção Nacional</p>
+        </div>
+
+        <div class="card-body">
+            <div class="photo-space">
+                Foto Digital<br>Documental
+            </div>
+            
+            <div class="user-info">
+                <div class="info-row">
+                    <div class="info-label">Nome do Titular</div>
+                    <div class="info-value">Carlos Henrique da Silva</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Registro Geral / CPF</div>
+                    <div class="info-value">000.000.000-00</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Código de Autenticidade Nacional</div>
+                    <div class="info-value"><span class="code-highlight">CAD-778899-BR</span></div>
+                </div>
+            </div>
+
+            <!-- Selo Heráldico Oposto à Foto -->
+            <div class="seal-authority">CADMIV<br>VALIDADO<br>✦ BR ✦</div>
+        </div>
+
+        <div class="card-footer">
+            FRENTE • SISTEMA CRIPTOGRAFADO VIA NUVEM CADMIV
+        </div>
+    </div>
+
+
+    <!-- LADO B: VERSO DO CARTÃO -->
+    <div class="card-cadmiv">
+        <div class="gold-line"></div>
+        <div class="card-header">
+            <h2>CADMIV</h2>
+            <p>Disposições Legais e Regulamentares</p>
+        </div>
+
+        <div class="instructions-box">
+            <ol>
+                <li>Esta credencial é de uso pessoal, intransferível e protegida por sigilo criptográfico de conformidade nacional.</li>
+                <li>A autenticidade deste documento deve ser obrigatoriamente checada por autoridades policiais ou competentes através do portal oficial <strong>://cadmiv.com.br/validar-sistema</strong>.</li>
+                <li>Qualquer tentativa de adulteração visual ou inserção de códigos falsificados sujeitará o infrator às sanções civis e penais previstas na legislação brasileira.</li>
+            </ol>
+        </div>
+
+        <!-- O Slogan Oficial Corporativo -->
+        <div class="slogan-cadmiv">
+            "CADMIV: Dignidade Blindada, Cidadania Assegurada."
+        </div>
+
+        <div class="card-footer">
+            VERSO • OUVIDORIA E SUPORTE NACIONAL DE CREDENCIAIS
+        </div>
+    </div>
+
+    <!-- ÁREA DE IMPRESSÃO -->
+    <div class="actions-area">
+        <button class="btn-print" onclick="window.print()">IMPRIMIR CREDENCIAL COMPLETA (TAMANHO CARTA)</button>
+    </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CADMIV - Cadastro de Credencial Nacional</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f4f7f6 0%, #e3eae7 100%);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #2c3e50;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+            width: 100%;
+            max-width: 550px;
+            padding: 40px;
+            box-sizing: border-box;
+            border-top: 6px solid #1b5e20; /* Verde Imperial */
+            position: relative;
+        }
+        .gold-accent {
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(90deg, #d4af37, #f3e5ab); /* Dourado Reluzente */
+            margin: 0 auto 20px auto;
+            border-radius: 2px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            color: #1b5e20;
+            margin: 0;
+            font-size: 26px;
+            letter-spacing: 1px;
+        }
+        .header p {
+            color: #7f8c8d;
+            margin: 5px 0 0 0;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .form-group {
+            margin-bottom: 22px;
+            text-align: left;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 15px;
+            background-color: #fdfdfd;
+            transition: all 0.3s ease;
+        }
+        input[type="text"]:focus {
+            border-color: #28a745;
+            box-shadow: 0 0 8px rgba(40,167,69,0.15);
+            outline: none;
+            background-color: #ffffff;
+        }
+        .btn-submit {
+            width: 100%;
+            background-color: #1b5e20;
+            color: white;
+            border: none;
+            padding: 14px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(27,94,32,0.2);
+            letter-spacing: 1px;
+            margin-top: 10px;
+        }
+        .btn-submit:hover {
+            background-color: #2e7d32;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(27,94,32,0.3);
+        }
+        .btn-back {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #7f8c8d;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .btn-back:hover { color: #1b5e20; }
+
+        /* FAIXA VERDE ESMERALDA DE SUCESSO APÓS PAGAMENTO */
+        .success-box {
+            display: none;
+            background-color: #e8f5e9;
+            border: 2px solid #a5d6a7;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: center;
+            animation: fadeIn 0.5s ease;
+        }
+        .success-title {
+            color: #1b5e20;
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        .code-display {
+            font-size: 24px;
+            font-weight: 800;
+            color: #1b5e20;
+            letter-spacing: 2px;
+            background-color: #ffffff;
+            padding: 10px;
+            border-radius: 6px;
+            border: 2px dashed #d4af37; /* Borda Dourada */
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+        .btn-download {
+            display: inline-block;
+            background: linear-gradient(135deg, #d4af37 0%, #aa8010 100%);
+            color: white;
+            text-decoration: none;
+            padding: 12px 25px;
+            font-weight: bold;
+            border-radius: 6px;
+            font-size: 14px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        /* ESTILOS DA JANELA FLUTUANTE DO PIX (MODAL) */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background-color: #ffffff;
+            border-radius: 12px;
+            padding: 30px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            border-top: 6px solid #1b5e20;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            animation: scaleUp 0.3s ease;
+        }
+        .qrcode-simulado {
+            width: 180px;
+            height: 180px;
+            background-color: #f8fafc;
+            border: 2px solid #e2e8f0;
+            margin: 20px auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 12px;
+            color: #7f8c8d;
+            font-weight: bold;
+        }
+        .btn-pay-simulate {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+            width: 100%;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes scaleUp { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    </style>
+</head>
+<body>
+
+<div class="container" id="formContainer">
+    <div class="gold-accent"></div>
+    <div class="header">
+        <h1>CADMIV</h1>
+        <p>Emissão de Credencial Protegida</p>
+    </div>
+
+    <!-- Campos de Entrada -->
+    <div class="form-group">
+        <label for="nomeCompleto">Nome Completo do Titular:</label>
+        <input type="text" id="nomeCompleto" placeholder="Digite seu nome completo">
+    </div>
+
+    <div class="form-group">
+        <label for="cpfUsuario">CPF / Registro Nacional:</label>
+        <input type="text" id="cpfUsuario" placeholder="000.000.000-00">
+    </div>
+
+    <div class="form-group">
+        <label for="telefoneUsuario">Telefone de Contato (WhatsApp):</label>
+        <input type="text" id="telefoneUsuario" placeholder="(00) 90000-0000">
+    </div>
+
+    <button class="btn-submit" onclick="abrirJanelaPix()">SOLICITAR EMISSÃO CORPORATIVA</button>
+
+    <!-- CAIXINHA VERDE RELUZENTE QUE SURGIRÁ EMBAIXO APÓS O PAGAMENTO -->
+    <div class="success-box" id="caixaSucesso">
+        <div class="success-title">✨ PARABÉNS! SEU CÓDIGO NACIONAL FOI GERADO COM SUCESSO:</div>
+        <div class="code-display">CAD-778899-BR</div>
+        <br>
+        <a href="cartao.html" class="btn-download">BAIXAR CREDENCIAL DIGITAL</a>
+    </div>
+
+    <a href="index.html" class="btn-back">← Voltar para a Página Inicial</a>
+</div>
+
+<!-- A JANELA FLUTUANTE DO PIX (MODAL) -->
+<div class="modal-overlay" id="modalPix">
+    <div class="modal-content">
+        <div class="gold-accent"></div>
+        <h2 style="color: #1b5e20; margin: 0; font-size: 20px;">Pagamento Seguro via PIX</h2>
+        <p style="font-size: 13px; color: #7f8c8d; margin: 5px 0 0 0;">AMBIENTE DE TESTES INTEGRADO</p>
+        
+        <!-- O Quadrado do QR Code de mentira -->
+        <div class="qrcode-simulado">
+            [ QR CODE SIMULADO ]<br>CADMIV GATEWAY
+        </div>
+        
+        <p style="font-size: 12px; color: #2c3e50; line-height: 1.5; margin: 15px 0;">
+            Escaneie o código acima no aplicativo do seu banco ou use a chave de testes para simular a aprovação instantânea.
+        </p>
+        
+        <!-- Botão do Sandbox para simular o aviso do banco -->
+        <button class="btn-pay-simulate" onclick="simularConfirmacaoBanco()">SIMULAR CONFIRMAÇÃO DO PAGAMENTO</button>
+    </div>
+</div>
+
+<script>
+    function abrirJanelaPix() {
+        const nome = document.getElementById('nomeCompleto').value.trim();
+        const cpf = document.getElementById('cpfUsuario').value.trim();
+        
+        if(nome === "" || cpf === "") {
+            alert("Por favor, preencha os dados cadastrais antes de prosseguir.");
+            return;
+        }
+        
+        // Abre a janela flutuante no centro da tela
+        document.getElementById('modalPix').style.display = "flex";
+    }
+
+    function simularConfirmacaoBanco() {
+        // Fecha a janela do Pix
+        document.getElementById('modalPix').style.display = "none";
+        
+        // Faz surgir a maravilhosa caixinha Verde Esmeralda com bordas douradas embaixo!
+        document.getElementById('caixaSucesso').style.display = "block";
+        
+        // Rola a tela suavemente para baixo para focar no prêmio
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }
+</script>
+
+</body>
+</html>
