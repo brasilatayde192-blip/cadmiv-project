@@ -3,47 +3,147 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CADMIV - Cadastro Corporativo</title>
+    <title>CADMIV - Cadastro de Segurança Nacional</title>
     <style>
-        body { font-family: Arial, sans-serif; background-color: #f4f4f9; padding: 30px; text-align: center; }
-        .form-container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); display: inline-block; width: 100%; max-width: 500px; text-align: left; }
-        h2 { color: #2c3e50; text-align: center; }
-        label { font-weight: bold; display: block; margin-top: 10px; color: #34495e; }
-        input { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #bdc3c7; border-radius: 5px; box-sizing: border-box; }
-        .btn-submit { background-color: #2980b9; color: white; border: none; padding: 15px; width: 100%; border-radius: 5px; font-weight: bold; font-size: 16px; margin-top: 20px; cursor: pointer; }
-        .btn-submit:hover { background-color: #2471a3; }
+        body { font-family: Arial, sans-serif; background-color: #f4f4f9; padding: 20px; text-align: center; color: #2c3e50; }
+        .container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); display: inline-block; width: 100%; max-width: 600px; text-align: left; box-sizing: border-box; }
+        h2, h3 { text-align: center; color: #2c3e50; }
+        .section-title { background-color: #34495e; color: white; padding: 10px; border-radius: 5px; margin-top: 20px; font-size: 16px; font-weight: bold; }
+        label { font-weight: bold; display: block; margin-top: 15px; color: #34495e; }
+        input, select { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #bdc3c7; border-radius: 5px; box-sizing: border-box; font-size: 14px; }
+        .alert-box { background-color: #fadbd8; border-left: 5px solid #e74c3c; color: #78281f; padding: 15px; border-radius: 5px; margin-top: 15px; display: none; font-weight: bold; }
+        .offer-box { background-color: #e8f8f5; border: 2px dashed #27ae60; padding: 20px; border-radius: 5px; margin-top: 25px; text-align: justify; }
+        .price-option { background: white; border: 1px solid #bdc3c7; padding: 15px; margin-top: 10px; border-radius: 5px; display: flex; align-items: center; cursor: pointer; }
+        .price-option input { width: auto; margin-top: 0; margin-right: 15px; transform: scale(1.3); }
+        .price-label { font-size: 16px; font-weight: bold; color: #27ae60; }
+        .btn-next { background-color: #27ae60; color: white; border: none; padding: 15px; width: 100%; border-radius: 5px; font-weight: bold; font-size: 16px; margin-top: 25px; cursor: pointer; }
+        .btn-next:hover { background-color: #219150; }
     </style>
+    <script>
+        function verificarRegistro() {
+            var jaCadastrado = document.getElementById("historico").value;
+            var alerta = document.getElementById("alerta-trava");
+            if (jaCadastrado === "sim") {
+                alerta.style.display = "block";
+                document.getElementById("btn-enviar").disabled = true;
+                document.getElementById("btn-enviar").style.backgroundColor = "#bdc3c7";
+            } else {
+                alerta.style.display = "none";
+                document.getElementById("btn-enviar").disabled = false;
+                document.getElementById("btn-enviar").style.backgroundColor = "#27ae60";
+            }
+        }
+        function avançarPagamento() {
+            window.location.href = "cartao.html";
+        }
+    </script>
 </head>
 <body>
-    <div class="form-container">
-        <h2>Cadastro de Usuário CADMIV</h2>
+
+    <div class="container">
+        <h2>Cadastro do Usuário CADMIV</h2>
+        <p style="text-align: center; color: #7f8c8d;">Insira os dados obrigatórios para validação nacional.</p>
+
         <form>
+            <!-- SEÇÃO 1: DADOS DO PROPRIETÁRIO -->
+            <div class="section-title">1. Dados do Proprietário e Entrega</div>
+            
             <label>Nome Completo:</label>
-            <input type="text" placeholder="Digite seu nome">
+            <input type="text" placeholder="Digite seu nome completo" required>
 
             <label>E-mail:</label>
-            <input type="email" placeholder="Digite seu e-mail">
+            <input type="email" placeholder="Digite seu e-mail corporativo" required>
 
             <label>CEP:</label>
-            <input type="text" placeholder="00000-000">
+            <input type="text" placeholder="00000-000" required>
 
-            <label>Logradouro (Rua/Avenida):</label>
-            <input type="text" placeholder="Nome da rua">
+            <label>Logradouro (Rua / Avenida):</label>
+            <input type="text" placeholder="Nome da rua ou avenida" required>
 
             <label>Número:</label>
-            <input type="text" placeholder="Nº">
+            <input type="text" placeholder="Nº" required>
 
             <label>Bairro:</label>
-            <input type="text" placeholder="Nome do bairro">
+            <input type="text" placeholder="Nome do bairro" required>
 
             <label>Cidade:</label>
-            <input type="text" placeholder="Nome da cidade">
+            <input type="text" placeholder="Nome da cidade" required>
 
             <label>Estado:</label>
-            <input type="text" placeholder="UF">
+            <input type="text" placeholder="UF" required>
 
-            <button type="button" class="btn-submit">Salvar Cadastro Completo</button>
+            <!-- SEÇÃO 2: DADOS DO VEÍCULO -->
+            <div class="section-title">2. Dados do Veículo Autopropelido</div>
+
+            <label>Número de Identificação do Veículo (Chassi / Série):</label>
+            <input type="text" placeholder="Digite o número de série" required>
+
+            <label>Número da Nota Fiscal de Compra:</label>
+            <input type="text" placeholder="Número da NF" required>
+
+            <label>Ano de Fabricação:</label>
+            <input type="text" placeholder="Ex: 2024" required>
+
+            <label>Cor do Veículo:</label>
+            <input type="text" placeholder="Cor predominante" required>
+
+            <label>Estado de Conservação:</label>
+            <select required>
+                <option value="">Selecione...</option>
+                <option value="novo">Veículo Novo</option>
+                <option value="usado">Veículo Usado</option>
+            </select>
+
+            <label>Este veículo já foi cadastrado anteriormente no CADMIV?</label>
+            <select id="historico" onchange="verificarRegistro()" required>
+                <option value="">Selecione...</option>
+                <option value="nao">Não, este é o primeiro cadastro</option>
+                <option value="sim">Sim, já possui registro anterior</option>
+            </select>
+
+            <!-- TRAVA DE SEGURANÇA JURÍDICA -->
+            <div id="alerta-trava" class="alert-box">
+                ⚠️ BLOQUEIO DE SEGURANÇA JURÍDICA NACIONAL:<br>
+                Este veículo já possui um registro ativo no sistema. A conclusão deste novo cadastro só será permitida com a autorização expressa do primeiro proprietário cadastrado.
+            </div>
+
+            <!-- SEÇÃO 3: TEXTO DE CONCRETIZAÇÃO E PREÇOS -->
+            <div class="section-title">3. Concretização do Registro Corporativo</div>
+            
+            <div class="offer-box">
+                <strong>CONCRETIZAÇÃO E PROTEÇÃO OFICIAL DA SUA CREDENCIAL</strong><br><br>
+                <em>Atenção: O seu veículo autopropelido passou com sucesso pela nossa Trava de Segurança Jurídica Nacional e está pré-aprovado para registro.</em><br><br>
+                <em>Para oficializar, selar e concretizar o seu cadastro de forma definitiva, emita agora a sua <strong>Credencial Digital Corporativa CADMIV</strong>. Este cartão digital não é apenas um comprovante; ele é o documento que valida a propriedade legal do seu veículo perante a Plataforma de Conformidade Nacional, garantindo proteção contra fraudes, roubos e clonagens em todo o território.</em><br><br>
+                <em>Escolha abaixo o combo ideal para a proteção do seu patrimônio e receba a sua credencial oficial pronta para uso e impressão em tamanho carta:</em>
+            </div>
+
+            <div class="price-option">
+                <input type="radio" name="combo" checked>
+                <div>
+                    <strong>Emitir 1 Cartão Digital</strong><br>
+                    <span class="price-label">Taxa Única: $24.99 (Via PIX Cielo)</span>
+                </div>
+            </div>
+
+            <div class="price-option">
+                <input type="radio" name="combo">
+                <div>
+                    <strong>Emitir 2 Cartões Digitais</strong><br>
+                    <span class="price-label">Taxa Única: $39.99 (Via PIX Cielo)</span>
+                </div>
+            </div>
+
+            <div class="price-option">
+                <input type="radio" name="combo">
+                <div>
+                    <strong>Emitir 3 Cartões Digitais (Combo-Familiar)</strong><br>
+                    <span class="price-label">Taxa Única: $49.99 (Via PIX Cielo)</span>
+                </div>
+            </div>
+
+            <button type="button" id="btn-enviar" onclick="avançarPagamento()" class="btn-next">Salvar Cadastro Completo e Gerar PIX</button>
         </form>
     </div>
+
 </body>
 </html>
