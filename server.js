@@ -3,11 +3,11 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// O motor agora lê os arquivos na raiz e em subpastas automaticamente
-app.use(express.static(path.join(__dirname)));
-app.use(express.static(path.join(__dirname, 'CADMIV')));
+// Motor ultra inteligente: entrega qualquer arquivo HTML automaticamente, mesmo sem digitar .html no link!
+app.use(express.static(__dirname, { extensions: ['html', 'htm'] }));
+app.use(express.json());
 
-// Abre o lindo Cartão de Boas-Vindas principal
+// Rota principal para o Cartão de Boas-Vindas
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
