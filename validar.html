@@ -3,55 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CADMIV - Pagamento e Validação</title>
+    <title>CADMIV - Pagamento e Fotos da Credencial</title>
     <style>
         body { font-family: Arial, sans-serif; background-color: #f4f4f9; padding: 20px; text-align: center; color: #2c3e50; }
-        .container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); display: inline-block; width: 100%; max-width: 500px; box-sizing: border-box; }
-        h2 { color: #27ae60; }
-        .pix-box { background-color: #e8f8f5; border: 2px solid #27ae60; padding: 20px; border-radius: 10px; margin-top: 20px; }
+        .container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); display: inline-block; width: 100%; max-width: 550px; box-sizing: border-box; text-align: left; }
+        h2 { color: #27ae60; text-align: center; }
+        p { text-align: center; }
+        .pix-box { background-color: #e8f8f5; border: 2px solid #27ae60; padding: 20px; border-radius: 10px; margin-top: 20px; text-align: center; }
         .qr-placeholder { background-color: #eaeded; width: 200px; height: 200px; margin: 20px auto; display: flex; align-items: center; justify-content: center; border: 2px dashed #bdc3c7; font-weight: bold; color: #7f8c8d; }
-        .btn-confirm { background-color: #2980b9; color: white; border: none; padding: 15px; width: 100%; border-radius: 5px; font-weight: bold; font-size: 16px; margin-top: 25px; cursor: pointer; text-decoration: none; display: block; box-sizing: border-box; }
+        .btn-confirm { background-color: #2980b9; color: white; border: none; padding: 15px; width: 100%; border-radius: 5px; font-weight: bold; font-size: 16px; margin-top: 25px; cursor: pointer; text-decoration: none; display: block; box-sizing: border-box; text-align: center; }
         .btn-confirm:hover { background-color: #2471a3; }
-        .upload-photo-section { background-color: #fcf3cf; border: 1px dashed #f39c12; padding: 15px; border-radius: 5px; margin-top: 20px; text-align: left; }
-        .upload-btn { background-color: #f39c12; color: white; padding: 8px 15px; border: none; border-radius: 3px; cursor: pointer; font-weight: bold; font-size: 12px; display: inline-block; margin-top: 5px; }
+        
+        /* Estilos Novos para as Fotos e Câmera */
+        .photo-section { background-color: #fcf3cf; border: 1px dashed #f39c12; padding: 20px; border-radius: 5px; margin-top: 20px; }
+        .dependent-box { background: white; border: 1px solid #f39c12; padding: 15px; border-radius: 5px; margin-top: 15px; }
+        .upload-btn { background-color: #f39c12; color: white; padding: 10px 15px; border: none; border-radius: 3px; cursor: pointer; font-weight: bold; font-size: 13px; display: inline-block; margin-top: 10px; margin-right: 10px; }
+        .camera-btn { background-color: #d35400; color: white; padding: 10px 15px; border: none; border-radius: 3px; cursor: pointer; font-weight: bold; font-size: 13px; display: inline-block; margin-top: 10px; }
+        select { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #bdc3c7; border-radius: 5px; box-sizing: border-box; }
+        label { font-weight: bold; display: block; margin-top: 10px; }
+        video { width: 100%; max-width: 320px; display: none; margin-top: 10px; border-radius: 5px; background: black; }
     </style>
     <script>
-        // Função que leva o cliente para a emissão do cartão após o pagamento
         function finalizarProcesso() {
-            alert("Pagamento PIX confirmado com sucesso! Emitindo sua credencial corporativa.");
+            alert("Pagamento PIX confirmado com sucesso! Emitindo suas credenciais corporativas CADMIV.");
             window.location.href = "cartao.html";
+        }
+
+        // Função moderna para ligar a câmera do celular/computador na hora
+        function ligarCamera(idVideo) {
+            var video = document.getElementById(idVideo);
+            video.style.display = "block";
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(function (stream) { video.srcObject = stream; video.play(); })
+                .catch(function (err) { alert("Câmera não encontrada ou permissão negada."); });
         }
     </script>
 </head>
 <body>
 
     <div class="container">
-        <h2>Portal de Pagamento Seguro</h2>
+        <h2>Portal de Pagamento e Identificação</h2>
         <p>Sua transação está protegida pela Plataforma de Conformidade Nacional.</p>
 
-        <!-- ESPAÇO PARA O CLIENTE ENVIAR A FOTO DO CARTÃO DIGITAL -->
-        <div class="upload-photo-section">
-            <strong>📸 FOTO DA CREDENCIAL DIGITAL:</strong>
-            <p style="margin: 5px 0; font-size: 13px; color: #7f8c8d;">Clique abaixo para selecionar a foto de perfil que será impressa no seu Cartão Digital corporativo.</p>
-            <input type="file" id="foto-usuario" accept="image/*" style="display: none;" onchange="alert('Foto carregada com sucesso! Ela será impressa no seu cartão.')">
-            <button type="button" class="upload-btn" onclick="document.getElementById('foto-usuario').click()">Clique aqui para enviar sua foto</button>
+        <!-- SEÇÃO DE FOTOS COM REGRAS DO COMBO FAMILIAR -->
+        <div class="photo-section">
+            <strong>📸 RECONHECIMENTO VISUAL DA CREDENCIAL DIGITAL</strong>
+            <p style="margin: 5px 0; font-size: 13px; color: #7f8c8d;">Personalize as suas credenciais oficiais enviando um arquivo ou tirando uma foto atual na hora.</p>
+            
+            <!-- TITULAR DO CARTÃO -->
+            <div class="dependent-box">
+                <span style="font-weight: bold; color: #d35400;">• Foto do Titular da CADMIV:</span>
+                <br>
+                <input type="file" id="foto-titular" accept="image/*" style="display: none;" onchange="alert('Foto do Titular carregada!')">
+                <button type="button" class="upload-btn" onclick="document.getElementById('foto-titular').click()">📁 Escolher Arquivo</button>
+                <button type="button" class="camera-btn" onclick="ligarCamera('video-titular')">📷 Tirar Foto na Hora</button>
+                <video id="video-titular"></video>
+            </div>
+
+            <!-- ADICIONAL DO COMBO FAMILIAR -->
+            <div class="dependent-box">
+                <span style="font-weight: bold; color: #2c3e50;">• Foto Adicional (Combo Familiar):</span>
+                
+                <label>Selecione o Grau de Parentesco:</label>
+                <select>
+                    <option value="">Selecione o parentesco...</option>
+                    <option value="filho">Filho(a)</option>
+                    <option value="primo">Primo(a)</option>
+                    <option value="irmao">Irmão/Irmã</option>
+                    <option value="neto">Neto(a)</option>
+                    <option value="amigo">Amigo(a)</option>
+                </select>
+
+                <input type="file" id="foto-dependente" accept="image/*" style="display: none;" onchange="alert('Foto do Dependente carregada!')">
+                <button type="button" class="upload-btn" onclick="document.getElementById('foto-dependente').click()">📁 Escolher Arquivo</button>
+                <button type="button" class="camera-btn" onclick="ligarCamera('video-dependente')">📷 Tirar Foto na Hora</button>
+                <video id="video-dependente"></video>
+            </div>
         </div>
 
-        <!-- ÁREA DO PIX PREPARADA PARA A NOVA COMPANHIA -->
+        <!-- ÁREA DO PIX PREPARADA -->
         <div class="pix-box">
             <strong>GERANDO PIX AUTOMÁTICO...</strong>
             <p style="font-size: 14px; color: #7f8c8d; margin-top: 5px;">Sistema integrado via API com: <strong>[NOME DA NOVA COMPANHIA]</strong></p>
-            
-            <!-- Simulador do QR Code que a nova companhia vai gerar -->
-            <div class="qr-placeholder">
-                [QR CODE DO PIX]
-            </div>
-            
+            <div class="qr-placeholder">[QR CODE DO PIX]</div>
             <p style="font-size: 13px; font-weight: bold; color: #c0392b;">⚠️ Copie o código PIX no seu banco ou escaneie o QR Code acima para pagar.</p>
         </div>
 
-        <!-- Botão para avançar e liberar o cartão após pagar -->
-        <button type="button" onclick="finalizarProcesso()" class="btn-confirm">Confirmar Pagamento e Gerar Cartão Digital</button>
+        <button type="button" onclick="finalizarProcesso()" class="btn-confirm">Confirmar Pagamento e Gerar Cartões Digitais</button>
     </div>
 
 </body>
