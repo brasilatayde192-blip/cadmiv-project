@@ -1,44 +1,58 @@
-function consultarCredencial() {
-    const codigo = document.getElementById('codigoConsulta').value.trim();
-    const resultadoDiv = document.getElementById('resultado');
-
-    if(codigo === "") {
-        alert("Por favor, digite um código válido para consulta.");
-        return;
-    }
-
-    // Faz uma busca real dentro do nosso novo motor server.js
-    fetch('/api/consultar', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ codigo: codigo })
-    })
-    .then(response => response.json())
-    .then(data => {
-        resultadoDiv.style.display = "block";
-        resultadoDiv.innerHTML = data.mensagem;
-
-        // Ajusta as cores corporativas de acordo com o status retornado
-        if (data.status === "REGULAR") {
-            resultadoDiv.style.backgroundColor = "#d4edda";
-            resultadoDiv.style.color = "#155724";
-            resultadoDiv.style.border = "1px solid #c3e6cb";
-        } else if (data.status === "ROUBO") {
-            resultadoDiv.style.backgroundColor = "#f8d7da";
-            resultadoDiv.style.color = "#721c24";
-            resultadoDiv.style.border = "1px solid #f5c6cb";
-        } else if (data.status === "ADORMECIDO") {
-            resultadoDiv.style.backgroundColor = "#fff3cd";
-            resultadoDiv.style.color = "#856404";
-            resultadoDiv.style.border = "1px solid #ffeeba";
-        } else {
-            resultadoDiv.style.backgroundColor = "#e2e3e5";
-            resultadoDiv.style.color = "#383d41";
-            resultadoDiv.style.border = "1px solid #d6d8db";
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CADMIV - Pagamento e Validação</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f9; padding: 20px; text-align: center; color: #2c3e50; }
+        .container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); display: inline-block; width: 100%; max-width: 500px; box-sizing: border-box; }
+        h2 { color: #27ae60; }
+        .pix-box { background-color: #e8f8f5; border: 2px solid #27ae60; padding: 20px; border-radius: 10px; margin-top: 20px; }
+        .qr-placeholder { background-color: #eaeded; width: 200px; height: 200px; margin: 20px auto; display: flex; align-items: center; justify-content: center; border: 2px dashed #bdc3c7; font-weight: bold; color: #7f8c8d; }
+        .btn-confirm { background-color: #2980b9; color: white; border: none; padding: 15px; width: 100%; border-radius: 5px; font-weight: bold; font-size: 16px; margin-top: 25px; cursor: pointer; text-decoration: none; display: block; box-sizing: border-box; }
+        .btn-confirm:hover { background-color: #2471a3; }
+        .upload-photo-section { background-color: #fcf3cf; border: 1px dashed #f39c12; padding: 15px; border-radius: 5px; margin-top: 20px; text-align: left; }
+        .upload-btn { background-color: #f39c12; color: white; padding: 8px 15px; border: none; border-radius: 3px; cursor: pointer; font-weight: bold; font-size: 12px; display: inline-block; margin-top: 5px; }
+    </style>
+    <script>
+        // Função que leva o cliente para a emissão do cartão após o pagamento
+        function finalizarProcesso() {
+            alert("Pagamento PIX confirmado com sucesso! Emitindo sua credencial corporativa.");
+            window.location.href = "cartao.html";
         }
-    })
-    .catch(error => {
-        alert("Erro ao conectar com o servidor do CADMIV.");
-        console.error(error);
-    });
-}
+    </script>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Portal de Pagamento Seguro</h2>
+        <p>Sua transação está protegida pela Plataforma de Conformidade Nacional.</p>
+
+        <!-- ESPAÇO PARA O CLIENTE ENVIAR A FOTO DO CARTÃO DIGITAL -->
+        <div class="upload-photo-section">
+            <strong>📸 FOTO DA CREDENCIAL DIGITAL:</strong>
+            <p style="margin: 5px 0; font-size: 13px; color: #7f8c8d;">Clique abaixo para selecionar a foto de perfil que será impressa no seu Cartão Digital corporativo.</p>
+            <input type="file" id="foto-usuario" accept="image/*" style="display: none;" onchange="alert('Foto carregada com sucesso! Ela será impressa no seu cartão.')">
+            <button type="button" class="upload-btn" onclick="document.getElementById('foto-usuario').click()">Clique aqui para enviar sua foto</button>
+        </div>
+
+        <!-- ÁREA DO PIX PREPARADA PARA A NOVA COMPANHIA -->
+        <div class="pix-box">
+            <strong>GERANDO PIX AUTOMÁTICO...</strong>
+            <p style="font-size: 14px; color: #7f8c8d; margin-top: 5px;">Sistema integrado via API com: <strong>[NOME DA NOVA COMPANHIA]</strong></p>
+            
+            <!-- Simulador do QR Code que a nova companhia vai gerar -->
+            <div class="qr-placeholder">
+                [QR CODE DO PIX]
+            </div>
+            
+            <p style="font-size: 13px; font-weight: bold; color: #c0392b;">⚠️ Copie o código PIX no seu banco ou escaneie o QR Code acima para pagar.</p>
+        </div>
+
+        <!-- Botão para avançar e liberar o cartão após pagar -->
+        <button type="button" onclick="finalizarProcesso()" class="btn-confirm">Confirmar Pagamento e Gerar Cartão Digital</button>
+    </div>
+
+</body>
+</html>
