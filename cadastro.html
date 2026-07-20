@@ -33,8 +33,9 @@
                 document.getElementById("btn-enviar").style.backgroundColor = "#27ae60";
             }
         }
+        // CORREÇÃO DO FLUXO: Direciona primeiro para a tela de geração do PIX
         function avançarPagamento() {
-            window.location.href = "cartao.html";
+            window.location.href = "validar";
         }
     </script>
 </head>
@@ -121,7 +122,7 @@
                 <input type="radio" name="combo" checked>
                 <div>
                     <strong>Emitir 1 Cartão Digital</strong><br>
-                    <span class="price-label">Taxa Única: $24.99 (Via PIX Cielo)</span>
+                    <span class="price-label">Taxa Única: $24.99 (Via PIX Seguro)</span>
                 </div>
             </div>
 
@@ -129,7 +130,7 @@
                 <input type="radio" name="combo">
                 <div>
                     <strong>Emitir 2 Cartões Digitais</strong><br>
-                    <span class="price-label">Taxa Única: $39.99 (Via PIX Cielo)</span>
+                    <span class="price-label">Taxa Única: $39.99 (Via PIX Seguro)</span>
                 </div>
             </div>
 
@@ -137,7 +138,7 @@
                 <input type="radio" name="combo">
                 <div>
                     <strong>Emitir 3 Cartões Digitais (Combo-Familiar)</strong><br>
-                    <span class="price-label">Taxa Única: $49.99 (Via PIX Cielo)</span>
+                    <span class="price-label">Taxa Única: $49.99 (Via PIX Seguro)</span>
                 </div>
             </div>
 
