@@ -9,6 +9,7 @@
         .container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); display: inline-block; width: 100%; max-width: 600px; text-align: left; box-sizing: border-box; }
         h2, h3 { text-align: center; color: #2c3e50; }
         .section-title { background-color: #34495e; color: white; padding: 10px; border-radius: 5px; margin-top: 20px; font-size: 16px; font-weight: bold; }
+        .health-title { background-color: #c0392b; color: white; padding: 10px; border-radius: 5px; margin-top: 20px; font-size: 16px; font-weight: bold; }
         label { font-weight: bold; display: block; margin-top: 15px; color: #34495e; }
         input, select { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #bdc3c7; border-radius: 5px; box-sizing: border-box; font-size: 14px; }
         .alert-box { background-color: #fadbd8; border-left: 5px solid #e74c3c; color: #78281f; padding: 15px; border-radius: 5px; margin-top: 15px; display: none; font-weight: bold; }
@@ -18,6 +19,11 @@
         .price-label { font-size: 16px; font-weight: bold; color: #27ae60; }
         .btn-next { background-color: #27ae60; color: white; border: none; padding: 15px; width: 100%; border-radius: 5px; font-weight: bold; font-size: 16px; margin-top: 25px; cursor: pointer; }
         .btn-next:hover { background-color: #219150; }
+        
+        /* Estilo para as bolinhas do Fator Sanguíneo */
+        .blood-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 5px; }
+        .blood-option { display: flex; align-items: center; background: #f8f9f9; padding: 10px; border: 1px solid #d5dbdb; border-radius: 5px; cursor: pointer; }
+        .blood-option input { width: auto; margin-top: 0; margin-right: 8px; }
     </style>
     <script>
         function verificarRegistro() {
@@ -33,7 +39,6 @@
                 document.getElementById("btn-enviar").style.backgroundColor = "#27ae60";
             }
         }
-        // CORREÇÃO DO FLUXO: Direciona primeiro para a tela de geração do PIX
         function avançarPagamento() {
             window.location.href = "validar";
         }
@@ -73,6 +78,53 @@
             <label>Estado:</label>
             <input type="text" placeholder="UF" required>
 
+            <!-- SEÇÃO NOVA: SAÚDE E EMERGÊNCIA CORPORATIVA -->
+            <div class="health-title">🚨 Protocolo de Saúde e Emergência</div>
+
+            <label>Em caso de emergência, ligar para:</label>
+            <select required>
+                <option value="">Selecione o contato...</option>
+                <option value="pai">Pai</option>
+                <option value="mae">Mãe</option>
+                <option value="irmao">Irmão/Irmã</option>
+                <option value="tio">Tio(a)</option>
+                <option value="filho">Filho(a)</option>
+                <option value="primo">Primo(a)</option>
+                <option value="cunhado">Cunhado(a)</option>
+                <option value="amigo">Amigo(a)</option>
+            </select>
+
+            <label>Telefone Fixo ou Celular do Contato:</label>
+            <input type="text" placeholder="(00) 00000-0000" required>
+
+            <label>Fator Sanguíneo (Selecione a opção correspondente):</label>
+            <div class="blood-grid">
+                <div class="blood-option"><input type="radio" name="sangue" value="A+"> A+</div>
+                <div class="blood-option"><input type="radio" name="sangue" value="A-"> A-</div>
+                <div class="blood-option"><input type="radio" name="sangue" value="B+"> B+</div>
+                <div class="blood-option"><input type="radio" name="sangue" value="B-"> B-</div>
+                <div class="blood-option"><input type="radio" name="sangue" value="AB+"> AB+</div>
+                <div class="blood-option"><input type="radio" name="sangue" value="AB-"> AB-</div>
+                <div class="blood-option"><input type="radio" name="sangue" value="O+"> O+</div>
+                <div class="blood-option"><input type="radio" name="sangue" value="O-"> O-</div>
+            </div>
+
+            <label>Possui Alergia a Látex?</label>
+            <select required>
+                <option value="">Selecione...</option>
+                <option value="nao">Não possuo alergia</option>
+                <option value="sim">Sim, sou alérgico(a)</option>
+            </select>
+
+            <label>Possui Alergia a algum Medicamento? (Escreva abaixo):</label>
+            <input type="text" placeholder="Digite os medicamentos ou escreva 'Nenhuma'">
+
+            <label>Médico de sua preferência (Nome Completo):</label>
+            <input type="text" placeholder="Nome do Doutor(a)">
+
+            <label>Telefone de contato do Médico:</label>
+            <input type="text" placeholder="(00) 00000-0000">
+
             <!-- SEÇÃO 2: DADOS DO VEÍCULO -->
             <div class="section-title">2. Dados do Veículo Autopropelido</div>
 
@@ -83,7 +135,7 @@
             <input type="text" placeholder="Número da NF" required>
 
             <label>Ano de Fabricação:</label>
-            <input type="text" placeholder="Ex: 2024" required>
+            <input type="text" placeholder="Ex: 2026" required>
 
             <label>Cor do Veículo:</label>
             <input type="text" placeholder="Cor predominante" required>
@@ -121,30 +173,3 @@
             <div class="price-option">
                 <input type="radio" name="combo" checked>
                 <div>
-                    <strong>Emitir 1 Cartão Digital</strong><br>
-                    <span class="price-label">Taxa Única: $24.99 (Via PIX Seguro)</span>
-                </div>
-            </div>
-
-            <div class="price-option">
-                <input type="radio" name="combo">
-                <div>
-                    <strong>Emitir 2 Cartões Digitais</strong><br>
-                    <span class="price-label">Taxa Única: $39.99 (Via PIX Seguro)</span>
-                </div>
-            </div>
-
-            <div class="price-option">
-                <input type="radio" name="combo">
-                <div>
-                    <strong>Emitir 3 Cartões Digitais (Combo-Familiar)</strong><br>
-                    <span class="price-label">Taxa Única: $49.99 (Via PIX Seguro)</span>
-                </div>
-            </div>
-
-            <button type="button" id="btn-enviar" onclick="avançarPagamento()" class="btn-next">Salvar Cadastro Completo e Gerar PIX</button>
-        </form>
-    </div>
-
-</body>
-</html>
