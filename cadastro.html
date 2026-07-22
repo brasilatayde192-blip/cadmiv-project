@@ -1,1 +1,181 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CADMIV - Cadastro de Segurança Nacional</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f9; padding: 20px; text-align: center; color: #2c3e50; }
+        .container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); display: inline-block; width: 100%; max-width: 650px; text-align: left; box-sizing: border-box; }
+        h2, h3 { text-align: center; color: #2c3e50; }
+        .section-title { background-color: #34495e; color: white; padding: 10px; border-radius: 5px; margin-top: 20px; font-size: 16px; font-weight: bold; }
+        .health-title { background-color: #c0392b; color: white; padding: 10px; border-radius: 5px; margin-top: 20px; font-size: 16px; font-weight: bold; }
+        .family-title { background-color: #2980b9; color: white; padding: 10px; border-radius: 5px; margin-top: 20px; font-size: 16px; font-weight: bold; }
+        label { font-weight: bold; display: block; margin-top: 15px; color: #34495e; }
+        input, select, textarea { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #bdc3c7; border-radius: 5px; box-sizing: border-box; font-size: 14px; }
+        .alert-box { background-color: #fadbd8; border-left: 5px solid #e74c3c; color: #78281f; padding: 15px; border-radius: 5px; margin-top: 15px; display: none; font-weight: bold; }
+        .offer-box { background-color: #e8f8f5; border: 2px dashed #27ae60; padding: 20px; border-radius: 5px; margin-top: 25px; text-align: justify; }
+        .price-option { background: white; border: 1px solid #bdc3c7; padding: 15px; margin-top: 10px; border-radius: 5px; display: flex; align-items: center; cursor: pointer; }
+        .price-option input { width: auto; margin-top: 0; margin-right: 15px; transform: scale(1.3); }
+        .price-label { font-size: 16px; font-weight: bold; color: #27ae60; }
+        .btn-next { background-color: #27ae60; color: white; border: none; padding: 15px; width: 100%; border-radius: 5px; font-weight: bold; font-size: 16px; margin-top: 25px; cursor: pointer; }
+        .btn-next:hover { background-color: #219150; }
+        .blood-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 5px; }
+        .blood-option { display: flex; align-items: center; background: #f8f9f9; padding: 10px; border: 1px solid #d5dbdb; border-radius: 5px; cursor: pointer; }
+        .blood-option input { width: auto; margin-top: 0; margin-right: 8px; }
+        .dependent-container { display: none; background: #ebf5fb; padding: 20px; border-radius: 5px; border: 1px solid #a9cce3; margin-top: 15px; }
+        .photo-btn { background-color: #e67e22; color: white; border: none; padding: 8px 12px; border-radius: 3px; cursor: pointer; font-size: 12px; font-weight: bold; margin-top: 5px; margin-right: 5px; }
+        video { width: 100%; max-width: 200px; display: none; margin-top: 10px; border-radius: 5px; background: black; }
+    </style>
+    <script>
+        function verificarRegistro() {
+            var jaCadastrado = document.getElementById("historico").value;
+            var alerta = document.getElementById("alerta-trava");
+            if (jaCadastrado === "sim") {
+                alerta.style.display = "block";
+                bloquearBotao(true);
+            } else {
+                alerta.style.display = "none";
+                bloquearBotao(false);
+            }
+        }
 
+        function verificarIdade() {
+            var anoNascimento = parseInt(document.getElementById("ano_nascimento").value);
+            var anoAtual = new Date().getFullYear();
+            var idade = anoAtual - anoNascimento;
+            var alertaIdade = document.getElementById("alerta-idade");
+            
+            if (idade < 18) {
+                alertaIdade.style.display = "block";
+                bloquearBotao(true);
+            } else {
+                alertaIdade.style.display = "none";
+                bloquearBotao(false);
+            }
+        }
+
+        function gerenciarCombo() {
+            var combo1 = document.getElementById("combo1").checked;
+            var combo2 = document.getElementById("combo2").checked;
+            var combo3 = document.getElementById("combo3").checked;
+            
+            document.getElementById("dep1").style.display = (combo2 || combo3) ? "block" : "none";
+            document.getElementById("dep2").style.display = combo3 ? "block" : "none";
+            document.getElementById("secao-responsabilidade").style.display = (combo2 || combo3) ? "block" : "none";
+        }
+
+        function bloquearBotao(status) {
+            var btn = document.getElementById("btn-enviar");
+            btn.disabled = status;
+            btn.style.backgroundColor = status ? "#bdc3c7" : "#27ae60";
+        }
+
+        function ligarCamera(idVideo) {
+            var video = document.getElementById(idVideo);
+            video.style.display = "block";
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(function(stream) { video.srcObject = stream; video.play(); })
+                .catch(function() { alert("Câmera não encontrada ou sem permissão."); });
+        }
+
+        function avançarPagamento() {
+            window.location.href = "validar";
+        }
+    </script>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Cadastro do Usuário CADMIV</h2>
+        <p style="text-align: center; color: #7f8c8d;">Plataforma Homologada para Registro de Patrimônio Nacional.</p>
+
+        <form>
+            <!-- SEÇÃO 1: DADOS DO PROPRIETÁRIO TITULAR -->
+            <div class="section-title">1. Dados do Proprietário e Entrega (Titular)</div>
+            
+            <label>Nome Completo:</label>
+            <input type="text" placeholder="Digite seu nome completo" required>
+
+            <label>Ano de Nascimento (Uso estrito para validação de maioridade 18+):</label>
+            <input type="number" id="ano_nascimento" onchange="verificarIdade()" placeholder="Ex: 1985" required>
+
+            <!-- TRAVA DE IDADE CRONOLÓGICA -->
+            <div id="alerta-idade" class="alert-box">
+                ❌ RESTRIÇÃO DE IDADE CRONOLÓGICA:<br>
+                Só é permitido cadastrar-se nesta plataforma pessoas maiores de 18 anos de idade.
+            </div>
+
+            <label>E-mail:</label>
+            <input type="email" placeholder="Digite seu e-mail corporativo" required>
+
+            <label>CEP:</label>
+            <input type="text" placeholder="00000-000" required>
+
+            <label>Logradouro (Rua / Avenida):</label>
+            <input type="text" placeholder="Nome da rua ou avenida" required>
+
+            <label>Número:</label>
+            <input type="text" placeholder="Nº" required>
+
+            <label>Bairro:</label>
+            <input type="text" placeholder="Nome do bairro" required>
+
+            <label>Cidade:</label>
+            <input type="text" placeholder="Nome da cidade" required>
+
+            <label>Estado:</label>
+            <input type="text" placeholder="UF" required>
+
+            <!-- SEÇÃO: PROTOCOLO DE SAÚDE E EMERGÊNCIA -->
+            <div class="health-title">🚨 Protocolo de Saúde e Emergência</div>
+
+            <label>Em caso de emergência, ligar para:</label>
+            <select required>
+                <option value="">Selecione o contato...</option>
+                <option value="pai">Pai</option>
+                <option value="mae">Mãe</option>
+                <option value="irmao">Irmão/Irmã</option>
+                <option value="tio">Tio(a)</option>
+                <option value="filho">Filho(a)</option>
+                <option value="primo">Primo(a)</option>
+                <option value="cunhado">Cunhado(a)</option>
+                <option value="amigo">Amigo(a)</option>
+            </select>
+
+            <label>Telefone Fixo ou Celular do Contato:</label>
+            <input type="text" placeholder="(00) 00000-0000" required>
+
+            <label>Fator Sanguíneo (Selecione a opção correspondente):</label>
+            <div class="blood-grid">
+                <div class="blood-option"><input type="radio" name="sangue" value="A+"> A+</div>
+                <div class="blood-option"><input type="radio" name="sangue" value="A-"> A-</div>
+                <div class="blood-option"><input type="radio" name="sangue" value="B+"> B+</div>
+                <div class="blood-option"><input type="radio" name="sangue" value="B-"> B-</div>
+                <div class="blood-option"><input type="radio" name="sangue" value="AB+"> AB+</div>
+                <div class="blood-option"><input type="radio" name="sangue" value="AB-"> AB-</div>
+                <div class="blood-option"><input type="radio" name="sangue" value="O+"> O+</div>
+                <div class="blood-option"><input type="radio" name="sangue" value="O-"> O-</div>
+            </div>
+
+            <label>Possui Alergia a Látex?</label>
+            <select required>
+                <option value="">Selecione...</option>
+                <option value="nao">Não possuo alergia</option>
+                <option value="sim">Sim, sou alérgico(a)</option>
+            </select>
+
+            <label>Possui Alergia a algum Medicamento? (Escreva abaixo):</label>
+            <input type="text" placeholder="Digite os medicamentos ou escreva 'Nenhuma'">
+
+            <label>Médico de sua preferência (Nome Completo):</label>
+            <input type="text" placeholder="Nome do Doutor(a)">
+
+            <label>Telefone de contato do Médico:</label>
+            <input type="text" placeholder="(00) 00000-0000">
+
+            <!-- SEÇÃO 2: DADOS DO VEÍCULO COM ADIÇÃO DOS MODELOS -->
+            <div class="section-title">2. Dados do Veículo Autopropelido</div>
+
+            <label>Modelo do Veículo:</label>
+            <select required>
