@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CADMIV - Login de Segurança Nacional</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f9; padding: 20px; text-align: center; color: #2c3e50; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        .login-container { background: white; padding: 40px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: left; box-sizing: border-box; }
+        h2 { text-align: center; color: #2c3e50; margin-bottom: 5px; }
+        p { text-align: center; color: #7f8c8d; font-size: 14px; margin-bottom: 25px; }
+        label { font-weight: bold; display: block; margin-top: 15px; color: #34495e; }
+        input { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #bdc3c7; border-radius: 5px; box-sizing: border-box; font-size: 14px; }
+        .btn-login { background-color: #2980b9; color: white; border: none; padding: 15px; width: 100%; border-radius: 5px; font-weight: bold; font-size: 16px; margin-top: 25px; cursor: pointer; }
+        .btn-login:hover { background-color: #2471a3; }
+        .footer-text { text-align: center; margin-top: 20px; font-size: 12px; color: #bdc3c7; }
+    </style>
+    <script>
+        function realizarLogin() {
+            var telefone = document.getElementById("login_telefone").value;
+            var senha = document.getElementById("login_senha").value;
+            
+            if (telefone === "" || senha === "") {
+                alert("Por favor, preencha todos os campos obrigatórios.");
+                return;
+            }
+            
+            // Direciona o usuário para a área logada do Cartão Digital corporativo
+            alert("Acesso autorizado! Entrando no painel de credenciais CADMIV.");
+            window.location.href = "cartao.html";
+        }
+    </script>
+</head>
+<body>
+
+    <div class="login-container">
+        <h2>Acesso ao Painel CADMIV</h2>
+        <p>Insira suas credenciais de segurança homologadas.</p>
+
+        <form onsubmit="event.preventDefault(); realizarLogin();">
+            <label>Telefone Celular (Com DDD):</label>
+            <input type="text" id="login_telefone" placeholder="Ex: 11999998888" required>
+
+            <label>Senha de Acesso:</label>
+            <input type="password" id="login_senha" placeholder="Digite sua senha" required>
+
+            <button type="submit" class="btn-login">Entrar no Sistema Seguro</button>
+        </form>
+        
+        <div class="footer-text">Plataforma sob conformidade de proteção nacional.</div>
+    </div>
+
+</body>
+</html>
