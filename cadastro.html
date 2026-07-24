@@ -14,6 +14,7 @@
         label { font-weight: bold; display: block; margin-top: 15px; color: #34495e; }
         input, select, textarea { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #bdc3c7; border-radius: 5px; box-sizing: border-box; font-size: 14px; }
         .alert-box { background-color: #fadbd8; border-left: 5px solid #e74c3c; color: #78281f; padding: 15px; border-radius: 5px; margin-top: 15px; display: none; font-weight: bold; }
+        .info-box-used { background-color: #fef9e7; border-left: 5px solid #f39c12; color: #7e5109; padding: 15px; border-radius: 5px; margin-top: 10px; font-size: 13px; font-weight: bold; line-height: 1.4; }
         .offer-box { background-color: #e8f8f5; border: 2px dashed #27ae60; padding: 20px; border-radius: 5px; margin-top: 25px; text-align: justify; }
         .price-option { background: white; border: 1px solid #bdc3c7; padding: 15px; margin-top: 10px; border-radius: 5px; display: flex; align-items: center; cursor: pointer; }
         .price-option input { width: auto; margin-top: 0; margin-right: 15px; transform: scale(1.3); }
@@ -111,8 +112,7 @@
             <label>Telefone Celular (Será usado como seu Login de Acesso):</label>
             <input type="text" placeholder="Ex: 11999998888" required>
 
-            <!-- NOVO CAMPO SOLICITADO: CRIAÇÃO DE SENHA -->
-            <label>Crie uma Senha de Acesso (Para entrar no Painel depois de pagar):</label>
+            <label>Crie uma Senha de Acesso:</label>
             <input type="password" placeholder="Digite uma senha segura" required>
 
             <label>CEP:</label>
@@ -133,7 +133,7 @@
             <label>Estado:</label>
             <input type="text" placeholder="UF" required>
 
-            <!-- SEÇÃO: PROTOCOLO DE SAÚDE E EMERGÊNCIA -->
+            <!-- SEÇÃO: PROTOCOLO DE SAÚE E EMERGÊNCIA -->
             <div class="health-title">🚨 Protocolo de Saúde e Emergência</div>
 
             <label>Em caso de emergência, ligar para:</label>
@@ -175,6 +175,3 @@
             <input type="text" placeholder="Digite os medicamentos ou escreva 'Nenhuma'">
 
             <label>Médico de sua preferência (Nome Completo):</label>
-            <input type="text" placeholder="Nome do Doutor(a)">
-
-            <label>Telefone de contato do Médico:</label>
