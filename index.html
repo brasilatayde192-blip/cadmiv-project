@@ -5,20 +5,93 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CADMIV - Plataforma de Conformidade</title>
     <style>
-        body { font-family: Arial, sans-serif; background-color: #f4f4f9; text-align: center; padding: 50px; }
-        .card { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); display: inline-block; max-width: 500px; }
-        h1 { color: #2c3e50; }
-        p { color: #7f8c8d; font-size: 16px; }
-        .btn { display: inline-block; background-color: #27ae60; color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; font-weight: bold; margin-top: 20px; }
+        body { font-family: Arial, sans-serif; background-color: #f4f4f9; text-align: center; padding: 40px 20px; color: #2c3e50; }
+        .card { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); display: inline-block; width: 100%; max-width: 500px; box-sizing: border-box; }
+        h1 { color: #2c3e50; font-size: 28px; margin-bottom: 5px; }
+        p { color: #7f8c8d; font-size: 16px; line-height: 1.4; }
+        .btn { display: inline-block; background-color: #27ae60; color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; font-weight: bold; margin-top: 20px; font-size: 16px; }
         .btn:hover { background-color: #219150; }
+        
+        /* PORTAL DE FISCALIZAÇÃO DO AGENTE DE TRÂNSITO COPIADO DO SEU TEXTO */
+        .police-section { background-color: #f2f4f4; border: 2px solid #34495e; padding: 25px; border-radius: 10px; margin-top: 40px; display: inline-block; width: 100%; max-width: 500px; box-sizing: border-box; text-align: left; }
+        .police-title { background-color: #34495e; color: white; padding: 10px; border-radius: 5px; text-align: center; font-weight: bold; font-size: 15px; }
+        .police-input { width: 100%; padding: 12px; margin-top: 10px; border: 2px solid #34495e; border-radius: 5px; box-sizing: border-box; font-size: 14px; font-weight: bold; text-align: center; }
+        .police-btn { background-color: #34495e; color: white; border: none; padding: 12px; width: 100%; border-radius: 5px; font-weight: bold; font-size: 15px; margin-top: 10px; cursor: pointer; }
+        
+        /* STATUS E BOTÃO DE FURTO EM VERMELHO PULSANTE EXCLUSIVO CADMIV */
+        .status-result { display: none; margin-top: 20px; padding: 20px; border-radius: 5px; text-align: center; font-weight: bold; font-size: 16px; line-height: 1.4; }
+        .status-alert-furto { background-color: #c0392b; color: white; border: 3px solid #78281f; animation: pulsar 0.8s infinite alternate; }
+        
+        @keyframes pulsar {
+            0% { background-color: #c0392b; box-shadow: 0 0 10px #c0392b; }
+            100% { background-color: #ec7063; box-shadow: 0 0 25px #ec7063; }
+        }
     </style>
+    <script>
+        // FUNÇÃO DE CHECAGEM COM OS STATUS ENVIADOS POR VOCÊ
+        function consultarChassi() {
+            var chassi = document.getElementById("input_chassi").value.trim();
+            var resultado = document.getElementById("resultado_consulta");
+            
+            if (chassi === "") {
+                alert("Agente, por favor insira o número do Chassi para fiscalização.");
+                return;
+            }
+
+            resultado.style.display = "block";
+
+            // Lógica de amostragem para testar os status pedidos por você
+            if (chassi === "1234" || chassi.toLowerCase() === "furto") {
+                resultado.className = "status-result status-alert-furto";
+                resultado.innerHTML = "🚨 🚨 ALERTA DE EMERGÊNCIA POLICIAL 🚨 🚨<br><br>" +
+                                      "STATUS: VEÍCULO FURTADO / ROUBADO!<br>" +
+                                      "MOTIVO: Cadastro bloqueado pelo proprietário titular no painel.<br>" +
+                                      "⚠️ ABORDE O CONDUTOR E ACIONE A POLÍCIA MILITAR IMEDIATAMENTE!";
+            } else if (chassi === "5555") {
+                resultado.className = "status-result";
+                resultado.style.backgroundColor = "#fadbd8";
+                resultado.style.color = "#78281f";
+                resultado.style.border = "2px solid #e74c3c";
+                resultado.innerHTML = "🔴 STATUS: DESATIVADO<br>Motivo do Desligamento: Veículo Repassado via Venda / Doação / Fora de Uso.";
+            } else if (chassi === "7777") {
+                resultado.className = "status-result";
+                resultado.style.backgroundColor = "#fdebd0";
+                resultado.style.color = "#7e5109";
+                resultado.style.border = "2px solid #f39c12";
+                resultado.innerHTML = "💛 STATUS: ADORMECIDO<br>Motivo do Desligamento: Falta fazer a Renovação Anual do Cadastro CADMIV.";
+            } else {
+                resultado.className = "status-result";
+                resultado.style.backgroundColor = "#d4efdf";
+                resultado.style.color = "#196f3d";
+                resultado.style.border = "2px solid #27ae60";
+                resultado.innerHTML = "🟢 STATUS: ATIVO (OK)<br>Veículo Homologado sob Proteção Nacional. Proprietário Regularizado.";
+            }
+        }
+    </script>
 </head>
 <body>
+
+    <!-- SEGUNDO CARTÃO DE BOAS-VINDAS PRINCIPAL -->
     <div class="card">
         <h1>CADMIV</h1>
         <p>Plataforma de Conformidade e Proteção Nacional</p>
-        <p>Bem-vindo ao portal oficial de segurança corporativa.</p>
-        <a href="validar.html" class="btn">Acessar Portal De Validação</a>
+        <p>Bem-vindo ao portal oficial de segurança corporativa de veículos individuais de pequeno porte.</p>
+        <a href="termos.html" class="btn">Acessar Portal De Validação</a>
     </div>
+    
+    <br><br>
+
+    <!-- 👮‍♂️ PORTAL DE FISCALIZAÇÃO LOGO ABAIXO DO CARTÃO CONFORME SUA ORDEM -->
+    <div class="police-section">
+        <div class="police-title">👮‍♂️ PORTAL DE FISCALIZAÇÃO DO AGENTE DE TRÂNSITO</div>
+        <p style="font-size: 12px; color: #7f8c8d; margin-top: 5px;">Uso exclusivo das autoridades de segurança pública rodoviária nacional para checagem instantânea de patrimônio.</p>
+        
+        <input type="text" id="input_chassi" class="police-input" placeholder="DIGITE O CHASSI OU N° DE SÉRIE">
+        <button type="button" onclick="consultarChassi()" class="police-btn">🔍 Verificar Status do Veículo Abordado</button>
+        
+        <!-- Painel onde o grande Alerta de Furto vai pulsar na tela -->
+        <div id="resultado_consulta" class="status-result"></div>
+    </div>
+
 </body>
 </html>
