@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CADMIV - Pagamento e Fiscalização Nacional</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f9; padding: 20px; text-align: center; color: #2c3e50; }
+        .container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); display: inline-block; width: 100%; max-width: 550px; box-sizing: border-box; text-align: left; }
+        h2, h3 { text-align: center; color: #27ae60; }
+        p { text-align: center; }
+        .pix-box { background-color: #e8f8f5; border: 2px solid #27ae60; padding: 20px; border-radius: 10px; margin-top: 20px; text-align: center; }
+        .qr-placeholder { background-color: #eaeded; width: 200px; height: 200px; margin: 20px auto; display: flex; align-items: center; justify-content: center; border: 2px dashed #bdc3c7; font-weight: bold; color: #7f8c8d; }
+        .btn-confirm { background-color: #2980b9; color: white; border: none; padding: 15px; width: 100%; border-radius: 5px; font-weight: bold; font-size: 16px; margin-top: 25px; cursor: pointer; text-decoration: none; display: block; box-sizing: border-box; text-align: center; }
+        .btn-confirm:hover { background-color: #2471a3; }
+        
+        .photo-section { background-color: #fcf3cf; border: 1px dashed #f39c12; padding: 20px; border-radius: 5px; margin-top: 20px; }
+        .dependent-box { background: white; border: 1px solid #f39c12; padding: 15px; border-radius: 5px; margin-top: 15px; }
+        .upload-btn { background-color: #f39c12; color: white; padding: 10px 15px; border: none; border-radius: 3px; cursor: pointer; font-weight: bold; font-size: 13px; display: inline-block; margin-top: 10px; margin-right: 10px; }
+        .camera-btn { background-color: #d35400; color: white; padding: 10px 15px; border: none; border-radius: 3px; cursor: pointer; font-weight: bold; font-size: 13px; display: inline-block; margin-top: 10px; }
+        video { width: 100%; max-width: 200px; display: none; margin-top: 10px; border-radius: 5px; background: black; }
+
+        /* ESTILOS EXCLUSIVOS DO PORTAL DO AGENTE DE TRÂNSITO */
+        .police-section { background-color: #eaeeded; border: 2px solid #34495e; padding: 25px; border-radius: 10px; margin-top: 40px; }
+        .police-title { background-color: #34495e; color: white; padding: 10px; border-radius: 5px; text-align: center; font-weight: bold; font-size: 16px; }
+        .police-input { width: 100%; padding: 12px; margin-top: 10px; border: 2px solid #34495e; border-radius: 5px; box-sizing: border-box; font-size: 14px; font-weight: bold; text-align: center; }
+        .police-btn { background-color: #34495e; color: white; border: none; padding: 12px; width: 100%; border-radius: 5px; font-weight: bold; font-size: 15px; margin-top: 10px; cursor: pointer; }
+        
+        /* PAINEL DE ALERTA DE FURTO PULSANTE MANDADO POR VOCÊ */
+        .status-result { display: none; margin-top: 20px; padding: 20px; border-radius: 5px; text-align: center; font-weight: bold; font-size: 16px; }
+        .status-alert-furto { background-color: #c0392b; color: white; border: 3px solid #78281f; animation: pulsar 1s infinite alternate; }
+        
+        @keyframes pulsar {
+            0% { background-color: #c0392b; box-shadow: 0 0 10px #c0392b; }
+            100% { background-color: #ec7063; box-shadow: 0 0 25px #ec7063; }
+        }
+    </style>
+    <script>
+        function finalizarProcesso() {
+            alert("Pagamento PIX confirmado com sucesso! Emitindo suas credenciais corporativas CADMIV.");
+            window.location.href = "cartao.html";
+        }
+
+        function ligarCamera(idVideo) {
+            var video = document.getElementById(idVideo);
+            video.style.display = "block";
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(function (stream) { video.srcObject = stream; video.play(); })
+                .catch(function () { alert("Câmera não encontrada ou permissão negada."); });
+        }
+
+        // FUNÇÃO INTELIGENTE DE CHECAGEM DO AGENTE DE TRÂNSITO
+        function consultarChassi() {
+            var chassi = document.getElementById("input_chassi").value.trim();
+            var resultado = document.getElementById("resultado_consulta");
+            
+            if (chassi === "") {
+                alert("Agente, por favor insira o número do Chassi para fiscalização.");
+                return;
+            }
+
+            resultado.style.display = "block";
+
+            // Simulação de consulta por amostragem baseada na sua lógica de segurança
+            if (chassi === "1234" || chassi.toLowerCase() === "furto") {
+                resultado.className = "status-result status-alert-furto";
+                resultado.innerHTML = "🚨 🚨 ALERTA DE EMERGÊNCIA POLICIAL 🚨 🚨<br><br>" +
+                                      "STATUS: VEÍCULO FURTADO / ROUBADO!<br>" +
+                                      "MOTIVO: Cadastro bloqueado pelo proprietário titular.<br>" +
+                                      "⚠️ ABORDE O CONDUTOR E ACIONE A POLÍCIA MILITAR IMEDIATAMENTE!";
+            } else if (chassi === "5555") {
+                resultado.className = "status-result";
+                resultado.style.backgroundColor = "#fadbd8";
+                resultado.style.color = "#78281f";
+                resultado.style.border = "2px solid #e74c3c";
+                resultado.innerHTML = "🔴 STATUS: DESATIVADO<br>Motivo do Desligamento: Veículo Repassado via Venda / Doação / Fora de Uso.";
+            } else if (chassi === "7777") {
+                resultado.className = "status-result";
+                resultado.style.backgroundColor = "#fdebd0";
+                resultado.style.color = "#7e5109";
+                resultado.style.border = "2px solid #f39c12";
+                resultado.innerHTML = "💛 STATUS: ADORMECIDO<br>Motivo do Desligamento: Falta fazer a Renovação Anual do Cadastro CADMIV.";
+            } else {
+                resultado.className = "status-result";
+                resultado.style.backgroundColor = "#d4efdf";
+                resultado.style.color = "#196f3d";
+                resultado.style.border = "2px solid #27ae60";
+                resultado.innerHTML = "🟢 STATUS: ATIVO (OK)<br>Veículo Homologado sob Proteção Nacional. Proprietário Regularizado.";
+            }
+        }
+    </script>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Portal de Pagamento e Identificação</h2>
+        <p>Sua transação está protegida pela Plataforma de Conformidade Nacional.</p>
+
+        <!-- SEÇÃO DE FOTOS E RECONHECIMENTO VISUAL -->
+        <div class="photo-section">
+            <strong>📸 RECONHECIMENTO VISUAL DA CREDENCIAL DIGITAL</strong>
+            <p style="margin: 5px 0; font-size: 13px; color: #7f8c8d;">Personalize as suas credenciais oficiais enviando um arquivo ou tirando uma foto atual na hora.</p>
+            
+            <div class="dependent-box">
+                <span style="font-weight: bold; color: #d35400;">• Foto do Titular da CADMIV:</span>
+                <br>
+                <input type="file" id="foto-titular" accept="image/*" style="display: none;">
+                <button type="button" class="upload-btn" onclick="document.getElementById('foto-titular').click()">📁 Escolher Arquivo</button>
+                <button type="button" class="camera-btn" onclick="ligarCamera('video-titular')">📷 Tirar Foto na Hora</button>
+                <video id="video-titular"></video>
+            </div>
+        </div>
+
+        <!-- ÁREA DO PIX PREPARADA PARA A NOVA COMPANHIA -->
+        <div class="pix-box">
+            <strong>GERANDO PIX AUTOMÁTICO...</strong>
+            <p style="font-size: 14px; color: #7f8c8d; margin-top: 5px;">Sistema integrado via API com: <strong>[NOME DA NOVA COMPANHIA]</strong></p>
+            <div class="qr-placeholder">[QR CODE DO PIX]</div>
+            <p style="font-size: 13px; font-weight: bold; color: #c0392b;">⚠️ Copie o código PIX no seu banco ou escaneie o QR Code acima para pagar.</p>
+        </div>
+
+        <button type="button" onclick="finalizarProcesso()" class="btn-confirm">Confirmar Pagamento e Gerar Cartões Digitais</button>
+
+        <!-- 👮‍♂️ SEÇÃO MONUMENTAL: PORTAL DE CONSULTA DO AGENTE DE TRÂNSITO -->
+        <div class="police-section">
+            <div class="police-title">👮‍♂️ PORTAL DE FISCALIZAÇÃO DO AGENTE DE TRÂNSITO</div>
+            <p style="font-size: 12px; color: #7f8c8d; margin-top: 5px;">Uso exclusivo das autoridades de segurança pública rodoviária nacional.</p>
+            
+            <input type="text" id="input_chassi" class="police-input" placeholder="DIGITE O CHASSI OU N° DE SÉRIE">
+            <button type="button" onclick="consultarChassi()" class="police-btn">🔍 Verificar Status do Veículo Abordado</button>
+            
+            <!-- Caixa onde estoura o Alerta de Furto Pulsante -->
+            <div id="resultado_consulta" class="status-result"></div>
+        </div>
+    </div>
+
+</body>
+</html>
