@@ -3,94 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CADMIV - Plataforma de Conformidade</title>
+    <title>CADMIV - Bem-Vindo e Informativo Oficial</title>
     <style>
-        body { font-family: Arial, sans-serif; background-color: #f4f4f9; text-align: center; padding: 40px 20px; color: #2c3e50; }
-        .card { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); display: inline-block; width: 100%; max-width: 500px; box-sizing: border-box; }
-        h1 { color: #2c3e50; font-size: 28px; margin-bottom: 5px; }
-        p { color: #7f8c8d; font-size: 16px; line-height: 1.4; }
-        .btn { display: inline-block; background-color: #27ae60; color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; font-weight: bold; margin-top: 20px; font-size: 16px; }
-        .btn:hover { background-color: #219150; }
-        
-        /* PORTAL DE FISCALIZAÇÃO DO AGENTE DE TRÂNSITO COPIADO DO SEU TEXTO */
-        .police-section { background-color: #f2f4f4; border: 2px solid #34495e; padding: 25px; border-radius: 10px; margin-top: 40px; display: inline-block; width: 100%; max-width: 500px; box-sizing: border-box; text-align: left; }
-        .police-title { background-color: #34495e; color: white; padding: 10px; border-radius: 5px; text-align: center; font-weight: bold; font-size: 15px; }
-        .police-input { width: 100%; padding: 12px; margin-top: 10px; border: 2px solid #34495e; border-radius: 5px; box-sizing: border-box; font-size: 14px; font-weight: bold; text-align: center; }
-        .police-btn { background-color: #34495e; color: white; border: none; padding: 12px; width: 100%; border-radius: 5px; font-weight: bold; font-size: 15px; margin-top: 10px; cursor: pointer; }
-        
-        /* STATUS E BOTÃO DE FURTO EM VERMELHO PULSANTE EXCLUSIVO CADMIV */
-        .status-result { display: none; margin-top: 20px; padding: 20px; border-radius: 5px; text-align: center; font-weight: bold; font-size: 16px; line-height: 1.4; }
-        .status-alert-furto { background-color: #c0392b; color: white; border: 3px solid #78281f; animation: pulsar 0.8s infinite alternate; }
-        
-        @keyframes pulsar {
-            0% { background-color: #c0392b; box-shadow: 0 0 10px #c0392b; }
-            100% { background-color: #ec7063; box-shadow: 0 0 25px #ec7063; }
-        }
+        body { font-family: Arial, sans-serif; background-color: #f4f4f9; padding: 20px; text-align: center; color: #2c3e50; }
+        .welcome-container { background: white; padding: 40px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 100%; max-width: 600px; box-sizing: border-box; display: inline-block; margin-bottom: 25px; }
+        .info-container { background: #eaf2f8; padding: 30px; border-radius: 10px; border: 2px solid #3498db; width: 100%; max-width: 600px; box-sizing: border-box; display: inline-block; text-align: left; }
+        h1 { color: #2c3e50; font-size: 26px; margin-bottom: 5px; text-align: center; }
+        .subtitle { color: #7f8c8d; font-size: 14px; font-weight: bold; margin-bottom: 20px; text-align: center; display: block; }
+        .info-title { color: #2980b9; font-size: 20px; margin-bottom: 15px; font-weight: bold; text-align: center; }
+        p { text-align: justify; color: #34495e; font-size: 15px; line-height: 1.6; margin-bottom: 20px; }
+        .btn-start { background-color: #27ae60; color: white; border: none; padding: 15px 30px; border-radius: 5px; font-weight: bold; font-size: 16px; cursor: pointer; text-decoration: none; display: inline-block; margin-top: 20px; }
+        .btn-start:hover { background-color: #219150; }
+        .badge-security { margin-top: 25px; font-size: 12px; color: #7f8c8d; font-weight: bold; text-align: center; }
+        ul { margin-top: 10px; padding-left: 20px; color: #34495e; font-size: 14px; line-height: 1.6; }
+        li { margin-bottom: 8px; }
     </style>
-    <script>
-        // FUNÇÃO DE CHECAGEM COM OS STATUS ENVIADOS POR VOCÊ
-        function consultarChassi() {
-            var chassi = document.getElementById("input_chassi").value.trim();
-            var resultado = document.getElementById("resultado_consulta");
-            
-            if (chassi === "") {
-                alert("Agente, por favor insira o número do Chassi para fiscalização.");
-                return;
-            }
-
-            resultado.style.display = "block";
-
-            // Lógica de amostragem para testar os status pedidos por você
-            if (chassi === "1234" || chassi.toLowerCase() === "furto") {
-                resultado.className = "status-result status-alert-furto";
-                resultado.innerHTML = "🚨 🚨 ALERTA DE EMERGÊNCIA POLICIAL 🚨 🚨<br><br>" +
-                                      "STATUS: VEÍCULO FURTADO / ROUBADO!<br>" +
-                                      "MOTIVO: Cadastro bloqueado pelo proprietário titular no painel.<br>" +
-                                      "⚠️ ABORDE O CONDUTOR E ACIONE A POLÍCIA MILITAR IMEDIATAMENTE!";
-            } else if (chassi === "5555") {
-                resultado.className = "status-result";
-                resultado.style.backgroundColor = "#fadbd8";
-                resultado.style.color = "#78281f";
-                resultado.style.border = "2px solid #e74c3c";
-                resultado.innerHTML = "🔴 STATUS: DESATIVADO<br>Motivo do Desligamento: Veículo Repassado via Venda / Doação / Fora de Uso.";
-            } else if (chassi === "7777") {
-                resultado.className = "status-result";
-                resultado.style.backgroundColor = "#fdebd0";
-                resultado.style.color = "#7e5109";
-                resultado.style.border = "2px solid #f39c12";
-                resultado.innerHTML = "💛 STATUS: ADORMECIDO<br>Motivo do Desligamento: Falta fazer a Renovação Anual do Cadastro CADMIV.";
-            } else {
-                resultado.className = "status-result";
-                resultado.style.backgroundColor = "#d4efdf";
-                resultado.style.color = "#196f3d";
-                resultado.style.border = "2px solid #27ae60";
-                resultado.innerHTML = "🟢 STATUS: ATIVO (OK)<br>Veículo Homologado sob Proteção Nacional. Proprietário Regularizado.";
-            }
-        }
-    </script>
 </head>
 <body>
 
-    <!-- SEGUNDO CARTÃO DE BOAS-VINDAS PRINCIPAL -->
-    <div class="card">
-        <h1>CADMIV</h1>
-        <p>Plataforma de Conformidade e Proteção Nacional</p>
-        <p>Bem-vindo ao portal oficial de segurança corporativa de veículos individuais de pequeno porte.</p>
-        <a href="termos.html" class="btn">Acessar Portal De Validação</a>
+    <!-- 1º CARTÃO: BOAS-VINDAS ORIGINAL COM OS AJUSTES VERBAIS -->
+    <div class="welcome-container">
+        <h1>👮‍♂️ BEM-VINDO À CADMIV</h1>
+        <!-- COMPLEMENTO DA SIGLA PEDIDO POR VOCÊ -->
+        <span class="subtitle">( Cadastro Mobilidade Individual Veículo-Autopropelido )</span>
+        
+        <p>
+            Seja muito bem-vindo à CADMIV — Plataforma Homologada para Registro de Patrimônio Nacional. 
+            A nossa missão <strong>consiste</strong> em salvaguardar o seu patrimônio de mobilidade individual e 
+            <strong>garantir</strong> a legitimidade jurídica de sua propriedade em todo o território nacional. 
+            Caso o seu veículo <strong>venha</strong> a ser alvo de uma fatalidade civil, as autoridades competentes 
+            <strong>terão</strong> o amparo técnico e imediato para identificá-lo e devolvê-lo com total segurança.
+        </p>
+        <p style="font-weight: bold; text-align: center; margin-bottom: 0;">
+            Proteja o que é seu por direito. Veja abaixo os detalhes da nossa atuação institucional.
+        </p>
     </div>
-    
-    <br><br>
 
-    <!-- 👮‍♂️ PORTAL DE FISCALIZAÇÃO LOGO ABAIXO DO CARTÃO CONFORME SUA ORDEM -->
-    <div class="police-section">
-        <div class="police-title">👮‍♂️ PORTAL DE FISCALIZAÇÃO DO AGENTE DE TRÂNSITO</div>
-        <p style="font-size: 12px; color: #7f8c8d; margin-top: 5px;">Uso exclusivo das autoridades de segurança pública rodoviária nacional para checagem instantânea de patrimônio.</p>
+    <br>
+
+    <!-- 2º CARTÃO: COMPLEMENTO INFORMATIVO (O QUE É E QUAL A FINALIDADE DA CADMIV) -->
+    <div class="info-container">
+        <div class="info-title">📋 Painel Informativo de Utilidade Pública</div>
         
-        <input type="text" id="input_chassi" class="police-input" placeholder="DIGITE O CHASSI OU N° DE SÉRIE">
-        <button type="button" onclick="consultarChassi()" class="police-btn">🔍 Verificar Status do Veículo Abordado</button>
+        <p>
+            Para que você compreenda a relevância deste registro corporativo, detalhamos abaixo o escopo de atuação e as finalidades da plataforma CADMIV:
+        </p>
+
+        <ul>
+            <li><strong>O que é a CADMIV?</strong> É uma central de registro e homologação patrimonial de segurança nacional voltada exclusivamente para veículos de pequeno porte de mobilidade individual.</li>
+            <li><strong>Qual é a nossa Finalidade Primordial?</strong> Estabelecer um vínculo jurídico definitivo entre o legítimo proprietário e o chassi/série do veículo autopropelido (bicicletas comuns, elétricas, esportivas, patinetes e monociclos) através de um banco de dados unificado.</li>
+            <li><strong>Apoio à Fiscalização de Trânsito:</strong> Em abordagens rotineiras nas vias públicas, os agentes de segurança pública utilizam o Portal de Consulta da CADMIV para checar instantaneamente o status do veículo abordado, agindo de forma implacável contra o comércio de receptação ilícita.</li>
+            <li><strong>Protocolo de Emergência e Saúde:</strong> Além da proteção ao patrimônio, a sua credencial digital carrega informações vitais de saúde (como tipo sanguíneo e contatos de emergência), garantindo socorro humanizado e rápido em caso de acidentes nas ruas.</li>
+        </ul>
+
+        <p style="font-weight: bold; text-align: center; margin-top: 15px; margin-bottom: 5px; color: #27ae60;">
+            Cidadão consciente protege o seu patrimônio.
+        </p>
+
+        <div style="text-align: center;">
+            <a href="termos.html" class="btn-start">Prosseguir para Contrato de Segurança</a>
+        </div>
         
-        <!-- Painel onde o grande Alerta de Furto vai pulsar na tela -->
-        <div id="resultado_consulta" class="status-result"></div>
+        <div class="badge-security">🛡️ SISTEMA SOB CONFORMIDADE DE PROTEÇÃO PATRIMONIAL NACIONAL</div>
     </div>
 
 </body>
