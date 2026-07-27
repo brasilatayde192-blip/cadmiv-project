@@ -3,68 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CADMIV - Bem-Vindo e Informativo Oficial</title>
+    <title>CADMIV - Sistema de Proteção Patrimonial Nacional</title>
     <style>
         body { font-family: Arial, sans-serif; background-color: #f4f4f9; padding: 20px; text-align: center; color: #2c3e50; }
-        .welcome-container { background: white; padding: 40px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 100%; max-width: 600px; box-sizing: border-box; display: inline-block; margin-bottom: 25px; }
-        .info-container { background: #eaf2f8; padding: 30px; border-radius: 10px; border: 2px solid #3498db; width: 100%; max-width: 600px; box-sizing: border-box; display: inline-block; text-align: left; }
-        h1 { color: #2c3e50; font-size: 26px; margin-bottom: 5px; text-align: center; }
-        .subtitle { color: #7f8c8d; font-size: 14px; font-weight: bold; margin-bottom: 20px; text-align: center; display: block; }
-        .info-title { color: #2980b9; font-size: 20px; margin-bottom: 15px; font-weight: bold; text-align: center; }
-        p { text-align: justify; color: #34495e; font-size: 15px; line-height: 1.6; margin-bottom: 20px; }
-        .btn-start { background-color: #27ae60; color: white; border: none; padding: 15px 30px; border-radius: 5px; font-weight: bold; font-size: 16px; cursor: pointer; text-decoration: none; display: inline-block; margin-top: 20px; }
+        .welcome-container { background: white; padding: 40px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 600px; display: inline-block; text-align: center; box-sizing: border-box; }
+        h1 { color: #27ae60; margin-bottom: 10px; }
+        .headline { font-size: 16px; color: #7f8c8d; margin-bottom: 30px; font-weight: bold; }
+        .feature-box { background: #f8f9f9; border: 1px solid #d5dbdb; padding: 20px; border-radius: 5px; text-align: left; margin-bottom: 25px; }
+        .btn-start { background-color: #27ae60; color: white; border: none; padding: 15px 30px; border-radius: 5px; font-weight: bold; font-size: 18px; cursor: pointer; text-decoration: none; display: block; margin-top: 15px; }
         .btn-start:hover { background-color: #219150; }
-        .badge-security { margin-top: 25px; font-size: 12px; color: #7f8c8d; font-weight: bold; text-align: center; }
-        ul { margin-top: 10px; padding-left: 20px; color: #34495e; font-size: 14px; line-height: 1.6; }
-        li { margin-bottom: 8px; }
+        
+        /* BOTÃO SOLICITADO POR VOCÊ PARA QUEM JÁ TEM CADASTRO */
+        .client-section { border-top: 2px dashed #bdc3c7; margin-top: 30px; padding-top: 20px; }
+        .btn-client { background-color: #c0392b; color: white; border: none; padding: 12px 25px; border-radius: 5px; font-weight: bold; font-size: 15px; cursor: pointer; text-decoration: none; display: inline-block; }
+        .btn-client:hover { background-color: #a93226; }
+        .client-subtext { font-size: 12px; font-weight: bold; color: #7f8c8d; display: block; margin-top: 5px; }
     </style>
 </head>
 <body>
 
-    <!-- 1º CARTÃO: BOAS-VINDAS ORIGINAL COM OS AJUSTES VERBAIS -->
     <div class="welcome-container">
-        <h1>👮‍♂️ BEM-VINDO À CADMIV</h1>
-        <!-- COMPLEMENTO DA SIGLA PEDIDO POR VOCÊ -->
-        <span class="subtitle">( Cadastro Mobilidade Individual Veículo-Autopropelido )</span>
-        
-        <p>
-            Seja muito bem-vindo à CADMIV — Plataforma Homologada para Registro de Patrimônio Nacional. 
-            A nossa missão <strong>consiste</strong> em salvaguardar o seu patrimônio de mobilidade individual e 
-            <strong>garantir</strong> a legitimidade jurídica de sua propriedade em todo o território nacional. 
-            Caso o seu veículo <strong>venha</strong> a ser alvo de uma fatalidade civil, as autoridades competentes 
-            <strong>terão</strong> o amparo técnico e imediato para identificá-lo e devolvê-lo com total segurança.
-        </p>
-        <p style="font-weight: bold; text-align: center; margin-bottom: 0;">
-            Proteja o que é seu por direito. Veja abaixo os detalhes da nossa atuação institucional.
-        </p>
-    </div>
+        <h1>Bem-vindo à Plataforma CADMIV</h1>
+        <div class="headline">Homologação e Registro de Segurança para Veículos Autopropelidos e de Mobilidade Individual</div>
 
-    <br>
-
-    <!-- 2º CARTÃO: COMPLEMENTO INFORMATIVO (O QUE É E QUAL A FINALIDADE DA CADMIV) -->
-    <div class="info-container">
-        <div class="info-title">📋 Painel Informativo de Utilidade Pública</div>
-        
-        <p>
-            Para que você compreenda a relevância deste registro corporativo, detalhamos abaixo o escopo de atuação e as finalidades da plataforma CADMIV:
-        </p>
-
-        <ul>
-            <li><strong>O que é a CADMIV?</strong> É uma central de registro e homologação patrimonial de segurança nacional voltada exclusivamente para veículos de pequeno porte de mobilidade individual.</li>
-            <li><strong>Qual é a nossa Finalidade Primordial?</strong> Estabelecer um vínculo jurídico definitivo entre o legítimo proprietário e o chassi/série do veículo autopropelido (bicicletas comuns, elétricas, esportivas, patinetes e monociclos) através de um banco de dados unificado.</li>
-            <li><strong>Apoio à Fiscalização de Trânsito:</strong> Em abordagens rotineiras nas vias públicas, os agentes de segurança pública utilizam o Portal de Consulta da CADMIV para checar instantaneamente o status do veículo abordado, agindo de forma implacável contra o comércio de receptação ilícita.</li>
-            <li><strong>Protocolo de Emergência e Saúde:</strong> Além da proteção ao patrimônio, a sua credencial digital carrega informações vitais de saúde (como tipo sanguíneo e contatos de emergência), garantindo socorro humanizado e rápido em caso de acidentes nas ruas.</li>
-        </ul>
-
-        <p style="font-weight: bold; text-align: center; margin-top: 15px; margin-bottom: 5px; color: #27ae60;">
-            Cidadão consciente protege o seu patrimônio.
-        </p>
-<a href="fiscalizacao.html" class="btn-start">Prosseguir para Central de Fiscalização</a>
-        <div style="text-align: center;">
-            
+        <div class="feature-box">
+            <strong>🛡️ PROTEÇÃO NACIONAL DO SEU PATRIMÔNIO</strong><br><br>
+            A CADMIV oferece uma infraestrutura de identificação jurídica para proprietários de bicicletas (comuns ou elétricas), patinetes, e monociclos. Através do nosso sistema, autoridades civis e agentes de trânsito em todo o território nacional possuem ferramentas oficiais para consultar e verificar a procedência regular do seu veículo abordado na rua.
         </div>
-        
-        <div class="badge-security">🛡️ SISTEMA SOB CONFORMIDADE DE PROTEÇÃO PATRIMONIAL NACIONAL</div>
+
+        <a href="termos.html" class="btn-start">Iniciar Meu Registro Patrimonial</a>
+
+        <!-- ÁREA EXCLUSIVA DE ENTRADA RÁPIDA CRIADA POR VOCÊ -->
+        <div class="client-section">
+            <a href="login.html" class="btn-client">Acessar Área do Cliente Registrado</a>
+            <span class="client-subtext">👇 Toque aqui você que possui cadastro na CADMIV para acionar o Botão de Furto</span>
+        </div>
     </div>
 
 </body>
