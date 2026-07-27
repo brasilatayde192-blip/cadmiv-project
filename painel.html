@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CADMIV - Painel Administrativo Secreto</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #1a252f; padding: 20px; text-align: center; color: #ecf0f1; }
+        .panel-container { background: #2c3e50; padding: 40px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); width: 100%; max-width: 800px; display: inline-block; text-align: left; box-sizing: border-box; }
+        h2 { text-align: center; color: #2ecc71; margin-bottom: 5px; }
+        .subtitle { text-align: center; color: #bdc3c7; font-size: 13px; font-weight: bold; margin-bottom: 30px; display: block; }
+        .grid-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 30px; }
+        .stat-box { background: #34495e; padding: 20px; border-radius: 5px; border-left: 5px solid #2ecc71; text-align: center; }
+        .stat-box.blue { border-left-color: #3498db; }
+        .stat-box.orange { border-left-color: #e67e22; }
+        .stat-number { font-size: 24px; font-weight: bold; color: white; margin-top: 5px; }
+        .section-title { background-color: #23313f; color: #2ecc71; padding: 10px; border-radius: 5px; margin-top: 20px; font-size: 16px; font-weight: bold; border: 1px solid #2ecc71; }
+        table { width: 100%; margin-top: 15px; border-collapse: collapse; background: #34495e; border-radius: 5px; overflow: hidden; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #2c3e50; }
+        th { background-color: #23313f; color: #2ecc71; font-weight: bold; }
+        tr:hover { background-color: #3d566e; }
+        .footer-text { text-align: center; margin-top: 30px; font-size: 12px; color: #7f8c8d; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="panel-container">
+        <h2>📊 PAINEL DE CONTROLE FINANCEIRO E ESTATÍSTICO</h2>
+        <span class="subtitle">🔒 ÁREA INTERNA RESTRITA DA DIRETORIA DA CADMIV - DOCUMENTO CONFIDENCIAL</span>
+
+        <!-- RELATÓRIO GLOBAL DIÁRIO E MENSAL -->
+        <div class="grid-stats">
+            <div class="stat-box">
+                <div style="font-size: 13px; font-weight: bold; color: #2ecc71;">👥 CADASTRADOS HOJE</div>
+                <div class="stat-number" id="hoje-total">42 pessoas</div>
+            </div>
+            <div class="stat-box blue">
+                <div style="font-size: 13px; font-weight: bold; color: #3498db;">📅 ACUMULADO MENSAL</div>
+                <div class="stat-number" id="mes-total">1.248 pessoas</div>
+            </div>
+            <div class="stat-box orange">
+                <div style="font-size: 13px; font-weight: bold; color: #e67e22;">💰 RECEITA BRUTA MENSAL</div>
+                <div class="stat-number" id="receita-total">$48.650,00</div>
+            </div>
+        </div>
+
+        <!-- DIVISÃO POR SELEÇÃO DE COMBOS -->
+        <div class="section-title">1. Demonstrativo de Escolha de Planos (Para Prestação de Contas IR)</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Tipo de Combo Escolhido</th>
+                    <th>Valor da Taxa</th>
+                    <th>Quantidade de Vendas (Mês)</th>
+                    <th>Subtotal Arrecadado</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Emitir 1 Cartão Digital</strong> (Apenas Titular)</td>
+                    <td>$24.99</td>
+                    <td>412 adesões</td>
+                    <td style="color: #2ecc71; font-weight: bold;">$10.295,88</td>
+                </tr>
+                <tr>
+                    <td><strong>Emitir 2 Cartões Digitais</strong> (Titular + 1 Dependente)</td>
+                    <td>$39.99</td>
+                    <td>356 adesões</td>
+                    <td style="color: #2ecc71; font-weight: bold;">$14.236,44</td>
+                </tr>
+                <tr>
+                    <td><strong>Emitir 3 Cartões Digitais</strong> (Combo-Familiar)</td>
+                    <td>$49.99</td>
+                    <td>480 adesões</td>
+                    <td style="color: #2ecc71; font-weight: bold;">$23.995,20</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- DISTRIBUIÇÃO ESTATÍSTICA POR ESTADO -->
+        <div class="section-title">2. Distribuição Geográfica de Homologações por Estado (Amostragem Nacional)</div>
+        <table style="margin-top: 15px;">
+            <thead>
+                <tr>
+                    <th>Estado (UF)</th>
+                    <th>Região Geográfica</th>
+                    <th>Total de Veículos Protegidos</th>
+                    <th>Percentual da Base</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>SP</strong> - São Paulo</td>
+                    <td>Sudeste</td>
+                    <td>520 cadastros</td>
+                    <td>41.6%</td>
+                </tr>
+                <tr>
+                    <td><strong>RJ</strong> - Rio de Janeiro</td>
+                    <td>Sudeste</td>
+                    <td>280 cadastros</td>
+                    <td>22.4%</td>
+                </tr>
+                <tr>
+                    <td><strong>MG</strong> - Minas Gerais</td>
+                    <td>Sudeste</td>
+                    <td>195 cadastros</td>
+                    <td>15.6%</td>
+                </tr>
+                <tr>
+                    <td><strong>BA</strong> - Bahia</td>
+                    <td>Nordeste</td>
+                    <td>143 cadastros</td>
+                    <td>11.4%</td>
+                </tr>
+                <tr>
+                    <td><strong>PR</strong> - Paraná</td>
+                    <td>Sul</td>
+                    <td>110 cadastros</td>
+                    <td>8.8%</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="footer-text">🛡️ Dados integrados via API do banco de dados criptografado CADMIV. Em conformidade jurídica nacional.</div>
+    </div>
+
+</body>
+</html>
