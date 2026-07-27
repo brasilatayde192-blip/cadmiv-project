@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CADMIV - Central de Fiscalização e Utilidade Pública</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f9; padding: 20px; text-align: center; color: #2c3e50; }
+        .container-police { background: white; padding: 40px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 100%; max-width: 600px; box-sizing: border-box; display: inline-block; margin-bottom: 25px; border: 3px solid #34495e; text-align: left; }
+        .container-info { background: #eaf2f8; padding: 30px; border-radius: 10px; border: 2px solid #3498db; width: 100%; max-width: 600px; box-sizing: border-box; display: inline-block; text-align: left; }
+        .police-title { background-color: #34495e; color: white; padding: 12px; border-radius: 5px; text-align: center; font-weight: bold; font-size: 18px; margin-bottom: 15px; }
+        .info-title { color: #2980b9; font-size: 20px; margin-bottom: 15px; font-weight: bold; text-align: center; }
+        .police-input { width: 100%; padding: 12px; margin-top: 10px; border: 2px solid #34495e; border-radius: 5px; box-sizing: border-box; font-size: 15px; font-weight: bold; text-align: center; }
+        .police-btn { background-color: #34495e; color: white; border: none; padding: 15px; width: 100%; border-radius: 5px; font-weight: bold; font-size: 16px; margin-top: 15px; cursor: pointer; }
+        .police-btn:hover { background-color: #2c3e50; }
+        .qr-section { text-align: center; margin-top: 25px; padding: 15px; background: #f8f9f9; border-radius: 5px; border: 1px dashed #34495e; }
+        .qr-box { background-color: #34495e; color: white; width: 140px; height: 140px; margin: 10px auto; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 12px; border-radius: 5px; }
+        p { text-align: justify; color: #34495e; font-size: 15px; line-height: 1.6; margin-bottom: 20px; }
+        .btn-next { background-color: #27ae60; color: white; border: none; padding: 15px 30px; border-radius: 5px; font-weight: bold; font-size: 16px; cursor: pointer; text-decoration: none; display: inline-block; margin-top: 20px; }
+        .btn-next:hover { background-color: #219150; }
+        .status-result { display: none; margin-top: 20px; padding: 20px; border-radius: 5px; text-align: center; font-weight: bold; font-size: 16px; }
+        .status-alert-furto { background-color: #c0392b; color: white; border: 3px solid #78281f; animation: pulsar 1s infinite alternate; }
+        ul { margin-top: 10px; padding-left: 20px; color: #34495e; font-size: 14px; line-height: 1.6; }
+        li { margin-bottom: 8px; }
+        @keyframes pulsar { 0% { background-color: #c0392b; box-shadow: 0 0 10px #c0392b; } 100% { background-color: #ec7063; box-shadow: 0 0 25px #ec7063; } }
+    </style>
+    <script>
+        function consultarChassiAgente() {
+            var chassi = document.getElementById("chassi_agente").value.trim();
+            var resultado = document.getElementById("resultado_agente");
+            
+            if (chassi === "") {
+                alert("Agente, insira o número do Chassi para realizar a fiscalização.");
+                return;
+            }
+            resultado.style.display = "block";
+
+            if (chassi === "1234" || chassi.toLowerCase() === "furto") {
+                resultado.className = "status-result status-alert-furto";
+                resultado.innerHTML = "🚨 🚨 ALERTA DE EMERGÊNCIA POLICIAL 🚨 🚨<br><br>STATUS: VEÍCULO FURTADO / ROUBADO!<br>⚠️ ABORDE O CONDUTOR E ACIONE A POLÍCIA MILITAR IMEDIATAMENTE!";
+            } else if (chassi === "5555") {
+                resultado.className = "status-result"; resultado.style.backgroundColor = "#fadbd8"; resultado.style.color = "#78281f"; resultado.style.border = "2px solid #e74c3c";
+                resultado.innerHTML = "🔴 STATUS: DESATIVADO<br>Motivo: Veículo Repassado via Venda / Doação / Fora de Uso.";
+            } else if (chassi === "7777") {
+                resultado.className = "status-result"; resultado.style.backgroundColor = "#fdebd0"; resultado.style.color = "#7e5109"; resultado.style.border = "2px solid #f39c12";
+                resultado.innerHTML = "💛 STATUS: ADORMECIDO<br>Motivo: Falta fazer a Renovação Anual do Cadastro CADMIV.";
+            } else {
+                resultado.className = "status-result"; resultado.style.backgroundColor = "#d4efdf"; resultado.style.color = "#196f3d"; resultado.style.border = "2px solid #27ae60";
+                resultado.innerHTML = "🟢 STATUS: ATIVO (OK)<br>Veículo Regularizado sob Proteção Nacional.";
+            }
+        }
+    </script>
+</head>
+<body>
+
+    <!-- PORTAL DE FISCALIZAÇÃO DO AGENTE DE TRÂNSITO (PRIORIDADE NO TOPO) -->
+    <div class="container-police">
+        <div class="police-title">👮‍♂️ PORTAL DE FISCALIZAÇÃO DO AGENTE DE TRÂNSITO</div>
+        <p style="font-size: 13px; color: #7f8c8d; text-align: center; margin-top: -5px;">Acesso rápido para averiguação de veículos autopropelidos em vias públicas.</p>
+        
+        <input type="text" id="chassi_agente" class="police-input" placeholder="DIGITE O CHASSI OU N° DE SÉRIE DO VEÍCULO">
+        <button type="button" onclick="consultarChassiAgente()" class="police-btn">🔍 Verificar Status do Veículo Abordado</button>
+        
+        <div id="resultado_agente" class="status-result"></div>
+
+        <!-- ESPAÇO DO QR-CODE DO AGENTE -->
+        <div class="qr-section">
+            <span style="font-weight: bold; font-size: 14px; color: #34495e;">📱 QR-CODE OFICIAL DE FISCALIZAÇÃO</span>
+            <p style="font-size: 12px; color: #7f8c8d; text-align: center; margin: 5px 0 0 0;">Agente, aponte a câmera do seu celular para este QR-Code para acessar o portal de checagem instantânea de qualquer lugar do Brasil.</p>
+            <div class="qr-box"><br><br>[ QR-CODE DO<br>AGENTE ]</div>
+        </div>
+    </div>
+
+    <br>
+
+    <!-- PAINEL INFORMATIVO DE UTILIDADE PÚBLICA -->
+    <div class="container-info">
+        <div class="info-title">📋 Painel Informativo de Utilidade Pública</div>
+        <p>Para que você compreenda a relevância deste registro corporativo, detalhamos abaixo o escopo de atuação e as finalidades da plataforma CADMIV:</p>
+
+        <ul>
+            <li><strong>O que é a CADMIV?</strong> É uma central de registro e homologação patrimonial de segurança nacional voltada exclusivamente para veículos de pequeno porte de mobilidade individual.</li>
+            <li><strong>Qual é a nossa Finalidade Primordial?</strong> Estabelecer um vínculo jurídico definitivo entre o legítimo proprietário e o chassi/série do veículo autopropelido (bicicletas comuns, elétricas, esportivas, patinetes e monociclos) através de um banco de dados unificado.</li>
+            <li><strong>Apoio à Fiscalização de Trânsito:</strong> Em abordagens rotineiras nas vias públicas, os agentes de segurança pública utilizam este Portal acima para checar instantaneamente o status do veículo abordado, agindo de forma implacável contra o comércio de receptação ilícita.</li>
+            <li><strong>Protocolo de Emergência e Saúde:</strong> Além da proteção ao patrimônio, a sua credencial digital carrega informações vitais de saúde (como tipo sanguíneo e contatos de emergência), garantindo socorro humanizado e rápido em caso de acidentes nas ruas.</li>
+        </ul>
+
+        <p style="font-weight: bold; text-align: center; margin-top: 25px; margin-bottom: 5px; color: #27ae60;">
+            Cidadão consciente protege o seu patrimônio.
+        </p>
+
+        <div style="text-align: center;">
+            <a href="termos.html" class="btn-next">Prosseguir para Contrato de Segurança</a>
+        </div>
+    </div>
+
+</body>
+</html>
