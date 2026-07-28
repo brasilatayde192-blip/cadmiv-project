@@ -3,40 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CADMIV - Sistema de Proteção Patrimonial Nacional</title>
+    <title>CADMIV - Seja Bem-Vindo</title>
     <style>
-        body { font-family: Arial, sans-serif; background-color: #f4f4f9; padding: 20px; text-align: center; color: #2c3e50; }
-        .welcome-container { background: white; padding: 40px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 600px; display: inline-block; text-align: center; box-sizing: border-box; }
-        h1 { color: #27ae60; margin-bottom: 10px; }
-        .headline { font-size: 16px; color: #7f8c8d; margin-bottom: 30px; font-weight: bold; }
-        .feature-box { background: #f8f9f9; border: 1px solid #d5dbdb; padding: 20px; border-radius: 5px; text-align: left; margin-bottom: 25px; }
-        .btn-start { background-color: #27ae60; color: white; border: none; padding: 15px 30px; border-radius: 5px; font-weight: bold; font-size: 18px; cursor: pointer; text-decoration: none; display: block; margin-top: 15px; }
-        .btn-start:hover { background-color: #219150; }
-        
-        /* ÁREA EXCLUSIVA DO CLIENTE REGISTRADO */
-        .client-section { border-top: 2px dashed #bdc3c7; margin-top: 30px; padding-top: 20px; }
-        .btn-client { background-color: #c0392b; color: white; border: none; padding: 12px 25px; border-radius: 5px; font-weight: bold; font-size: 15px; cursor: pointer; text-decoration: none; display: inline-block; }
-        .btn-client:hover { background-color: #a93226; }
-        .client-subtext { font-size: 12px; font-weight: bold; color: #7f8c8d; display: block; margin-top: 5px; }
+        body { font-family: Arial, sans-serif; background-color: #0b131f; color: #ffffff; padding: 20px; text-align: center; margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; }
+        .card-container { background: #111c2e; padding: 35px 25px; border-radius: 15px; box-shadow: 0 8px 16px rgba(0,0,0,0.3); width: 100%; max-width: 450px; box-sizing: border-box; }
+        h1 { color: #3498db; font-size: 28px; margin: 0 0 5px 0; font-weight: bold; }
+        .subtitle { color: #f1c40f; font-size: 13px; font-weight: bold; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 0.5px; line-height: 1.4; }
+        .badge-protection { background-color: rgba(39, 174, 96, 0.2); border: 1px solid #27ae60; color: #2ecc71; padding: 8px 15px; border-radius: 20px; display: inline-block; font-size: 12px; font-weight: bold; margin-bottom: 30px; letter-spacing: 1px; }
+        h2 { font-size: 22px; color: #ffffff; margin-bottom: 20px; font-weight: bold; line-height: 1.3; }
+        .content-text { color: #b2bec3; font-size: 14px; text-align: justify; line-height: 1.6; margin-bottom: 35px; }
+        .btn-advance { background-color: #3498db; color: #f1c40f; border: none; padding: 16px; width: 100%; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; text-decoration: none; display: block; box-sizing: border-box; text-align: center; text-transform: uppercase; letter-spacing: 0.5px; transition: background 0.3s; }
+        .btn-advance:hover { background-color: #2980b9; }
+        .footer-text { color: #57606f; font-size: 11px; margin-top: 35px; line-height: 1.4; border-top: 1px solid #1b2a47; padding-top: 15px; }
     </style>
 </head>
 <body>
 
-    <div class="welcome-container">
-        <h1>Bem-vindo à Plataforma CADMIV</h1>
-        <div class="headline">Homologação e Registro de Segurança para Veículos Autopropelidos e de Mobilidade Individual</div>
+    <div class="card-container">
+        <h1>CADMIV.com.br</h1>
+        <div class="subtitle">Cadastro Mobilidade Individual Veículo Autopropelido</div>
 
-        <div class="feature-box">
-            <strong>🛡️ PROTEÇÃO NACIONAL DO SEU PATRIMÔNIO</strong><br><br>
-            A CADMIV oferece uma infraestrutura de identificação jurídica para proprietários de bicicletas (comuns ou elétricas), patinetes, e monociclos. Atwear do nosso sistema, autoridades civis e agentes de trânsito em todo o território nacional possuem ferramentas oficiais para consultar e verificar a procedência regular do seu veículo abordado na rua.
+        <div class="badge-protection">🌱 PREPARAMOS SUA PROTEÇÃO</div>
+
+        <h2>Seja muito bem-vindo à<br>nossa plataforma!</h2>
+
+        <div class="content-text">
+            Olá, amigo condutor! É uma imensa alegria receber a sua visita. Sabemos o quanto o seu veículo — seja ele o seu monociclo elétrico, seu patinete de trajetos curtos ou a sua estimada bicicleta — é valioso para a sua liberdade e o seu dia a dia. É por isso que <strong>trabalhamos</strong> com muito amor, dedicação e afinco para entregar a você o sistema de segurança viária e proteção patrimonial mais robusto do Brasil. Nossas portas digitais <strong>foram</strong> preparadas nos mínimos detalhes para acolher você com a máxima excelência. <strong>No momento estamos com o cadastro</strong> 100% ativo para emitir o seu Cartão Digital de Conformidade e blindar o seu patrimônio. Obrigado por caminhar conosco rumo ao futuro da micro-mobilidade!
         </div>
 
-        <a href="termos.html" class="btn-start">Iniciar Meu Registro Patrimonial</a>
+        <!-- 🟦 BOTÃO AZUL COM ESCRITA AMARELA APONTANDO PARA A TELA DE APRESENTAÇÃO -->
+        <a href="apresentacao.html" class="btn-advance">Siga rumo ao CADASTRO</a>
 
-        <!-- ÁREA DE ENTRADA RÁPIDA CORRIGIDA COM A MÃO PARA CIMA (👆) -->
-        <div class="client-section">
-            <a href="login.html" class="btn-client">Acessar Área do Cliente Registrado</a>
-            <span class="client-subtext">👆 Toque aqui você que possui cadastro na CADMIV para acionar o Botão de Furto</span>
+        <div class="footer-text">
+            CADMIV &copy; 2026 &bull; Em Perfeito Alinhamento com a<br>Resolução CONTRAN 996/2023
         </div>
     </div>
 
