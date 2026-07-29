@@ -8,7 +8,6 @@
         body { font-family: Arial, sans-serif; background-color: #f4f4f9; padding: 15px; text-align: center; color: #2c3e50; margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; }
         .page-container { width: 100%; max-width: 520px; display: flex; flex-direction: column; align-items: center; box-sizing: border-box; }
         
-        /* DESIGN IDÊNTICO À SUA FOTO COM COMPACTAÇÃO ANTI-PREJUÍZO */
         .card-frame { background: #ffffff; border: 2px solid #bdc3c7; border-radius: 15px; width: 100%; padding: 20px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); box-sizing: border-box; text-align: left; position: relative; }
         .card-back-frame { background: #ffffff; border: 2px solid #bdc3c7; border-radius: 15px; width: 95%; padding: 15px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); box-sizing: border-box; text-align: left; font-size: 12.5px; }
         
@@ -30,20 +29,18 @@
         li { margin-bottom: 10px; text-align: justify; line-height: 1.4; }
         .verso-quote { text-align: center; font-weight: bold; font-style: italic; color: #c0392b; font-size: 13px; margin-top: 15px; margin-bottom: 5px; }
         
-        /* BOTÃO DE IMPRESSÃO VISÍVEL APENAS NA TELA */
         .btn-print { background-color: #1e5631; color: #ffffff; border: none; padding: 14px; width: 100%; border-radius: 5px; font-weight: bold; font-size: 15px; cursor: pointer; text-decoration: none; display: block; box-sizing: border-box; text-align: center; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 15px; }
         .btn-print:hover { background-color: #143d22; }
         
-        /* TARJA DOURADA EXECUTIVA COM LETRAS PRETAS */
-        .thanks-gold-bar { background: linear-gradient(135deg, #d4af37, #f3e5ab, #aa7c11); color: #000000; padding: 12px 20px; border-radius: 8px; font-size: 14.5px; font-weight: bold; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); font-style: italic; border: 1px solid #aa7c11; width: 100%; box-sizing: border-box; letter-spacing: 0.3px; margin-bottom: 10px; }
+        /* TARJA DOURADA EXECUTIVA TRANSFORMADA EM BOTÃO INTERATIVO DE REDIRECIONAMENTO */
+        .thanks-gold-bar { background: linear-gradient(135deg, #d4af37, #f3e5ab, #aa7c11); color: #000000; padding: 12px 20px; border-radius: 8px; font-size: 14px; font-weight: bold; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); font-style: italic; border: 1px solid #aa7c11; width: 100%; box-sizing: border-box; letter-spacing: 0.3px; margin-bottom: 10px; text-decoration: none; display: block; cursor: pointer; transition: transform 0.2s; }
+        .thanks-gold-bar:hover { transform: scale(1.02); background: linear-gradient(135deg, #aa7c11, #f3e5ab, #d4af37); }
         
-        /* ENDEREÇO DE DESTAQUE NO CENTRO DO RODAPÉ */
         .web-footer-center { font-size: 15px; font-weight: bold; color: #2c3e50; text-align: center; margin-top: 5px; letter-spacing: 0.5px; }
 
-        /* 👑 COMANDO DE ENGENHARIA OCULTA: INVISIBILIDADE NA IMPRESSÃO */
         @media print {
             body { background-color: #ffffff; padding: 0; }
-            .btn-print { display: none !important; } /* O botão some na impressora */
+            .btn-print, .thanks-gold-bar { display: none !important; } /* A tarja e o botão somem no papel */
             .page-container { max-width: 100%; }
         }
     </style>
@@ -55,8 +52,7 @@
         <!-- FRENTE DO CARTÃO DIGITAL -->
         <div class="card-frame">
             <h1>CADMIV</h1>
-            <!-- 1. CRAVADO: ENDEREÇO ELETRÔNICO LOGO ABAIXO DO NOME -->
-            <div class="web-url-card">www.cadmiv.com.br</div>
+            <div class="web-url-card">://cadmiv.com.br</div>
             <div class="card-subtitle">Credencial de Identificação e Proteção Nacional</div>
             
             <div class="flex-container">
@@ -97,14 +93,14 @@
             <div class="card-footer-note" style="margin-top: 10px;">Verso • Homologação de Patrimônio Corporativo</div>
         </div>
 
-        <!-- BOTÃO VERDE DE COMANDO (FICA INVISÍVEL NO PAPEL AUTOMATICAMENTE) -->
+        <!-- BOTÃO DE IMPRESSÃO -->
         <button type="button" onclick="window.print();" class="btn-print">Imprimir Credencial Completa (Tamanho Carta)</button>
 
-        <!-- TARJA DOURADA EXECUTIVA DE AGRADECIMENTO -->
-        <div class="thanks-gold-bar">Conclua e Receba o Agradecimento da CADMIV.</div>
+        <!-- TARJA DOURADA REFORMULADA COM RESPEITO GRAMATICAL E LINK DE FECHAMENTO -->
+        <a href="index.html" class="thanks-gold-bar">A CADMIV agradece por sua confiança na homologação e proteção do seu patrimônio.</a>
         
-        <!-- ENDEREÇO EM DESTAQUE NO CENTRO ABAIXO DA TARJA -->
-        <div class="web-footer-center">www.cadmiv.com.br</div>
+        <!-- ENDEREÇO EM DESTAQUE NO CENTRO -->
+        <div class="web-footer-center">://cadmiv.com.br</div>
     </div>
 
 </body>
