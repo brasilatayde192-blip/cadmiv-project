@@ -5,36 +5,47 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CADMIV - Credencial de Identificação Nacional</title>
     <style>
-        body { font-family: Arial, sans-serif; background-color: #f4f4f9; padding: 20px; text-align: center; color: #2c3e50; margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; }
-        .page-container { width: 100%; max-width: 550px; display: flex; flex-direction: column; align-items: center; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background-color: #f4f4f9; padding: 15px; text-align: center; color: #2c3e50; margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; }
+        .page-container { width: 100%; max-width: 520px; display: flex; flex-direction: column; align-items: center; box-sizing: border-box; }
         
-        /* DESIGN IDÊNTICO À SUA FOTO COM REDUÇÃO NO VERSO */
-        .card-frame { background: #ffffff; border: 2px solid #bdc3c7; border-radius: 15px; width: 100%; padding: 25px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); box-sizing: border-box; text-align: left; position: relative; }
-        .card-back-frame { background: #ffffff; border: 2px solid #bdc3c7; border-radius: 15px; width: 95%; padding: 20px; margin-bottom: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); box-sizing: border-box; text-align: left; font-size: 13px; }
+        /* DESIGN IDÊNTICO À SUA FOTO COM COMPACTAÇÃO ANTI-PREJUÍZO */
+        .card-frame { background: #ffffff; border: 2px solid #bdc3c7; border-radius: 15px; width: 100%; padding: 20px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); box-sizing: border-box; text-align: left; position: relative; }
+        .card-back-frame { background: #ffffff; border: 2px solid #bdc3c7; border-radius: 15px; width: 95%; padding: 15px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); box-sizing: border-box; text-align: left; font-size: 12.5px; }
         
-        h1 { font-size: 24px; color: #2c3e50; text-align: center; margin: 0 0 5px 0; letter-spacing: 1px; font-weight: bold; }
-        .card-subtitle { font-size: 11px; color: #7f8c8d; text-align: center; font-weight: bold; text-transform: uppercase; margin-bottom: 20px; letter-spacing: 0.5px; }
+        h1 { font-size: 24px; color: #2c3e50; text-align: center; margin: 0; letter-spacing: 1px; font-weight: bold; }
+        .web-url-card { font-size: 11px; color: #aa7c11; font-weight: bold; text-align: center; margin-top: 2px; margin-bottom: 10px; letter-spacing: 0.5px; }
+        .card-subtitle { font-size: 10px; color: #7f8c8d; text-align: center; font-weight: bold; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 0.5px; }
         
-        .flex-container { display: flex; gap: 20px; align-items: center; margin-top: 15px; }
-        .photo-placeholder { border: 2px dashed #bdc3c7; width: 110px; height: 140px; border-radius: 5px; background: #fafafa; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 11px; color: #95a5a6; font-weight: bold; text-align: center; padding: 5px; box-sizing: border-box; }
+        .flex-container { display: flex; gap: 15px; align-items: center; margin-top: 10px; }
+        .photo-placeholder { border: 2px dashed #bdc3c7; width: 105px; height: 135px; border-radius: 5px; background: #fafafa; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; color: #95a5a6; font-weight: bold; text-align: center; padding: 5px; box-sizing: border-box; }
         .data-fields { flex: 1; }
         
-        .field-label { font-size: 10px; color: #7f8c8d; font-weight: bold; text-transform: uppercase; margin-top: 10px; }
-        .field-value { font-size: 14px; color: #2c3e50; font-weight: bold; margin-bottom: 5px; }
+        .field-label { font-size: 9px; color: #7f8c8d; font-weight: bold; text-transform: uppercase; margin-top: 8px; }
+        .field-value { font-size: 13.5px; color: #2c3e50; font-weight: bold; margin-bottom: 4px; }
         
-        .seal-stamp { position: absolute; right: 25px; bottom: 45px; border: 2px solid #27ae60; color: #27ae60; border-radius: 50%; width: 65px; height: 65px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 8px; font-weight: bold; text-align: center; transform: rotate(15deg); opacity: 0.8; background: #ffffff; line-height: 1.1; }
-        .card-footer-note { font-size: 9px; color: #bdc3c7; text-align: center; font-weight: bold; text-transform: uppercase; margin-top: 20px; letter-spacing: 0.5px; }
+        .seal-stamp { position: absolute; right: 20px; bottom: 35px; border: 2px solid #27ae60; color: #27ae60; border-radius: 50%; width: 60px; height: 60px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 7.5px; font-weight: bold; text-align: center; transform: rotate(15deg); opacity: 0.8; background: #ffffff; line-height: 1.1; }
+        .card-footer-note { font-size: 8.5px; color: #bdc3c7; text-align: center; font-weight: bold; text-transform: uppercase; margin-top: 15px; letter-spacing: 0.5px; }
         
         ol { padding-left: 20px; margin: 0; color: #34495e; }
-        li { margin-bottom: 12px; text-align: justify; line-height: 1.5; }
-        .verso-quote { text-align: center; font-weight: bold; font-style: italic; color: #c0392b; font-size: 14px; margin-top: 20px; margin-bottom: 5px; }
+        li { margin-bottom: 10px; text-align: justify; line-height: 1.4; }
+        .verso-quote { text-align: center; font-weight: bold; font-style: italic; color: #c0392b; font-size: 13px; margin-top: 15px; margin-bottom: 5px; }
         
-        /* BOTÃO DE IMPRESSÃO DA SUA FOTO */
-        .btn-print { background-color: #1e5631; color: #ffffff; border: none; padding: 16px; width: 100%; border-radius: 5px; font-weight: bold; font-size: 15px; cursor: pointer; text-decoration: none; display: block; box-sizing: border-box; text-align: center; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 20px; }
+        /* BOTÃO DE IMPRESSÃO VISÍVEL APENAS NA TELA */
+        .btn-print { background-color: #1e5631; color: #ffffff; border: none; padding: 14px; width: 100%; border-radius: 5px; font-weight: bold; font-size: 15px; cursor: pointer; text-decoration: none; display: block; box-sizing: border-box; text-align: center; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 15px; }
         .btn-print:hover { background-color: #143d22; }
         
-        /* SUA NOVA TARJA DOURADA MONUMENTAL COM LETRAS PRETAS */
-        .thanks-gold-bar { background: linear-gradient(135deg, #d4af37, #f3e5ab, #aa7c11); color: #000000; padding: 15px 25px; border-radius: 8px; font-size: 15px; font-weight: bold; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.15); font-style: italic; border: 1px solid #aa7c11; width: 100%; box-sizing: border-box; letter-spacing: 0.3px; }
+        /* TARJA DOURADA EXECUTIVA COM LETRAS PRETAS */
+        .thanks-gold-bar { background: linear-gradient(135deg, #d4af37, #f3e5ab, #aa7c11); color: #000000; padding: 12px 20px; border-radius: 8px; font-size: 14.5px; font-weight: bold; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); font-style: italic; border: 1px solid #aa7c11; width: 100%; box-sizing: border-box; letter-spacing: 0.3px; margin-bottom: 10px; }
+        
+        /* ENDEREÇO DE DESTAQUE NO CENTRO DO RODAPÉ */
+        .web-footer-center { font-size: 15px; font-weight: bold; color: #2c3e50; text-align: center; margin-top: 5px; letter-spacing: 0.5px; }
+
+        /* 👑 COMANDO DE ENGENHARIA OCULTA: INVISIBILIDADE NA IMPRESSÃO */
+        @media print {
+            body { background-color: #ffffff; padding: 0; }
+            .btn-print { display: none !important; } /* O botão some na impressora */
+            .page-container { max-width: 100%; }
+        }
     </style>
 </head>
 <body>
@@ -44,6 +55,8 @@
         <!-- FRENTE DO CARTÃO DIGITAL -->
         <div class="card-frame">
             <h1>CADMIV</h1>
+            <!-- 1. CRAVADO: ENDEREÇO ELETRÔNICO LOGO ABAIXO DO NOME -->
+            <div class="web-url-card">www.cadmiv.com.br</div>
             <div class="card-subtitle">Credencial de Identificação e Proteção Nacional</div>
             
             <div class="flex-container">
@@ -58,7 +71,7 @@
                     <div class="field-value">000.000.000-00</div>
                     
                     <div class="field-label">Código de Autenticidade Nacional</div>
-                    <div class="field-value" style="color: #c0392b; font-size: 16px;">CAD-778899-BR</div>
+                    <div class="field-value" style="color: #c0392b; font-size: 15px;">CAD-778899-BR</div>
                 </div>
             </div>
             
@@ -69,27 +82,29 @@
             <div class="card-footer-note">Frente • Sistema Criptografado via Nuvem CADMIV</div>
         </div>
 
-        <!-- VERSO DO CARTÃO DIGITAL (TEXTO ATUALIZADO EXATAMENTE COM A SUA FRASE) -->
+        <!-- VERSO DO CARTÃO DIGITAL -->
         <div class="card-back-frame">
             <h1>CADMIV</h1>
             <div class="card-subtitle">Disposições Legais e Regulamentares</div>
             
             <ol>
                 <li>Esta credencial é de uso pessoal, intransferível e protegida por sigilo criptográfico de conformidade nacional.</li>
-                <!-- CRAVADO CONFORME A SUA ÚLTIMA ATUALIZAÇÃO -->
                 <li>A autenticidade deste Cartão Digital se deve aos dados fornecidos pelo TITULAR, em caso de dúvida, em uma abordagem por um agente de trânsito, autoridades policiais ou competentes para abordar, o mesmo deverá apresentar documento atual com foto, (ex: RG, CNH), para que seja comprovado a veracidade do mesmo.</li>
                 <li>Qualquer tentativa de adulteração visual ou inserção de códigos falsificados sujeitará o infrator às sanções civis e penais previstas na legislação brasileira.</li>
             </ol>
             
             <div class="verso-quote">"CADMIV: Dignidade Blindada, Cidadania Assegurada."</div>
-            <div class="card-footer-note" style="margin-top: 15px;">Verso • Homologação de Patrimônio Corporativo</div>
+            <div class="card-footer-note" style="margin-top: 10px;">Verso • Homologação de Patrimônio Corporativo</div>
         </div>
 
-        <!-- BOTÃO DA SUA FOTO -->
+        <!-- BOTÃO VERDE DE COMANDO (FICA INVISÍVEL NO PAPEL AUTOMATICAMENTE) -->
         <button type="button" onclick="window.print();" class="btn-print">Imprimir Credencial Completa (Tamanho Carta)</button>
 
-        <!-- SUA HISTÓRICA FRASE DE AGRADECIMENTO NA TARJA DOURADA EM LETRAS PRETAS -->
+        <!-- TARJA DOURADA EXECUTIVA DE AGRADECIMENTO -->
         <div class="thanks-gold-bar">Conclua e Receba o Agradecimento da CADMIV.</div>
+        
+        <!-- ENDEREÇO EM DESTAQUE NO CENTRO ABAIXO DA TARJA -->
+        <div class="web-footer-center">www.cadmiv.com.br</div>
     </div>
 
 </body>
