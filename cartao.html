@@ -5,66 +5,56 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CADMIV - Credencial de Identificação Nacional</title>
     <style>
-        body { font-family: Arial, sans-serif; background-color: #f4f4f9; padding: 20px; text-align: center; color: #2c3e50; margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; box-sizing: border-box; }
-        .page-container { width: 100%; max-width: 550px; display: flex; flex-direction: column; align-items: center; box-sizing: border-box; padding-bottom: 40px; }
+        body { font-family: Arial, sans-serif; background-color: #f4f4f9; padding: 20px; text-align: center; color: #2c3e50; margin: 0; display: flex; flex-direction: column; align-items: center; }
+        .page-container { width: 100%; max-width: 600px; display: flex; flex-direction: column; align-items: center; box-sizing: border-box; }
         
-        /* 💳 DESIGN DO CARTÃO DIGITAL CLÁSSICO - PREENCHIDO E IMPONENTE */
-        .card-frame { background: #ffffff; border: 2px solid #bdc3c7; border-radius: 15px; width: 100%; padding: 25px; margin-bottom: 25px; box-shadow: 0 4px 12 rgba(0,0,0,0.06); box-sizing: border-box; text-align: left; position: relative; }
+        /* 📏 ENGENHARIA COMPACTA DO CARTÃO - FIXO PARA NÃO ESTICAR NA IMPRESSÃO */
+        .card-box { 
+            background: #ffffff; 
+            border: 2px solid #bdc3c7; 
+            border-radius: 12px; 
+            width: 480px; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05); 
+            box-sizing: border-box; 
+            text-align: left; 
+            position: relative;
+            margin-bottom: 20px;
+        }
         
-        h1, h2 { font-size: 26px; color: #2c3e50; text-align: center; margin: 0; letter-spacing: 1px; font-weight: bold; }
-        .web-url-card { font-size: 13px; color: #aa7c11; font-weight: bold; text-align: center; margin-top: 3px; margin-bottom: 8px; letter-spacing: 0.5px; }
-        .card-subtitle { font-size: 11px; color: #7f8c8d; text-align: center; font-weight: bold; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 0.5px; }
+        .frente-height { height: 280px; padding: 15px; }
+        .verso-height { height: 340px; padding: 15px; }
         
-        .flex-container { display: flex; gap: 20px; align-items: center; margin-top: 10px; }
-        .photo-placeholder { border: 2px dashed #bdc3c7; width: 110px; height: 140px; border-radius: 5px; background: #fafafa; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; color: #95a5a6; font-weight: bold; text-align: center; padding: 5px; box-sizing: border-box; }
+        h1 { font-size: 24px; color: #2c3e50; text-align: center; margin: 0; letter-spacing: 1px; font-weight: bold; }
+        .web-url-card { font-size: 12px; color: #aa7c11; font-weight: bold; text-align: center; margin-top: 2px; margin-bottom: 5px; }
+        .card-subtitle { font-size: 9.5px; color: #7f8c8d; text-align: center; font-weight: bold; text-transform: uppercase; margin-bottom: 10px; }
+        
+        .flex-container { display: flex; gap: 15px; align-items: center; margin-top: 5px; }
+        .photo-placeholder { border: 2px dashed #bdc3c7; width: 95px; height: 120px; border-radius: 5px; background: #fafafa; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; color: #95a5a6; font-weight: bold; text-align: center; }
         .data-fields { flex: 1; }
         
-        .field-label { font-size: 10px; color: #7f8c8d; font-weight: bold; text-transform: uppercase; margin-top: 8px; }
-        .field-value { font-size: 15px; color: #2c3e50; font-weight: bold; margin-bottom: 4px; }
+        .field-label { font-size: 9px; color: #7f8c8d; font-weight: bold; text-transform: uppercase; margin-top: 4px; }
+        .field-value { font-size: 13.5px; color: #2c3e50; font-weight: bold; margin-bottom: 1px; }
         
-        .seal-stamp { position: absolute; right: 25px; bottom: 35px; border: 2px solid #27ae60; color: #27ae60; border-radius: 50%; width: 65px; height: 65px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 8px; font-weight: bold; text-align: center; transform: rotate(15deg); opacity: 0.8; background: #ffffff; line-height: 1.1; }
-        .card-footer-note { font-size: 9px; color: #bdc3c7; text-align: center; font-weight: bold; text-transform: uppercase; margin-top: 15px; letter-spacing: 0.5px; }
+        .seal-stamp { position: absolute; right: 15px; bottom: 20px; border: 2px solid #27ae60; color: #27ae60; border-radius: 50%; width: 55px; height: 55px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 7px; font-weight: bold; text-align: center; transform: rotate(15deg); opacity: 0.8; background: #ffffff; }
+        .card-footer-note { font-size: 8px; color: #bdc3c7; text-align: center; font-weight: bold; text-transform: uppercase; position: absolute; bottom: 8px; left: 0; width: 100%; }
         
-        ol { padding-left: 20px; margin: 0; color: #34495e; font-size: 13px; }
-        li { margin-bottom: 10px; text-align: justify; line-height: 1.4; }
-        .verso-quote { text-align: center; font-weight: bold; font-style: italic; color: #c0392b; font-size: 14px; margin-top: 15px; margin-bottom: 5px; }
+        ol { padding-left: 18px; margin: 0; color: #34495e; font-size: 11px; }
+        li { margin-bottom: 6px; text-align: justify; line-height: 1.3; }
+        .verso-quote { text-align: center; font-weight: bold; font-style: italic; color: #c0392b; font-size: 12px; margin-top: 10px; }
         
-        /* 📜 DESIGN DA ÚLTIMA PÁGINA DE AGRADECIMENTO E PROTOCOLO (DA SUA FOTO) */
-        .thanks-page-frame { background: #ffffff; border: 3px double #aa7c11; border-radius: 10px; width: 100%; padding: 35px 25px; margin-top: 15px; box-sizing: border-box; text-align: justify; line-height: 1.5; font-size: 14px; color: #2c3e50; }
-        .thanks-title { font-size: 20px; font-weight: bold; text-align: center; color: #2c3e50; margin-top: 0; margin-bottom: 3px; }
-        .thanks-subtitle { font-size: 12px; font-weight: bold; text-align: center; color: #7f8c8d; margin-bottom: 15px; text-transform: uppercase; }
-        .thanks-divider { border-top: 1px dashed #7f8c8d; margin: 15px 0; }
+        /* 🟢 A FAMOSA TARJA VERDE DE IMPRESSÃO DE VOLTA COM DESTAQUE */
+        .btn-print-green { background-color: #27ae60; color: #ffffff; border: none; padding: 15px; width: 100%; border-radius: 5px; font-weight: bold; font-size: 16px; cursor: pointer; text-decoration: none; display: block; box-sizing: border-box; text-align: center; text-transform: uppercase; margin-top: 10px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .btn-print-green:hover { background-color: #219150; }
         
-        .protocol-section { margin-top: 25px; }
-        .protocol-title { font-weight: bold; color: #2c3e50; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; display: flex; align-items: center; gap: 5px; }
-        .protocol-list { list-style: none; padding-left: 0; margin: 0; }
-        .protocol-item { margin-bottom: 12px; padding-left: 20px; position: relative; }
-        .protocol-item::before { content: "•"; position: absolute; left: 5px; color: #aa7c11; font-weight: bold; }
-        
-        .joint-braces-container { display: flex; align-items: center; gap: 10px; margin-top: 12px; padding-left: 20px; }
-        .joint-labels { font-weight: bold; font-size: 13px; line-height: 1.4; }
-        .brace-graphic { font-size: 32px; font-weight: 100; color: #34495e; transform: scaleY(1.3); margin-top: -4px; }
-        .brace-text { font-size: 13px; font-weight: bold; line-height: 1.3; color: #34495e; }
-        
-        .final-signature-text { text-align: center; font-weight: bold; font-style: italic; color: #2c3e50; font-size: 13.5px; margin-top: 30px; margin-bottom: 20px; line-height: 1.4; }
-        
-        /* BOTÃO INTERATIVO VISÍVEL APENAS NA TELA */
-        .btn-print-action { background-color: #1e5631; color: #ffffff; border: none; padding: 15px; width: 100%; border-radius: 5px; font-weight: bold; font-size: 15px; cursor: pointer; text-decoration: none; display: block; box-sizing: border-box; text-align: center; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 25px; margin-bottom: 20px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        .btn-print-action:hover { background-color: #143d22; }
-        
-        /* LINK MASTER DO APP DE VOLTAR AO INÍCIO */
-        .btn-back-home { text-align: center; font-size: 13px; font-weight: bold; color: #7f8c8d; text-decoration: none; margin-top: 15px; display: block; cursor: pointer; }
-        .btn-back-home:hover { color: #2c3e50; text-decoration: underline; }
-        
-        /* 👑 DESTAQUE EXCLUSIVO SOLICITADO NO CENTRO DO RODAPÉ */
-        .web-footer-app-center { font-size: 18px; font-weight: bold; color: #2c3e50; text-align: center; margin-top: 10px; letter-spacing: 0.5px; }
+        .thanks-gold-bar { background: linear-gradient(135deg, #d4af37, #f3e5ab, #aa7c11); color: #000000; padding: 12px 20px; border-radius: 8px; font-size: 14px; font-weight: bold; text-align: center; border: 1px solid #aa7c11; width: 100%; box-sizing: border-box; font-style: italic; text-decoration: none; display: block; margin-bottom: 10px; }
+        .web-footer-center { font-size: 16px; font-weight: bold; color: #2c3e50; text-align: center; margin-top: 5px; }
 
-        /* 👑 COMANDO DE ENGENHARIA OCULTA: INVISIBILIDADE NA IMPRESSÃO */
+        /* REGRAS OCULTAS QUE SOMEM NA IMPRESSORA */
         @media print {
             body { background-color: #ffffff; padding: 0; }
-            .btn-print-action, .btn-back-home { display: none !important; } /* O botão e o link de navegação somem no papel */
+            .btn-print-green, .thanks-gold-bar { display: none !important; }
             .page-container { max-width: 100%; }
-            .thanks-page-frame { border: 2px solid #aa7c11; page-break-before: always; } /* Força a página de agradecimento a sair em uma folha separada linda */
+            .card-box { border: 1px solid #bdc3c7; box-shadow: none; page-break-inside: avoid; }
         }
     </style>
 </head>
@@ -72,8 +62,8 @@
 
     <div class="page-container">
         
-        <!-- FRENTE DO CARTÃO DIGITAL CLÁSSICO -->
-        <div class="card-frame">
+        <!-- FRENTE DO CARTÃO COM MEDIDA TRAVADA -->
+        <div class="card-box frente-height">
             <h1>CADMIV</h1>
             <div class="web-url-card">www.cadmiv.com.br</div>
             <div class="card-subtitle">Credencial de Identificação e Proteção Nacional</div>
@@ -90,19 +80,18 @@
                     <div class="field-value">000.000.000-00</div>
                     
                     <div class="field-label">Código de Autenticidade Nacional</div>
-                    <div class="field-value" style="color: #c0392b; font-size: 16px;">CAD-778899-BR</div>
+                    <div class="field-value" style="color: #c0392b; font-size: 15px;">CAD-778899-BR</div>
                 </div>
             </div>
             
             <div class="seal-stamp">
                 CADMIV<br>VALIDADO<br>★ BR ★
             </div>
-            
             <div class="card-footer-note">Frente • Sistema Criptografado via Nuvem CADMIV</div>
         </div>
 
-        <!-- VERSO DO CARTÃO DIGITAL CLÁSSICO -->
-        <div class="card-frame">
+        <!-- VERSO DO CARTÃO COM MEDIDA TRAVADA -->
+        <div class="card-box verso-height">
             <h1>CADMIV</h1>
             <div class="web-url-card">www.cadmiv.com.br</div>
             <div class="card-subtitle">Disposições Legais e Regulamentares</div>
@@ -117,17 +106,13 @@
             <div class="card-footer-note">Verso • Homologação de Patrimônio Corporativo</div>
         </div>
 
-        <!-- 📜 ÚLTIMA PÁGINA DE AGRADECIMENTO E PROTOCOLO DE SEGURANÇA (REPRODUÇÃO DA SUA FOTO) -->
-        <div class="thanks-page-frame">
-            <div class="thanks-title">CADMIV</div>
-            <div class="thanks-subtitle">Cadastro Mobilidade Individual Veículo-Autopropelido</div>
-            <div class="thanks-divider"></div>
-            
-            <p><strong>Prezado Proprietário e Titular de Credencial Homologada,</strong></p>
-            
-            <p>A Diretoria Executiva da CADMIV expressa os seus mais sinceros agradecimentos pela conclusão do seu Registro Patrimonial Corporativo. O seu veículo autopropelido encontra-se oficialmente protegido e salvaguardado em nossa base de dados nacional.</p>
-            
-            <p>Desejamos a você um excelente, próspero e alegre passeio manejando o seu patrimônio — seja ele elétrico ou convencional!</p>
-            
-            <div class="protocol-section">
-                <div class="protocol-title">📋 PROTOCOLO IMPERIAL DE SEGURANÇA VIÁRIA:</div>
+        <!-- O GRANDE BOTÃO DA TARJA VERDE SOLICITADO POR VOCÊ -->
+        <button type="button" onclick="window.print();" class="btn-print-green">Imprimir Credencial Completa (Tamanho Carta)</button>
+
+        <a href="index.html" class="thanks-gold-bar">A CADMIV agradece por sua confiança na homologação e proteção do seu patrimônio.</a>
+        
+        <div class="web-footer-center">www.cadmiv.com.br</div>
+    </div>
+
+</body>
+</html>
