@@ -43,7 +43,7 @@
         
         .motto-text { text-align: center; font-size: 12px; font-weight: bold; color: #27ae60; margin-top: 20px; margin-bottom: 15px; }
         
-        /* 🟢 A TARJA VERDE CORRIGIDA E TRAVADA COM TEXTO E DESTINO EXATOS */
+        /* 🟢 A TARJA VERDE DE ELITE ENVIANDO DIRETAMENTE PARA OS TERMOS DE USO */
         .btn-prosseguir { background-color: #27ae60; color: white; border: none; padding: 14px; width: 100%; border-radius: 5px; font-weight: bold; font-size: 15px; cursor: pointer; text-decoration: none; display: block; box-sizing: border-box; text-align: center; text-transform: uppercase; }
         .btn-prosseguir:hover { background-color: #219150; }
         
@@ -91,9 +91,9 @@
             }
         }
 
-        // 🟢 DIRECIONAMENTO CORRIGIDO: ABRE DIRETO A PÁGINA DO FORMULÁRIO DE CADASTRO
+        // 🟢 DIRECIONAMENTO PERFEITO: ABRE DIRETAMENTE OS TERMOS DE USO DO SITE
         function avancarFluxo() {
-            window.location.href = "cadastro.html";
+            window.location.href = "termos.html";
         }
     </script>
 </head>
@@ -102,7 +102,7 @@
     <div class="container">
         <div class="police-section">
             <div class="police-header">👤 PORTAL DE FISCALIZAÇÃO DO AGENTE DE TRÂNSITO</div>
-            <div class="police-subtitle">Acesso rápido para averiguação de veículos autopropelidos in vias públicas</div>
+            <div class="police-subtitle">Acesso rápido para averiguação de veículos autopropelidos em vias públicas</div>
             
             <input type="text" id="input_agente" class="police-input" placeholder="DIGITE O CHASSI OU Nº DE SÉRIE DO VEÍCULO">
             <button type="button" onclick="consultarChassi()" class="police-btn">🔹 Verificar Status do Veículo Abordado</button>
@@ -121,18 +121,19 @@
             <div class="info-intro">Para que você compreenda a relevância deste registro corporativo, detalhamos abaixo o escopo de atuação e as finalidades da plataforma CADMIV:</div>
             
             <ul>
-                <li><strong>O que é a CADMIV?</strong> É uma central de registro e homologação patrimonial de segurança nacional voltada exclusivamente para veículos de pequeno porte de mobilidade individual.</li>
-                <li><strong>Qual é a nossa Finalidade Primordial?</strong> Estabelecer um vínculo firme, real e definitivo entre o legítimo proprietário, do veículo autopropelido (bicicletas comuns, elétricas, esportivas, patinetes e monociclos) através de um banco de dados unificado.</li>
+                <li><strong>O que é a CADMIV?</strong> É uma plataforma de registro e homologação patrimonial  de segurança  voltada exclusivamente para veículos  de pequeno  porte de mobilidade individual.</li>
+                <li><strong>Qual é a nossa Finalidade Primordial?</strong> Estabelecer um vínculo firme,      real e definitivo entre o legítimo proprietário do veículo autopropelido ( bicicletas comuns, elétricas, esportivas, patinetes e monociclos ) através de um banco de dados unificado.</li>
                 <li><strong>Apoio à Fiscalização de Trânsito:</strong> Em abordagens rotineiras nas vias públicas, os agentes de segurança pública utilizam este Portal acima para checar instantaneamente o status do veículo abordado, agindo de forma implacável contra o comércio de receptação ilícita.</li>
                 <li><strong>Protocolo de Emergência e Saúde:</strong> É um compromisso mútuo. Além da proteção ao patrimônio, a sua credencial digital carrega informações vitais de saúde (como tipo sanguíneo e contatos de emergência), garantindo socorro humanizado e rápido em caso de acidentes nas ruas.</li>
             </ul>
             
             <div class="motto-text">Cidadão consciente protege o seu patrimônio.</div>
             
-            <button type="button" onclick="avancarFluxo()" class="btn-prosseguir">Prosseguir para Cadastro </button>
+            <!-- 🟢 TEXTO ATUALIZADO: PROSSEGUIR PARA OS TERMOS DE USO -->
+            <button type="button" onclick="avancarFluxo()" class="btn-prosseguir">Prosseguir para os Termos de Uso</button>
         </div>
 
-        <div class="web-footer">:www.cadmiv.com.br</div>
+        <div class="web-footer">www.cadmiv.com.br</div>
     </div>
 
 </body>
