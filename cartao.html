@@ -116,8 +116,8 @@
         window.onload = function() {
             // Puxa as informações digitadas lá na folha de cadastro
             var nomeDigitado = localStorage.getItem("cadmiv_nome") || "Nome do Titular";
-            var cpfDigitado = localStorage.getItem("cadmiv_cpf") || "   .   .   -  ";
-            var codigoGerado = localStorage.getItem("cadmiv_codigo") || "   -      -  ";
+            var cpfDigitado = localStorage.getItem("cadmiv_cpf") || "              ";
+            var codigoGerado = localStorage.getItem("cadmiv_codigo") || "            ";
 
             // Encaixa dinamicamente nos campos do cartão de 14cm
             document.getElementById("card_nome").innerText = nomeDigitado;
