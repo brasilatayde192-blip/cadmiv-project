@@ -12,25 +12,21 @@
         .platform-title { font-size: 28px; color: #1e5631; margin: 0 0 15px 0; font-weight: bold; letter-spacing: 1px; }
         .main-subtitle { font-size: 13.5px; color: #555555; font-weight: bold; line-height: 1.4; margin-bottom: 25px; padding: 0 10px; }
         
-        /* CAIXA BRANCA INTERNA DE PROTEÇÃO */
         .info-card-box { background: #ffffff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 20px; text-align: justify; margin-bottom: 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
         
         .box-title-container { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
         .blue-diamond { color: #2f70af; font-size: 20px; font-weight: bold; }
         .box-title { font-size: 15px; font-weight: bold; color: #2f70af; letter-spacing: 0.5px; text-transform: uppercase; }
         
-        /* TEXTO INSTITUCIONAL - UNIFICADO EM CINZA E SEM NEGRITO NA PALAVRA ATRAVÉS */
         .box-text { font-size: 14px; color: #555555; line-height: 1.5; margin: 0; }
         
-        /* 🟢 TARJA VERDE DE REGISTRO PATRIMONIAL */
-        .btn-green-register { background-color: #1e5631; color: #ffffff; border: none; padding: 16px; width: 100%; border-radius: 6px; font-weight: bold; font-size: 15px; cursor: pointer; text-decoration: none; display: block; box-sizing: border-box; text-align: center; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: background 0.2s; }
+        /* 🟢 TARJA VERDE DE REGISTRO PATRIMONIAL DIRECIONANDO PARA FISCALIZACAO.HTML */
+        .btn-green-register { background-color: #1e5631; color: #ffffff; border: none; padding: 16px; width: 100%; border-radius: 6px; font-weight: bold; font-size: 15px; cursor: pointer; text-decoration: none; display: block; box-sizing: border-box; text-align: center; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .btn-green-register:hover { background-color: #143d22; }
         
-        /* 🟤 TARJA MARROM DE ACESSO AO CLIENTE */
-        .btn-brown-login { background-color: #4a2c2a; color: #ffffff; border: none; padding: 14px; width: 100%; border-radius: 6px; font-weight: bold; font-size: 15px; cursor: pointer; text-decoration: none; display: block; box-sizing: border-box; text-align: center; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: background 0.2s; }
+        .btn-brown-login { background-color: #4a2c2a; color: #ffffff; border: none; padding: 14px; width: 100%; border-radius: 6px; font-weight: bold; font-size: 15px; cursor: pointer; text-decoration: none; display: block; box-sizing: border-box; text-align: center; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .btn-brown-login:hover { background-color: #361f1e; }
         
-        /* AVISO DO BOTÃO DE FURTO NO RODAPÉ COM INDICADOR PARA CIMA */
         .theft-warning-text { font-size: 12px; color: #555555; font-weight: bold; line-height: 1.4; margin: 15px 0 0 0; padding: 0 15px; }
     </style>
 </head>
@@ -50,15 +46,15 @@
                 <span class="box-title">Proteção Nacional do Seu Patrimônio</span>
             </div>
             <p class="box-text">
-                A CADMIV oferece uma infraestrutura de identificação jurídica para proprietários de Bicicletas (comuns ou elétricas), Patinetes, e Monociclos. Através do nosso sistema, autoridades civis e agentes de trânsito em todo o território nacional possuem ferramentas oficiais para consultar e verificar a procedência regular do seu veículo abordado na rua.
+                A CADMIV oferece uma infraestrutura de identificação jurídica para proprietários de bicicletas (comuns ou elétricas), patinetes, e monociclos. Através do nosso sistema, autoridades civis e agentes de trânsito em todo o território nacional possuem ferramentas oficiais para consultar e verificar a procedência regular do seu veículo abordado na rua.
             </p>
         </div>
 
-        <a href="cadastro.html" class="btn-green-register">Iniciar Meu Registro Patrimonial</a>
+        <!-- ROTA CORRIGIDA PARA O PORTAL DE FISCALIZAÇÃO -->
+        <a href="fiscalizacao.html" class="btn-green-register">Iniciar Meu Registro Patrimonial</a>
         
         <a href="login.html" class="btn-brown-login">Acessar Área do Cliente Registrado</a>
         
-        <!-- 👆 MÃOZINHA VIRADA PARA CIMA APONTANDO PARA OS BOTÕES CONFORME SUA ORDEM -->
         <p class="theft-warning-text">
             👆 Toque aqui você que possui cadastro na CADMIV para acionar o Botão de Furto
         </p>
