@@ -132,18 +132,10 @@ function avancarPagamento(event) {
     <div style="position: relative; display: flex; align-items: center;">
         <input type="password" id="senha" placeholder="Sua senha de acesso" required style="width: 100%; padding: 12px; padding-right: 45px; border: 1px solid #bdc3c7; border-radius: 6px; font-size: 14px; color: #2c3e50; box-sizing: border-box; font-weight: bold;">
         <!-- 👁️ BOTÃO COM ID "ICONE_OLHO" PARA MUDAR O DESENHO AUTOMATICAMENTE -->
-        <button type="button" onclick="function alternarVisibilidadeSenha() {
-    var campoSenha = document.getElementById('senha');
-    var iconeOlho = document.getElementById('icone_olho');
-    
-    if (campoSenha.type === 'password') {
-        campoSenha.type = 'text';       // Mostra os caracteres da senha na tela
-        iconeOlho.innerText = '👀';     // Muda o desenho para o olho arregalado/aberto
-    } else {
-        campoSenha.type = 'password';   // Esconde a senha em pontinhos pretos novamente
-        iconeOlho.innerText = '👁️';     // Volta o desenho para o olho normal
-    }
-}
+        <button type="button" onclick="alternarVisibilidadeSenha()"id=ïcone_olho"style="position: absolute;right: 10px; background: none; font-size: 18px; cursor: pointer; color: #7f8c8d;padding: 5px;"> 
+</button>
+</div>
+</div>
             <label>CEP:</label>
             <input type="text" placeholder="00000-000" required>
             <label>Logradouro (Rua / Avenida):</label>
