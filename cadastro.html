@@ -1,297 +1,341 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CADMIV - Cadastro de Segurança Pessoal</title>
-    <style>
-        body { font-family: Arial, sans-serif; background-color: #f4f4f9; padding: 20px; text-align: center; color: #2c3e50; }
-        .container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); display: inline-block; width: 100%; max-width: 650px; text-align: left; box-sizing: border-box; }
-        h2, h3 { text-align: center; color: #2c3e50; }
-        .section-title { background-color: #34495e; color: white; padding: 10px; border-radius: 5px; margin-top: 20px; font-size: 16px; font-weight: bold; }
-        .health-title { background-color: #c0392b; color: white; padding: 10px; border-radius: 5px; margin-top: 20px; font-size: 16px; font-weight: bold; }
-        .family-title { background-color: #2980b9; color: white; padding: 10px; border-radius: 5px; margin-top: 20px; font-size: 16px; font-weight: bold; }
-        label { font-weight: bold; display: block; margin-top: 15px; color: #34495e; }
-        input, select, textarea { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #bdc3c7; border-radius: 5px; box-sizing: border-box; font-size: 14px; }
-        .alert-box { background-color: #fadbd8; border-left: 5px solid #e74c3c; color: #78281f; padding: 15px; border-radius: 5px; margin-top: 15px; display: none; font-weight: bold; }
-        .info-box-used { background-color: #fef9e7; border-left: 5px solid #f39c12; color: #7e5109; padding: 15px; border-radius: 5px; margin-top: 10px; font-size: 13px; font-weight: bold; line-height: 1.4; }
-        .offer-box { background-color: #e8f8f5; border: 2px dashed #27ae60; padding: 20px; border-radius: 5px; margin-top: 25px; text-align: justify; }
-        .price-option { background: white; border: 1px solid #bdc3c7; padding: 15px; margin-top: 10px; border-radius: 5px; display: flex; align-items: center; cursor: pointer; }
-        .price-option input { width: auto; margin-top: 0; margin-right: 15px; transform: scale(1.3); }
-        .price-label { font-size: 16px; font-weight: bold; color: #27ae60; }
-        .btn-next { background-color: #27ae60; color: white; border: none; padding: 15px; width: 100%; border-radius: 5px; font-weight: bold; font-size: 16px; margin-top: 25px; cursor: pointer; }
-        .btn-next:hover { background-color: #219150; }
-        .blood-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 5px; }
-        .blood-option { display: flex; align-items: center; background: #f8f9f9; padding: 10px; border: 1px solid #d5dbdb; border-radius: 5px; cursor: pointer; }
-        .blood-option input { width: auto; margin-top: 0; margin-right: 8px; }
-        .dependent-container { display: none; background: #ebf5fb; padding: 20px; border-radius: 5px; border: 1px solid #a9cce3; margin-top: 15px; }
-        .photo-btn { background-color: #e67e22; color: white; border: none; padding: 8px 12px; border-radius: 3px; cursor: pointer; font-size: 12px; font-weight: bold; margin-top: 5px; margin-right: 5px; }
-        video { width: 100%; max-width: 200px; display: none; margin-top: 10px; border-radius: 5px; background: black; }
-    </style>
-    <script>
-window.onload = function() {
-    var dataAtual = new Date();
-    var dia = String(dataAtual.getDate()).padStart(2, '0');
-    var mes = String(dataAtual.getMonth() + 1).padStart(2, '0');
-    var ano = dataAtual.getFullYear();
-    document.getElementById('data_registro').value = dia + '/' + mes + '/' + ano;
-};
-        function verificarRegistro() {
-            var jaCadastrado = document.getElementById("historico").value;
-            var alerta = document.getElementById("alerta-trava");
-            if (jaCadastrado === "sim") {
-                alerta.style.display = "block";
-                bloquearBotao(true);
-            } else {
-                alerta.style.display = "none";
-                bloquearBotao(false);
-            }
-        }
-        function verificarIdade() {
-            var anoNascimento = parseInt(document.getElementById("ano_nascimento").value);
-            var anoAtual = new Date().getFullYear();
-            var idade = anoAtual - anoNascimento;
-            var alertaIdade = document.getElementById("alerta-idade");
-            if (idade < 18) {
-                alertaIdade.style.display = "block";
-                bloquearBotao(true);
-            } else {
-                alertaIdade.style.display = "none";
-                bloquearBotao(false);
-            }
-        }
-        function gerenciarCombo() {
-            var combo2 = document.getElementById("combo2").checked;
-            var combo3 = document.getElementById("combo3").checked;
-            document.getElementById("dep1").style.display = (combo2 || combo3) ? "block" : "none";
-            document.getElementById("dep2").style.display = combo3 ? "block" : "none";
-            document.getElementById("secao-responsabilidade").style.display = (combo2 || combo3) ? "block" : "none";
-        }
-        function bloquearBotao(status) {
-            var btn = document.getElementById("btn-enviar");
-            btn.disabled = status;
-            btn.style.backgroundColor = status ? "#bdc3c7" : "#27ae60";
-        }
-        function ligarCamera(idVideo) {
-            var video = document.getElementById(idVideo);
-            video.style.display = "block";
-            navigator.mediaDevices.getUserMedia({ video: true })
-                .then(function(stream) { video.srcObject = stream; video.play(); })
-                .catch(function() { alert("Câmera não encontrada ou sem permissão."); });
-        }
-        function avançarPagamento() {// 6) AQUI ESTÁ A SUA FUNÇÃO DE AVANÇAR PAGAMENTO:
-function avancarPagamento(event) {
-    if (event) event.preventDefault();
-    
-    // 🧩 COLE A PARTE 2 EXATAMENTE AQUI DENTRO:
-    var dataAtual = new Date();
-    var dia = String(dataAtual.getDate()).padStart(2, '0');
-    var mes = String(dataAtual.getMonth() + 1).padStart(2, '0');
-    var ano = dataAtual.getFullYear();
-    
-    var dataEmissaoFormatada = dia + '/' + mes + '/' + ano;
-    var dataVencimentoFormatada = dia + '/' + mes + '/' + (ano + 1);
-    
-    // Guarda as duas datas com segurança dentro do cofre digital
-    localStorage.setItem('cadmiv_emissao', dataEmissaoFormatada);
-    localStorage.setItem('cadmiv_vencimento', dataVencimentoFormatada);
-    
-    // Daqui para baixo continuam os seus comandos que já estavam aí na função:
-    window.location.href = 'pagamento.html';
-}
-            window.location.href = "validar";
-        }
-    </script>
-<div class="form-group" style="margin-bottom: 15px; text-align: left; position: relative;">
-    <label style="font-size: 11px; color: #7f8c8d; font-weight: bold; text-transform: uppercase; display: block; margin-bottom: 5px;">Crie uma Senha de Acesso:</label>
-    <div style="position: relative; display: flex; align-items: center;">
-        <input type="password" id="senha" placeholder="Sua senha de acesso" required style="width: 100%; padding: 12px; padding-right: 45px; border: 1px solid #bdc3c7; border-radius: 6px; font-size: 14px; color: #2c3e50; box-sizing: border-box; font-weight: bold;">
-        <!-- 👁️ BOTÃO COM ID "ICONE_OLHO" PARA MUDAR O DESENHO AUTOMATICAMENTE -->
-        <button type="button" onclick="alternarVisibilidadeSenha()" id="icone_olho" style="position: absolute; right: 10px; background: none; border: none; font-size: 18px; cursor: pointer; color: #7f8c8d; padding: 5px;">
-</button>
-    </div>
-</div>
-</head>
-<body>
-    <div class="container">
-        <h2>Cadastro do Usuário CADMIV</h2>
-        <p style="text-align: center; color: #7f8c8d;">Plataforma Homologada para Registro de Patrimônio Nacional.</p>
-        <form>
-            <div class="section-title">1. Dados do Proprietário e Entrega (Titular)</div>
-            <label>Nome Completo:</label>
-            <input type="text" placeholder="Digite seu nome completo" required>
-            <label>Ano de Nascimento (Uso estrito para validação de maioridade 18+):</label>
-            <input type="number" id="ano_nascimento" onchange="verificarIdade()" placeholder="Ex: 1985" required>
-            <div id="alerta-idade" class="alert-box">❌ RESTRIÇÃO DE IDADE CRONOLÓGICA:<br>Só é permitido cadastrar-se nesta plataforma pessoas maiores de 18 anos de idade.</div>
-            <label>E-mail:</label>
-            <input type="email" placeholder="Digite seu e-mail corporativo" required>
-            <label>Telefone Celular (Será usado como seu Login de Acesso):</label>
-            <input type="text" placeholder="Ex: 11999998888" required>
-            <label>Crie uma Senha de Acesso:</label>
-            <div class="form-group" style="margin-bottom: 15px; text-align: left; position: relative;">
-    <label style="font-size: 11px; color: #7f8c8d; font-weight: bold; text-transform: uppercase; display: block; margin-bottom: 5px;">Crie uma Senha de Acesso:</label>
-    <div style="position: relative; display: flex; align-items: center;">
-        <input type="password" id="senha" placeholder="Sua senha de acesso" required style="width: 100%; padding: 12px; padding-right: 45px; border: 1px solid #bdc3c7; border-radius: 6px; font-size: 14px; color: #2c3e50; box-sizing: border-box; font-weight: bold;">
-        <!-- 👁️ BOTÃO COM ID "ICONE_OLHO" PARA MUDAR O DESENHO AUTOMATICAMENTE -->
-        <button type="button" onclick="alternarVisibilidadeSenha()" id="icone_olho" style="position: absolute;  right: 10px; background: none; border: none; font-size: 18px; cursor: pointer; color: #7f8c8d; padding: 5px;"> 
-</button>
-</div>
-</div>
-            <label>CEP:</label>
-            <input type="text" placeholder="00000-000" required>
-            <label>Logradouro (Rua / Avenida):</label>
-            <input type="text" placeholder="Nome da rua ou avenida" required>
-            <label>Número:</label>
-            <input type="text" placeholder="Nº" required>
-            <label>Bairro:</label>
-            <input type="text" placeholder="Nome do bairro" required>
-            <label>Cidade:</label>
-            <input type="text" placeholder="Nome da cidade" required>
+<!DOCTYPE html> 
+<html lang="pt-BR"> 
+<head> 
+    <meta charset="UTF-8"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <title>CADMIV - Cadastro de Segurança Pessoal</title> 
+    <style> 
+        body { font-family: Arial, sans-serif; background-color: #f4f4f9; padding: 20px; text-align: center; color: #2c3e50; } 
+        .container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); display: inline-block; width: 100%; max-width: 650px; text-align: left; box-sizing: border-box; } 
+        h2, h3 { text-align: center; color: #2c3e50; } 
+        .section-title { background-color: #34495e; color: white; padding: 10px; border-radius: 5px; margin-top: 20px; font-size: 16px; font-weight: bold; } 
+        .health-title { background-color: #c0392b; color: white; padding: 10px; border-radius: 5px; margin-top: 20px; font-size: 16px; font-weight: bold; } 
+        .family-title { background-color: #2980b9; color: white; padding: 10px; border-radius: 5px; margin-top: 20px; font-size: 16px; font-weight: bold; } 
+        label { font-weight: bold; display: block; margin-top: 15px; color: #34495e; } 
+        input, select, textarea { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #bdc3c7; border-radius: 5px; box-sizing: border-box; font-size: 14px; } 
+        .alert-box { background-color: #fadbd8; border-left: 5px solid #e74c3c; color: #78281f; padding: 15px; border-radius: 5px; margin-top: 15px; display: none; font-weight: bold; } 
+        .info-box-used { background-color: #fef9e7; border-left: 5px solid #f39c12; color: #7e5109; padding: 15px; border-radius: 5px; margin-top: 10px; font-size: 13px; font-weight: bold; line-height: 1.4; } 
+        .offer-box { background-color: #e8f8f5; border: 2px dashed #27ae60; padding: 20px; border-radius: 5px; margin-top: 25px; text-align: justify; } 
+        .price-option { background: white; border: 1px solid #bdc3c7; padding: 15px; margin-top: 10px; border-radius: 5px; display: flex; align-items: center; cursor: pointer; } 
+        .price-option input { width: auto; margin-top: 0; margin-right: 15px; transform: scale(1.3); } 
+        .price-label { font-size: 16px; font-weight: bold; color: #27ae60; } 
+        .btn-next { background-color: #27ae60; color: white; border: none; padding: 15px; width: 100%; border-radius: 5px; font-weight: bold; font-size: 16px; margin-top: 25px; cursor: pointer; } 
+        .btn-next:hover { background-color: #219150; } 
+        .blood-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 5px; } 
+        .blood-option { display: flex; align-items: center; background: #f8f9f9; padding: 10px; border: 1px solid #d5dbdb; border-radius: 5px; cursor: pointer; } 
+        .blood-option input { width: auto; margin-top: 0; margin-right: 8px; } 
+        .dependent-container { display: none; background: #ebf5fb; padding: 20px; border-radius: 5px; border: 1px solid #a9cce3; margin-top: 15px; } 
+        .photo-btn { background-color: #e67e22; color: white; border: none; padding: 8px 12px; border-radius: 3px; cursor: pointer; font-size: 12px; font-weight: bold; margin-top: 5px; margin-right: 5px; } 
+        video { width: 100%; max-width: 200px; display: none; margin-top: 10px; border-radius: 5px; background: black; } 
+    </style> 
+    <script> 
+        window.onload = function() { 
+            var dataAtual = new Date(); 
+            var dia = String(dataAtual.getDate()).padStart(2, '0'); 
+            var mes = String(dataAtual.getMonth() + 1).padStart(2, '0'); 
+            var ano = dataAtual.getFullYear(); 
+            document.getElementById('data_registro').value = dia + '/' + mes + '/' + ano; 
+        }; 
+
+        function alternarVisibilidadeSenha() { 
+            var campoSenha = document.getElementById('senha'); 
+            var iconeOlho = document.getElementById('icone_olho'); 
+            if (campoSenha.type === 'password') { 
+                campoSenha.type = 'text'; 
+                iconeOlho.innerText = '👁️'; 
+            } else { 
+                campoSenha.type = 'password'; 
+                iconeOlho.innerText = '🙈'; 
+            } 
+        } 
+
+        function verificarRegistro() { 
+            var jaCadastrado = document.getElementById("historico").value; 
+            var alerta = document.getElementById("alerta-trava"); 
+            if (jaCadastrado === "sim") { 
+                alerta.style.display = "block"; 
+                bloquearBotao(true); 
+            } else { 
+                alerta.style.display = "none"; 
+                bloquearBotao(false); 
+            } 
+        } 
+
+        function verificarIdade() { 
+            var anoNascimento = parseInt(document.getElementById("ano_nascimento").value); 
+            var anoAtual = new Date().getFullYear(); 
+            var idade = anoAtual - anoNascimento; 
+            var alertaIdade = document.getElementById("alerta-idade"); 
+            if (idade < 18) { 
+                alertaIdade.style.display = "block"; 
+                bloquearBotao(true); 
+            } else { 
+                alertaIdade.style.display = "none"; 
+                bloquearBotao(false); 
+            } 
+        } 
+
+        function gerenciarCombo() { 
+            var combo2 = document.getElementById("combo2").checked; 
+            var combo3 = document.getElementById("combo3").checked; 
+            document.getElementById("dep1").style.display = (combo2 || combo3) ? "block" : "none"; 
+            document.getElementById("dep2").style.display = combo3 ? "block" : "none"; 
+            document.getElementById("secao-responsabilidade").style.display = (combo2 || combo3) ? "block" : "none"; 
+        } 
+
+        function bloquearBotao(status) { 
+            var btn = document.getElementById("btn-enviar"); 
+            btn.disabled = status; 
+            btn.style.backgroundColor = status ? "#bdc3c7" : "#27ae60"; 
+        } 
+
+        function ligarCamera(idVideo) { 
+            var video = document.getElementById(idVideo); 
+            video.style.display = "block"; 
+            navigator.mediaDevices.getUserMedia({ video: true }) 
+            .then(function(stream) { 
+                video.srcObject = stream; 
+                video.play(); 
+            }) 
+            .catch(function() { 
+                alert("Câmera não encontrada ou sem permissão."); 
+            }); 
+        } 
+
+        function avançarPagamento(event) { 
+            if (event) event.preventDefault(); 
+            var dataAtual = new Date(); 
+            var dia = String(dataAtual.getDate()).padStart(2, '0'); 
+            var mes = String(dataAtual.getMonth() + 1).padStart(2, '0'); 
+            var ano = dataAtual.getFullYear(); 
+            
+            var dataEmissaoFormatada = dia + '/' + mes + '/' + ano; 
+            var dataVencimentoFormatada = dia + '/' + mes + '/' + (ano + 1); 
+            
+            localStorage.setItem('cadmiv_emissao', dataEmissaoFormatada); 
+            localStorage.setItem('cadmiv_vencimento', dataVencimentoFormatada); 
+            
+            window.location.href = 'pagamento.html'; 
+        } 
+    </script> 
+</head> 
+<body> 
+    <div class="container"> 
+        <h2>Cadastro do Usuário CADMIV</h2> 
+        <p style="text-align: center; color: #7f8c8d;">Plataforma Homologada para Registro de Patrimônio Nacional.</p> 
+        
+        <form> 
+            <div class="section-title">1. Dados do Proprietário e Entrega (Titular)</div> 
+            
+            <label>Nome Completo:</label> 
+            <input type="text" placeholder="Digite seu nome completo" required> 
+            
+            <label>Ano de Nascimento (Uso estrito para validação de maioridade 18+):</label> 
+            <input type="number" id="ano_nascimento" onchange="verificarIdade()" placeholder="Ex: 1985" required> 
+            
+            <div id="alerta-idade" class="alert-box">❌ RESTRIÇÃO DE IDADE CRONOLÓGICA:<br>Só é permitido cadastrar-se nesta plataforma pessoas maiores de 18 anos de idade.</div> 
+            
+            <label>E-mail:</label> 
+            <input type="email" placeholder="Digite seu e-mail corporativo" required> 
+            
+            <label>Telefone Celular (Será usado como seu Login de Acesso):</label> 
+            <input type="text" placeholder="Ex: 11999998888" required> 
+            
+            <!-- A CAIXA DE SENHA COMPRIDA AGORA REPOUSA CORRETAMENTE AQUI -->
+            <div class="form-group" style="margin-bottom: 15px; text-align: left; margin-top: 15px;"> 
+                <label style="font-size: 14px; color: #34495e; font-weight: bold; display: block; margin-bottom: 5px;">Crie uma Senha de Acesso:</label> 
+                <div style="position: relative; display: flex; align-items: center;"> 
+                    <input type="password" id="senha" placeholder="Sua senha de acesso" required style="width: 100%; padding: 12px; padding-right: 45px; border: 1px solid #bdc3c7; border-radius: 6px; font-size: 14px; color: #2c3e50; box-sizing: border-box; font-weight: bold;"> 
+                    <button type="button" onclick="alternarVisibilidadeSenha()" id="icone_olho" style="position: absolute; right: 10px; background: none; border: none; font-size: 18px; cursor: pointer; color: #7f8c8d; padding: 5px;">🙈</button> 
+                </div> 
+            </div> 
+
+            <label>CEP:</label> 
+            <input type="text" placeholder="00000-000" required> 
+            
+            <label>Logradouro (Rua / Avenida):</label> 
+            <input type="text" placeholder="Nome da rua ou avenida" required> 
+            
+            <label>Número:</label> 
+            <input type="text" placeholder="Nº" required> 
+            
+            <label>Bairro:</label> 
+            <input type="text" placeholder="Nome do bairro" required> 
+            
+            <label>Cidade:</label> 
+            <input type="text" placeholder="Nome da cidade" required> 
+            
             <label>Estado:</label>
-            <input type="text" placeholder="UF" required>
-            <div class="health-title">🚨 Protocolo de Saúde e Emergência</div>
-            <label>Em caso de emergência, ligar para:</label>
-            <select required>
-                <option value="">Selecione o contato...</option>
-                <option value="pai">Pai</option>
-                <option value="mae">Mãe</option>
-                <option value="irmao">Irmão/Irmã</option>
-                <option value="tio">Tio(a)</option>
-                <option value="filho">Filho(a)</option>
-                <option value="primo">Primo(a)</option>
-                <option value="cunhado">Cunhado(a)</option>
-                <option value="amigo">Amigo(a)</option>
-            </select>
-            <label>Telefone Fixo ou Celular do Contato:</label>
+  <input type="text" placeholder="UF" required> 
+            <div class="health-title">🚨 Protocolo de Saúde e Emergência</div> 
+            
+            <label>Em caso de emergência, ligar para:</label> 
+            <select required> 
+                <option value="">Selecione o contato...</option> 
+                <option value="pai">Pai</option> 
+                <option value="mae">Mãe</option> 
+                <option value="irmao">Irmão/Irmã</option> 
+                <option value="tio">Tio(a)</option> 
+                <option value="filho">Filho(a)</option> 
+                <option value="primo">Primo(a)</option> 
+                <option value="cunhado">Cunhado(a)</option> 
+                <option value="amigo">Amigo(a)</option> 
+            </select> 
+            
+            <label>Telefone Fixo ou Celular do Contato:</label> 
             <input type="text" placeholder="(00) 00000-0000" required>
-            <label>Fator Sanguíneo:</label>
-            <div class="blood-grid">
-                <div class="blood-option"><input type="radio" name="sangue" value="A+"> A+</div>
-                <div class="blood-option"><input type="radio" name="sangue" value="A-"> A-</div>
-                <div class="blood-option"><input type="radio" name="sangue" value="B+"> B+</div>
-                <div class="blood-option"><input type="radio" name="sangue" value="B-"> B-</div>
-                <div class="blood-option"><input type="radio" name="sangue" value="AB+"> AB+</div>
-                <div class="blood-option"><input type="radio" name="sangue" value="AB-"> AB-</div>
-                <div class="blood-option"><input type="radio" name="sangue" value="O+"> O+</div>
-                <div class="blood-option"><input type="radio" name="sangue" value="O-"> O-</div>
-            </div>
-            <label>Possui Alergia a Látex?</label>
-            <select required>
-                <option value="">Selecione...</option>
-                <option value="nao">Não possuo alergia</option>
-                <option value="sim">Sim, sou alérgico(a)</option>
-            </select>
-            <label>Possui Alergia a algum Medicamento?</label>
+
+            <label>Fator Sanguíneo:</label> 
+            <div class="blood-grid"> 
+                <div class="blood-option"><input type="radio" name="sangue" value="A+"> A+</div> 
+                <div class="blood-option"><input type="radio" name="sangue" value="A-"> A-</div> 
+                <div class="blood-option"><input type="radio" name="sangue" value="B+"> B+</div> 
+                <div class="blood-option"><input type="radio" name="sangue" value="B-"> B-</div> 
+                <div class="blood-option"><input type="radio" name="sangue" value="AB+"> AB+</div> 
+                <div class="blood-option"><input type="radio" name="sangue" value="AB-"> AB-</div> 
+                <div class="blood-option"><input type="radio" name="sangue" value="O+"> O+</div> 
+                <div class="blood-option"><input type="radio" name="sangue" value="O-"> O-</div> 
+            </div> 
+            
+            <label>Possui Alergia a Látex?</label> 
+            <select required> 
+                <option value="">Selecione...</option> 
+                <option value="nao">Não possuo alergia</option> 
+                <option value="sim">Sim, sou alérgico(a)</option> 
+            </select> 
+            
+            <label>Possui Alergia a algum Medicamento?</label> 
             <input type="text" placeholder="Digite os medicamentos ou escreva 'Nenhuma'">
-            <label>Médico de sua preferência (Nome Completo):</label>
+
+            <label>Médico de sua preferência (Nome Completo):</label> 
             <input type="text" placeholder="Nome do Doutor(a)">
-            <label>Telefone de contato do Médico:</label>
-            <input type="text" placeholder="(00) 00000-0000"><div class="section-title">2. Dados do Veículo Autopropelido</div>
-            <label>Modelo do Veículo:</label>
-            <select required>
-                <option value="">Selecione o modelo do veículo...</option>
-                <option value="bike_comum">Bicicleta Comum (Sem ser elétrica)</option>
-                <option value="bike_sem_acelerador">Bicicleta Elétrica sem acelerador</option>
-                <option value="bike_com_acelerador">Bicicleta Elétrica com acelerador</option>
-                <option value="bike_esportiva_alto_custo">Bicicleta Esportiva de Alto Custo</option>
-                <option value="patinetes">Patinetes</option>
-                <option value="monociclo">Monociclo</option>
-            </select>
-            <label>Número de Identificação do Veículo (Chassi / Série):</label>
+
+            <label>Telefone de contato do Médico:</label> 
+            <input type="text" placeholder="(00) 00000-0000">
+
+            <div class="section-title">2. Dados do Veículo Autopropelido</div> 
+            
+            <label>Modelo do Veículo:</label> 
+            <select required> 
+                <option value="">Selecione o modelo do veículo...</option> 
+                <option value="bike_comum">Bicicleta Comum (Sem ser elétrica)</option> 
+                <option value="bike_sem_acelerador">Bicicleta Elétrica sem acelerador</option> 
+                <option value="bike_com_acelerador">Bicicleta Elétrica com acelerador</option> 
+                <option value="bike_esportiva_alto_custo">Bicicleta Esportiva de Alto Custo</option> 
+                <option value="patinetes">Patinetes</option> 
+                <option value="monociclo">Monociclo</option> 
+            </select> 
+            
+            <label>Número de Identificação do Veículo (Chassi / Série):</label> 
             <input type="text" placeholder="Digite o número de série" required>
-            <label>Número da Nota Fiscal de Compra:</label>
+
+            <label>Número da Nota Fiscal de Compra:</label> 
             <input type="text" placeholder="Número da NF" required>
-            <label>Ano de Fabricação:</label>
+
+            <label>Ano de Fabricação:</label> 
             <input type="text" placeholder="Ex: 2026" required>
-            <label>Cor do Veículo:</label>
+
+            <label>Cor do Veículo:</label> 
             <input type="text" placeholder="Cor predominante" required>
-            <label>Estado de Conservação:</label>
-            <select required>
-                <option value="">Selecione...</option>
-                <option value="novo">Veículo Novo</option>
-                <option value="usado">Veículo Usado</option>
-            </select>
-            <div class="info-box-used">
-                ⚠️ AVISO IMPORTANTE SOBRE TRANSFERÊNCIAS:<br>
-                Caso você venda, doe ou passe este veículo a terceiros de forma que ele não pertença mais a você, é sua obrigação legal entrar no painel CADMIV e CANCELAR o registro imediatamente. Esta conduta evita constrangimentos civis e impede que futuros compradores de boa-fé fiquem bloqueados ao tentar realizar a nova homologação patrimonial.
-            </div>
-            <label>Este veículo já foi cadastrado anteriormente no CADMIV?</label>
-            <select id="historico" onchange="verificarRegistro()" required>
-                <option value="">Selecione...</option>
-                <option value="nao">Não, este é o primeiro cadastro</option>
-                <option value="sim">Sim, já possui registro anterior</option>
-            </select>
-            <div id="alerta-trava" class="alert-box">⚠️ BLOQUEIO DE SEGURANÇA JURÍDICA NACIONAL:<br>Este veículo já possui um registro ativo no sistema. A conclusão deste novo cadastro só será permitida com a autorização expressa do primeiro proprietário cadastrado.</div>
-            <div class="section-title">3. Concretização do Registro Corporativo</div>
-            <div class="offer-box">
-                <strong>CONCRETIZAÇÃO E PROTEÇÃO OFICIAL DA SUA CREDENCIAL</strong><br><br>
-                <em>Escolha abaixo o combo ideal para a proteção do seu patrimônio e ative as fichas de dependentes corporativos se necessário:</em>
-            </div>
-            <div class="price-option">
-                <input type="radio" name="combo" id="combo1" onchange="gerenciarCombo()" checked>
-                <div><strong>Emitir 1 Cartão Digital (Apenas Titular)</strong><br><span class="price-label">Taxa Única: $24.99 (Via PIX Seguro)</span></div>
-            </div>
-            <div class="price-option">
-                <input type="radio" name="combo" id="combo2" onchange="gerenciarCombo()">
-                <div><strong>Emitir 2 Cartões Digitais (Titular + 1 Dependente)</strong><br><span class="price-label">Taxa Única: $39.99 (Via PIX Seguro)</span></div>
-            </div>
-            <div class="price-option">
-                <input type="radio" name="combo" id="combo3" onchange="gerenciarCombo()">
-                <div><strong>Emitir 3 Cartões Digitais (Combo-Familiar)</strong><br><span class="price-label">Taxa Única: $49.99 (Via PIX Seguro)</span></div>
-            </div>
-            <p style="font-size: 13px; font-weight: bold; color: #7f8c8d; text-align: center; margin-top: 15px; line-height: 1.4;">
-                📋 INFORMATIVO DE VALIDADE NACIONAL:<br>
-                Esta credencial corporativa possui validade estrita de 1 (um) ano. Após este prazo, o registro mudará automaticamente para o status de 'Adormecido' na base de fiscalização. Um e-mail de alerta automatizado será enviado ao seu endereço eletrônico 1 (um) mês antes do vencimento para orientar o procedimento de renovação anual.
-            </p>
-            <div id="dep1" class="dependent-container">
-                <div class="family-title">👤 Cadastro Completo do Dependente 1</div>
-                <label>Nome Completo do Dependente 1:</label>
+
+            <label>Estado de Conservação:</label> 
+            <select required> 
+                <option value="">Selecione...</option> 
+                <option value="novo">Veículo Novo</option> 
+                <option value="usado">Veículo Usado</option> 
+            </select> 
+            
+            <div class="info-box-used"> 
+                ⚠️ AVISO IMPORTANTE SOBRE TRANSFERÊNCIAS:<br> Caso você venda, doe ou passe este veículo a terceiros de forma que ele não pertença mais a você, é sua obrigação legal entrar no painel CADMIV e CANCELAR o registro imediatamente. Esta conduta evita constrangimentos civis e impede que futuros compradores de boa-fé fiquem bloqueados ao tentar realizar a nova homologação patrimonial. 
+            </div> 
+            
+            <label>Este veículo já foi cadastrado anteriormente no CADMIV?</label> 
+            <select id="historico" onchange="verificarRegistro()" required> 
+                <option value="">Selecione...</option> 
+                <option value="nao">Não, este é o primeiro cadastro</option> 
+                <option value="sim">Sim, já possui registro anterior</option> 
+            </select> 
+            
+            <div id="alerta-trava" class="alert-box">⚠️ BLOQUEIO DE SEGURANÇA JURÍDICA NACIONAL:<br>Este veículo já possui um registro ativo no sistema. A conclusão deste novo cadastro só será permitida com a autorização expressa do primeiro proprietário cadastrado.</div> 
+
+            <div class="section-title">3. Concretização do Registro Corporativo</div> 
+            
+            <div class="offer-box"> 
+                <strong>CONCRETIZAÇÃO E PROTEÇÃO OFICIAL DA SUA CREDENCIAL</strong><br><br> 
+                <em>Escolha abaixo o combo ideal para a proteção do seu patrimônio e ative as fichas de dependentes corporativos se necessário:</em> 
+            </div> 
+            
+            <div class="price-option"> 
+                <input type="radio" name="combo" id="combo1" onchange="gerenciarCombo()" checked> 
+                <div><strong>Emitir 1 Cartão Digital (Apenas Titular)</strong><br><span class="price-label">Taxa Única: $24.99 (Via PIX Seguro)</span></div> 
+            </div> 
+            
+            <div class="price-option"> 
+                <input type="radio" name="combo" id="combo2" onchange="gerenciarCombo()"> 
+                <div><strong>Emitir 2 Cartões Digitais (Titular + 1 Dependente)</strong><br><span class="price-label">Taxa Única: $39.99 (Via PIX Seguro)</span></div> 
+            </div> 
+            
+            <div class="price-option"> 
+                <input type="radio" name="combo" id="combo3" onchange="gerenciarCombo()"> 
+                <div><strong>Emitir 3 Cartões Digitais (Combo-Familiar)</strong><br><span class="price-label">Taxa Única: $49.99 (Via PIX Seguro)</span></div> 
+            </div> 
+            
+            <p style="font-size: 13px; font-weight: bold; color: #7f8c8d; text-align: center; margin-top: 15px; line-height: 1.4;"> 📋 INFORMATIVO DE VALIDADE NACIONAL:<br> Esta credencial corporativa possui validade estrita de 1 (um) ano. Após este prazo, o registro mudará automaticamente para o status de 'Adormecido' na base de fiscalização. Um e-mail de alerta automatizado será enviado ao seu endereço eletrônico 1 (um) mês antes do vencimento para orientar o procedimento de renovação anual. </p> 
+
+            <div id="dep1" class="dependent-container"> 
+                <div class="family-title">👤 Cadastro Completo do Dependente 1</div> 
+                <label>Nome Completo do Dependente 1:</label> 
                 <input type="text" placeholder="Nome do dependente 1">
-                <label>Grau de Parentesco:</label>
-                <select>
-                    <option value="filho">Filho(a)</option>
-                    <option value="primo">Primo(a)</option>
-                    <option value="irmao">Irmão/Irmã</option>
-                    <option value="neto">Neto(a)</option>
-                    <option value="amigo">Amigo(a)</option>
-                </select>
-                <br><br>
-                <input type="file" id="f-dep1" style="display:none;">
-                <button type="button" class="photo-btn" onclick="document.getElementById('f-dep1').click()">📁 Buscar no Arquivo</button>
-                <button type="button" class="photo-btn" onclick="ligarCamera('v-dep1')">📷 Tirar Foto Agora</button>
-                <video id="v-dep1"></video>
+                <label>Grau de Parentesco:</label> 
+                <select> 
+                    <option value="filho">Filho(a)</option> 
+                    <option value="primo">Primo(a)</option> 
+                    <option value="irmao">Irmão/Irmã</option> 
+                    <option value="neto">Neto(a)</option> 
+                    <option value="amigo">Amigo(a)</option> 
+                </select> 
+                <br><br> 
+                <input type="file" id="f-dep1" style="display:none;"> 
+                <button type="button" class="photo-btn" onclick="document.getElementById('f-dep1').click()">📁 Buscar no Arquivo</button> 
+                <button type="button" class="photo-btn" onclick="ligarCamera('v-dep1')">📷 Tirar Foto Agora</button> 
+                <video id="v-dep1"></video> 
             </div>
-            <div id="dep2" class="dependent-container">
-                <div class="family-title">👤 Cadastro Completo do Dependente 2 (Combo Familiar)</div>
-                <label>Nome Completo do Dependente 2:</label>
+
+            <div id="dep2" class="dependent-container"> 
+                <div class="family-title">👤 Cadastro Completo do Dependente 2 (Combo Familiar)</div> 
+                <label>Nome Completo do Dependente 2:</label> 
                 <input type="text" placeholder="Nome do dependente 2">
-                <label>Grau de Parentesco:</label>
-                <select>
-                    <option value="filho">Filho(a)</option>
-                    <option value="primo">Primo(a)</option>
-                    <option value="irmao">Irmão/Irmã</option>
-                    <option value="neto">Neto(a)</option>
-                    <option value="amigo">Amigo(a)</option>
-                </select>
-                <br><br>
-                <input type="file" id="f-dep2" style="display:none;">
-                <button type="button" class="photo-btn" onclick="document.getElementById('f-dep2').click()">📁 Buscar no Arquivo</button>
-                <button type="button" class="photo-btn" onclick="ligarCamera('v-dep2')">📷 Tirar Foto Agora</button>
-                <video id="v-dep2"></video>
+                <label>Grau de Parentesco:</label> 
+                <select> 
+                    <option value="filho">Filho(a)</option> 
+                    <option value="primo">Primo(a)</option> 
+                    <option value="irmao">Irmão/Irmã</option> 
+                    <option value="neto">Neto(a)</option> 
+                    <option value="amigo">Amigo(a)</option> 
+                </select> 
+                <br><br> 
+                <input type="file" id="f-dep2" style="display:none;"> 
+                <button type="button" class="photo-btn" onclick="document.getElementById('f-dep2').click()">📁 Buscar no Arquivo</button> 
+                <button type="button" class="photo-btn" onclick="ligarCamera('v-dep2')">📷 Tirar Foto Agora</button> 
+                <video id="v-dep2"></video> 
             </div>
-            <div id="secao-responsabilidade" class="dependent-container" style="background-color: #fcf3cf; border-color: #f39c12;">
+
+            <div id="secao-responsabilidade" class="dependent-container" style="background-color: #fcf3cf; border-color: #f39c12;"> 
                 <span style="font-weight: bold; color: #b7950b;">📋 DECLARAÇÃO DE RESPONSABILIDADE JURÍDICA:</span>
-                <textarea rows="3" readonly style="margin-top:5px; background:#fff; resize:none;">Eu, na qualidade de proprietário titular cadastrado na plataforma CADMIV, declaro sob as penas da lei ser integralmente responsável pelas informações prestadas, bem como pelas emissões das credenciais dos dependentes acima indicados por mim anexados.</textarea>
-                <div style="margin-top: 10px; display: flex; align-items: center;">
-                    <input type="checkbox" style="width: auto; margin-top: 0; margin-right: 10px; transform: scale(1.2);">
-                    <strong>Confirmo e aceito os termos de responsabilidade acima.</strong>
-                </div>
-            </div><div class="form-group" style="margin-bottom: 15px; text-align: left;">
-    <label style="font-size: 11px; color: #7f8c8d; font-weight: bold; text-transform: uppercase; display: block; margin-bottom: 5px;">Data de Emissão do Registro Patrimonial</label>
-    <input type="text" id="data_registro" readonly style="width: 100%; padding: 12px; border: 1px solid #bdc3c7; border-radius: 6px; font-size: 14px; color: #7f8c8d; background-color: #e9ecef; cursor: not-allowed; font-weight: bold; box-sizing: border-box;">
-</div>
-            <button type="button" id="btn-enviar" onclick="avançarPagamento()" class="btn-next">Salvar Cadastro Completo e Gerar PIX</button>
-        </form>
-    </div>
-</body>
+<div style="margin-top: 10px; display: flex; align-items: center;"> 
+                    <input type="checkbox" style="width: auto; margin-top: 0; margin-right: 10px; transform: scale(1.2);"> 
+                    <strong>Confirmo e aceito os termos de responsabilidade acima.</strong> 
+                </div> 
+            </div>
+
+            <div class="form-group" style="margin-bottom: 15px; text-align: left; margin-top: 15px;">
+                <label style="font-size: 11px; color: #7f8c8d; font-weight: bold; text-transform: uppercase; display: block; margin-bottom: 5px;">Data de Emissão do Registro Patrimonial</label> 
+                <input type="text" id="data_registro" readonly style="width: 100%; padding: 12px; border: 1px solid #bdc3c7; border-radius: 6px; font-size: 14px; color: #7f8c8d; background-color: #e9ecef; cursor: not-allowed; font-weight: bold; box-sizing: border-box;"> 
+            </div> 
+
+            <button type="button" id="btn-enviar" onclick="avançarPagamento()" class="btn-next">Salvar Cadastro Completo e Gerar PIX</button> 
+        </form> 
+    </div> 
+</body> 
 </html>
+ 
