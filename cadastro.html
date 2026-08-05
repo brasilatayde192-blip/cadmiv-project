@@ -166,10 +166,11 @@
             <input type="text" placeholder="Nome da cidade" required> 
             
             <label>Estado:</label>
-  <input type="text" placeholder="UF" required> 
+            <input type="text" placeholder="UF" required> 
             <div class="health-title">🚨 Protocolo de Saúde e Emergência</div> 
             
             <label>Em caso de emergência, ligar para:</label> 
+            <input>
             <select required> 
                 <option value="">Selecione o contato...</option> 
                 <option value="pai">Pai</option> 
@@ -215,7 +216,8 @@
 
             <div class="section-title">2. Dados do Veículo Autopropelido</div> 
             
-            <label>Modelo do Veículo:</label> 
+            <label>Modelo do Veículo:</label>
+            <input> 
             <select required> 
                 <option value="">Selecione o modelo do veículo...</option> 
                 <option value="bike_comum">Bicicleta Comum (Sem ser elétrica)</option> 
@@ -238,7 +240,8 @@
             <label>Cor do Veículo:</label> 
             <input type="text" placeholder="Cor predominante" required>
 
-            <label>Estado de Conservação:</label> 
+            <label>Estado de Conservação:</label>
+            <input> 
             <select required> 
                 <option value="">Selecione...</option> 
                 <option value="novo">Veículo Novo</option> 
@@ -249,7 +252,8 @@
                 ⚠️ AVISO IMPORTANTE SOBRE TRANSFERÊNCIAS:<br> Caso você venda, doe ou passe este veículo a terceiros de forma que ele não pertença mais a você, é sua obrigação legal entrar no painel CADMIV e CANCELAR o registro imediatamente. Esta conduta evita constrangimentos civis e impede que futuros compradores de boa-fé fiquem bloqueados ao tentar realizar a nova homologação patrimonial. 
             </div> 
             
-            <label>Este veículo já foi cadastrado anteriormente no CADMIV?</label> 
+            <label>Este veículo já foi cadastrado anteriormente no CADMIV?</label>
+            <input> 
             <select id="historico" onchange="verificarRegistro()" required> 
                 <option value="">Selecione...</option> 
                 <option value="nao">Não, este é o primeiro cadastro</option> 
@@ -286,7 +290,8 @@
                 <div class="family-title">👤 Cadastro Completo do Dependente 1</div> 
                 <label>Nome Completo do Dependente 1:</label> 
                 <input type="text" placeholder="Nome do dependente 1">
-                <label>Grau de Parentesco:</label> 
+                <label>Grau de Parentesco:</label>
+                <input> 
                 <select> 
                     <option value="filho">Filho(a)</option> 
                     <option value="primo">Primo(a)</option> 
@@ -305,7 +310,8 @@
                 <div class="family-title">👤 Cadastro Completo do Dependente 2 (Combo Familiar)</div> 
                 <label>Nome Completo do Dependente 2:</label> 
                 <input type="text" placeholder="Nome do dependente 2">
-                <label>Grau de Parentesco:</label> 
+                <label>Grau de Parentesco:</label>
+                <input> 
                 <select> 
                     <option value="filho">Filho(a)</option> 
                     <option value="primo">Primo(a)</option> 
@@ -333,7 +339,7 @@
                 <input type="text" id="data_registro" readonly style="width: 100%; padding: 12px; border: 1px solid #bdc3c7; border-radius: 6px; font-size: 14px; color: #7f8c8d; background-color: #e9ecef; cursor: not-allowed; font-weight: bold; box-sizing: border-box;"> 
             </div> 
 
-            <button type="button" id="btn-enviar" onclick="avancarvalidar.html()" class="btn-next">Salvar Cadastro Completo e Gerar PIX</button> 
+            <button type="button" id="btn-enviar" onclick="avancarPagamento(event)" class="btn-next">Salvar Cadastro Completo e Gerar PIX</button> 
         </form> 
     </div> 
 </body> 
