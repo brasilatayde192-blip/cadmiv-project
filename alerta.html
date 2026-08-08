@@ -1,0 +1,102 @@
+<!DOCTYPE html> 
+<html lang="pt-BR"> 
+<head> 
+    <meta charset="UTF-8"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <title>CADMIV - Cartão Digital de Alerta</title> 
+    <style> 
+        body { font-family: Arial, sans-serif; background-color: #f4f4f9; padding: 20px; text-align: center; color: #2c3e50; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; } 
+        .cadmiv-container { background: white; padding: 40px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 100%; max-width: 480px; text-align: left; box-sizing: border-box; margin: 20px auto; } 
+        h2 { text-align: center; color: #2c3e50; margin-bottom: 20px; } 
+        label { font-weight: bold; display: block; margin-top: 15px; color: #34495e; } 
+        input { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #bdc3c7; border-radius: 5px; box-sizing: border-box; font-size: 14px; } 
+        
+        .cadmiv-secao-alerta { background-color: #fff5f5; border: 2px solid #feb2b2; border-radius: 12px; padding: 20px; margin-top: 5px; }
+        .cadmiv-informativo { font-size: 0.88rem; color: #4a5568; line-height: 1.5; margin-bottom: 15px; text-align: left; }
+        .cadmiv-btn-alerta { width: 100%; background-color: #e53e3e; color: white; border: none; padding: 14px; font-weight: bold; border-radius: 6px; cursor: pointer; font-size: 1rem; }
+        .cadmiv-btn-alerta:hover { background-color: #c53030; }
+        
+        .cadmiv-autenticacao { background: #ffffff; border: 1px solid #cbd5e0; padding: 15px; border-radius: 8px; margin-top: 15px; display: none; }
+        .cadmiv-autenticacao h4 { margin: 0 0 10px 0; color: #c53030; }
+        
+        /* A TARJA VERDE SOLICITADA EM FORMATO DE BOTÃO DO RODA-PÉ */
+        .cadmiv-tarja-link { display: block; background-color: #48bb78; color: white; text-align: center; padding: 14px; border-radius: 6px; font-weight: bold; margin-top: 20px; font-size: 1rem; text-decoration: none; transition: background 0.2s; }
+        .cadmiv-tarja-link:hover { background-color: #38a169; }
+    </style> 
+</head> 
+<body> 
+
+    <div class="cadmiv-container"> 
+        <h2>Cartão Digital de Alerta</h2> 
+
+        <div class="cadmiv-secao-alerta">
+            <!-- Botão de pânico inicial -->
+            <button type="button" class="cadmiv-btn-alerta" onclick="abrirVerificacaoAlerta()">
+                🚨 DISPARAR ALERTA DE FURTO OU ROUBO
+            </button>
+
+            <!-- Informativo com texto obrigatório -->
+            <div class="cadmiv-informativo">
+                <br>
+                <strong>Botão de Alerta de Furto ou Roubo do Veículo Registrado na CADMIV.</strong> 
+                Caro Cliente, caso tenha voce sido alvo de vandalismo e tenha gerado a perca do seu veículo, (Autopropelido) sendo considerado Furtado ou Roubado, acione o botão de Alerta.
+            </div>
+
+            <!-- Formulário que pede ID (Telefone) e Senha do cliente -->
+            <div id="caixa-validacao" class="cadmiv-autenticacao">
+                <h4>Confirmação de Identidade Requerida</h4>
+                
+                <label>ID do CLIENTE (Número do Telefone):</label>
+                <input type="text" id="alerta_id" placeholder="Digite seu telefone cadastrado">
+
+                <label>Senha de Cadastro:</label>
+                <div style="position: relative; display: flex; align-items: center; width: 100%;">
+    <input type="password" id="alerta_senha" placeholder="Digite sua senha de acesso" style="padding-right: 45px; width: 100%;"> 
+    <button type="button" onclick="alternarOlhoAlerta()" id="icone_olho_alerta" style="position: absolute; right: 10px; background: none; border: none; font-size: 18px; cursor: pointer; color: #7f8c8d; padding: 5px; top: 12px;">🙈</button> 
+</div>
+
+                <button type="button" class="cadmiv-btn-alerta" style="margin-top: 15px;" onclick="confirmarBloqueioTotal()">
+                    🔒 CONFIRMAR E ATIVAR BLOQUEIO
+                </button>
+            </div>
+
+            <!-- TARJA VERDE NO RODA-PÉ CONDUZINDO PARA O CADASTRO OFICIAL -->
+            <a href="cadastro.html" class="cadmiv-tarja-link">
+                Siga rumo ao cadastro Oficial da Cadmiv
+            </a>
+        </div>
+    </div> 
+
+    <script> 
+        function abrirVerificacaoAlerta() {
+            document.getElementById('caixa-validacao').style.display = 'block';
+        }
+
+        function confirmarBloqueioTotal() {
+            var idInput = document.getElementById('alerta_id').value;
+            var senhaInput = document.getElementById('alerta_senha').value;
+
+            if (idInput === "" || senhaInput === "") {
+                alert("Erro: Você precisa digitar seu ID e Senha para prosseguir.");
+                return;
+            }
+
+            alert("🚨 PROTOCOLO ATIVADO COM SUCESSO!\nO bloqueio do veículo (Autopropelido) foi registrado no sistema CADMIV.");
+            document.getElementById('alerta_id').value = "";
+            document.getElementById('alerta_senha').value = "";
+            document.getElementById('caixa-validacao').style.display = 'none';
+        }
+function alternarOlhoAlerta() { 
+    var campoSenha = document.getElementById('alerta_senha'); 
+    var iconeOlho = document.getElementById('icone_olho_alerta'); 
+    if (campoSenha.type === 'password') { 
+        campoSenha.type = 'text'; 
+        iconeOlho.innerText = '👁️'; 
+    } else { 
+        campoSenha.type = 'password'; 
+        iconeOlho.innerText = '🙈'; 
+    } 
+}
+    </script> 
+</body> 
+</html>

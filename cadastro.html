@@ -127,7 +127,19 @@
             localStorage.setItem('cadmiv_emissao', dataEmissaoFormatada); 
             localStorage.setItem('cadmiv_vencimento', dataVencimentoFormatada); 
             window.location.href = 'validar.html'; 
-        } 
+        }
+ // FUNÇÃO PARA FAZER O MACAQUINHO ALTERNAR O OLHO E MOSTRAR A SENHA
+function alternarOlhoCadastro() { 
+    var campoSenha = document.getElementById('senha-confirmacao'); 
+    var iconeOlho = document.getElementById('icone_olho_cadastro'); 
+    if (campoSenha.type === 'password') { 
+        campoSenha.type = 'text'; 
+        iconeOlho.innerText = '👁️'; 
+    } else { 
+        campoSenha.type = 'password'; 
+        iconeOlho.innerText = '🙈'; 
+    } 
+}
     </script> 
 </head> 
 <body> 
@@ -151,9 +163,10 @@
             
             <div class="form-group" style="margin-bottom: 15px; text-align: left; margin-top: 15px;"> 
                 <label style="font-size: 14px; color: #34495e; font-weight: bold; display: block; margin-bottom: 5px;">Crie uma Senha de Acesso:</label> 
-                <div style="position: relative; display: flex; align-items: center;"> 
-                    <input type="password" id="senha" placeholder="Sua senha de acesso" required style="width: 100%; padding: 12px; padding-right: 45px; border: 1px solid #bdc3c7; border-radius: 6px; font-size: 14px; color: #2c3e50; box-sizing: border-box; font-weight: bold;">
-     </div> 
+            <div style="position: relative; display: flex; align-items: center; width: 100%;">
+    <input type="password" id="senha-confirmacao" placeholder="Digite sua senha para bloquear" style="padding-right: 45px; width: 100%; box-sizing: border-box;"> 
+    <button type="button" onclick="alternarOlhoCadastro()" id="icone_olho_cadastro" style="position: absolute; right: 10px; background: none; border: none; font-size: 18px; cursor: pointer; color: #7f8c8d; padding: 5px; top: 50%; transform: translateY(-50%); z-index: 10;">🙈</button> 
+</div>     
             </div> 
             
             <label>CEP:</label> 
@@ -229,7 +242,7 @@
                 <option value="bike_sem_acelerador">Bicicleta Elétrica sem acelerador</option> 
                 <option value="bike_com_acelerador">Bicicleta Elétrica com acelerador</option> 
                 <option value="bike_esportiva_alto_custo">Bicicleta Esportiva de Alto Custo</option> 
-                <option value="patinetes">Patinetes</option> 
+                <option value="patinete">Patinete</option> 
                 <option value="monociclo">Monociclo</option> 
             </select> 
             
@@ -294,7 +307,8 @@
                 <label>Nome Completo do Dependente 1:</label> 
                 <input type="text" placeholder="Nome do dependente 1">
                 <label>Grau de Parentesco:</label> 
-                <select> 
+                <select>
+  <option value="" disabled selected>Selecione um dependente...</option>
                     <option value="filho">Filho(a)</option> 
                     <option value="primo">Primo(a)</option> 
                     <option value="irmao">Irmão/Irmã</option> 
@@ -314,7 +328,8 @@
                 <label>Nome Completo do Dependente 2:</label> 
                 <input type="text" placeholder="Nome do dependente 2">
                 <label>Grau de Parentesco:</label> 
-                <select> 
+                <select>
+  <option value="" disabled selected>Selecione um dependente...</option>
                     <option value="filho">Filho(a)</option> 
                     <option value="primo">Primo(a)</option> 
                     <option value="irmao">Irmão/Irmã</option> 
@@ -331,7 +346,7 @@
 
             <div id="secao-responsabilidade" class="dependent-container" style="background-color: #fcf3cf; border-color: #f39c12;"> 
                 <span style="font-weight: bold; color: #b7950b;">📋 DECLARAÇÃO DE RESPONSABILIDADE JURÍDICA:</span> 
-                <textarea rows="3" readonly style="margin-top:5px; background:#fff; resize:none;">Eu, na qualidade de proprietário titular cadastrado na plataforma CADMIV, declaro ser responsável pelas informações prestadas.</textarea>
+                <textarea rows="3" readonly style="margin-top:5px; background:#fff; resize:none;">Eu, na qualidade de proprietário titular cadastrado na plataforma CADMIV, vencionando para todos os fins de direito, a vinculação do meu Endereço Residencial e Contatos Telefônicos ao cadastro do dependente refirido acima, declaro ser responsável pelas informações prestadas.</textarea>
 <div style="margin-top: 10px; display: flex; align-items: center;"> 
                     <input type="checkbox" style="width: auto; margin-top: 0; margin-right: 10px; transform: scale(1.2);"> 
                     <strong>Confirmo e aceito os termos de responsabilidade acima.</strong> 
