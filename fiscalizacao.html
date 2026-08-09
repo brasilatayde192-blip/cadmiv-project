@@ -96,6 +96,7 @@
             window.location.href = "termos.html";
         }
     </script>
+<script src="https://cloudflare.com"></script>
 </head>
 <body>
 
@@ -112,7 +113,7 @@
             <div class="qr-section">
                 <div class="qr-title">📷 QR-CODE OFICIAL DE FISCALIZAÇÃO</div>
                 <div class="qr-text">Agente, aponte a câmera do seu celular para este QR-Code para acessar o portal de checagem instantânea de qualquer lugar do Brasil.</div>
-                <div class="qr-box">[ QR-CODE DO AGENTE ]</div>
+                <div class="qr-box"><div id="qrcode"></div></div>
             </div>
         </div>
 
@@ -135,6 +136,17 @@
 
         <div class="web-footer">www.cadmiv.com.br</div>
     </div>
+<script>
+    // Altere o link abaixo para o link real do seu site no Render
+    var textoQrCode = "https://cadmiv.com.br";
 
+    var qrcode = new QRCode(document.getElementById("qrcode"), {
+        text: textoQrCode,
+        width: 150, // Tamanho ideal para caber certinho dentro do seu quadrado
+        height: 150,
+        colorDark : "#2c3e50", // Cor escura combinando com seu layout
+        colorLight : "#ffffff"
+    });
+</script>
 </body>
 </html>
