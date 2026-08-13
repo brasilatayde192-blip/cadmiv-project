@@ -140,11 +140,40 @@ function alternarOlhoCadastro() {
         iconeOlho.innerText = '🙈'; 
     } 
 }
+// --- COMANDO EXPRESSO DA SEGUNDA VIA DE CORTESIA ---
+document.getElementById('tarja-cortesia').addEventListener('click', function() {
+    // Busca o nome completo do cliente que já está armazenado no sistema
+    var nomeArmazenado = localStorage.getItem('nome_completo');
+    
+    // Se o sistema não achar o nome gravado ainda, ele tenta pegar o que estiver digitado no campo da tela
+    if (!nomeArmazenado) {
+        var campoNome = document.getElementById('nome_completo');
+        if (campoNome && campoNome.value.trim() !== "") {
+            nomeArmazenado = campoNome.value;
+            localStorage.setItem('nome_completo', nomeArmazenado);
+        }
+    }
+
+    // Se mesmo assim não encontrar nenhum nome, avisa o usuário de forma amigável
+    if (!nomeArmazenado || nomeArmazenado.trim() === "") {
+        alert("Por favor, digite seu nome no campo correspondente antes de emitir a cortesia.");
+        return;
+    }
+
+    // Redireciona DIRETO para a página do cartão final, pulando o validar.html (PIX)
+    window.location.href = "cartao.html";
+});
+// --- FIM DO COMANDO DE CORTESIA ---
     </script> 
 </head> 
 <body> 
     <div class="container"> 
-        <h2>Formulário de Registro -- CADMIV --</h2> 
+        <h2>Formulário de Registro -- CADMIV --</h2>
+ <!-- INICIO DA TARJA DE CORTESIA -->
+<div id="tarja-cortesia" style="background-color: #28a745; color: white; text-align: center; padding: 15px; cursor: pointer; font-weight: bold; border-radius: 5px; margin: 15px 0; font-size: 16px;">
+    🎉 Clique aqui, 2ª via do CARTÃO DIGITAL. ( Cortesia: GRÁTIS  )                                                                                                                                                         
+</div>
+<!-- FIM DA TARJA DE CORTESIA -->
         <p style="text-align: center; color: #7f8c8d;">Plataforma Homologada para Registro de Patrimônio Privado.</p> 
         <form> 
             <div class="section-title">1. Dados do Proprietário e Entrega (Titular)</div> 
