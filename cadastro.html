@@ -1,6 +1,46 @@
+
 <!DOCTYPE html> 
 <html lang="pt-BR"> 
-<head> 
+<head>
+ <!-- 🔐 COMANDO SUPREMO CADMIV: FORÇA A EXIBIÇÃO ABSOLUTA DOS ELEMENTOS NO MONITOR -->
+<style>
+#cadmiv_registro, #data_registro, .data-registro, [id*="registro"] {
+    display: block !important;
+    background-color: #e2e8f0 !important;
+    color: #1e293b !important;
+    font-weight: bold !important;
+    text-align: center !important;
+    visibility: visible !important;
+}
+
+#tarja-cortesia, #tarja_cortesia, .btn-tarja-verde, [id*="tarja"], [id*="cortesia"] {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+#alerta-trava, .alerta-trava, [id*="alerta"] {
+    border: 2px solid #ef4444 !important;
+    padding: 10px !important;
+    background-color: #fef2f2 !important;
+    color: #b91c1c !important;
+    font-weight: bold !important;
+    border-radius: 4px !important;
+    margin-bottom: 15px !important;
+}
+/* Efeitos visuais para o botão da tarja verde do CADMIV */
+.tarja-botoes .btn-next {
+    transition: background-color 0.3s ease, color 0.3s ease; /* Deixa a mudança de cor suave */
+}
+
+/* Quando o cliente passar o mouse por cima, o botão reage */
+.tarja-botoes .btn-next:hover {
+    background-color: #e8f5e9 !important; /* Vira um branco levemente esverdeado */
+    color: #1e7e34 !important;            /* O texto ganha um verde mais escuro e vivo */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15); /* Dá um leve efeito de sombra ao focar */
+}
+
+</style>
     <meta charset="UTF-8"> 
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
     <title>CADMIV - Cadastro de Segurança Pessoal</title> 
@@ -26,177 +66,291 @@
         .blood-option input { width: auto; margin-top: 0; margin-right: 8px; } 
         .dependent-container { display: none; background: #ebf5fb; padding: 20px; border-radius: 5px; border: 1px solid #a9cce3; margin-top: 15px; } 
         .photo-btn { background-color: #e67e22; color: white; border: none; padding: 8px 12px; border-radius: 3px; cursor: pointer; font-size: 12px; font-weight: bold; margin-top: 5px; margin-right: 5px; } 
-        video { width: 100%; max-width: 200px; display: none; margin-top: 10px; border-radius: 5px; background: black; } 
-    </style> 
-    <script> 
-        window.onload = function() { 
-            // MEMÓRIA DIGITAL: Resgata a data atual do registro
-            var dataAtual = new Date(); 
-            var dia = String(dataAtual.getDate()).padStart(2, '0'); 
-            var mes = String(dataAtual.getMonth() + 1).padStart(2, '0'); 
-            var ano = dataAtual.getFullYear(); 
-            document.getElementById('data_registro').value = dia + '/' + mes + '/' + ano; 
-
-            // TECNOLOGIA ESPECIAL: Preenche o formulário se o cliente já tiver dados salvos
-            if(localStorage.getItem('cadmiv_nome')) {
-                document.getElementById('nome_completo').value = localStorage.getItem('cadmiv_nome');
-                document.getElementById('nome_completo').readOnly = true; // TRAVA DE SEGURANÇA NO NOME!
-                document.getElementById('nome_completo').style.backgroundColor = '#e9ecef';
-                document.getElementById('nome_completo').style.cursor = 'not-allowed';
-            }
-        }; 
-
-        function alternarVisibilidadeSenha() { 
-            var campoSenha = document.getElementById('senha'); 
-            var iconeOlho = document.getElementById('icone_olho'); 
-            if (campoSenha.type === 'password') { 
-                campoSenha.type = 'text'; 
-                iconeOlho.innerText = '👁️'; 
-            } else { 
-                campoSenha.type = 'password'; 
-                iconeOlho.innerText = '🙈'; 
-            } 
-        } 
-
-        function verificarRegistro() { 
-            var jaCadastrado = document.getElementById("historico").value; 
-            var alerta = document.getElementById("alerta-trava"); 
-            if (jaCadastrado === "sim") { 
-                alerta.style.display = "block"; 
-                bloquearBotao(true); 
-            } else { 
-                alerta.style.display = "none"; 
-                bloquearBotao(false); 
-            } 
-        } 
-
-        function verificarIdade() { 
-            var anoNascimento = parseInt(document.getElementById("ano_nascimento").value); 
-            var anoAtual = new Date().getFullYear(); 
-            var idade = anoAtual - anoNascimento; 
-            var alertaIdade = document.getElementById("alerta-idade"); 
-            if (idade < 18) { 
-                alertaIdade.style.display = "block"; 
-                bloquearBotao(true); 
-            } else { 
-                alertaIdade.style.display = "none"; 
-                bloquearBotao(false); 
-            } 
-        } 
-
-        function gerenciarCombo() { 
-            var combo2 = document.getElementById("combo2").checked; 
-            var combo3 = document.getElementById("combo3").checked; 
-            document.getElementById("dep1").style.display = (combo2 || combo3) ? "block" : "none"; 
-            document.getElementById("dep2").style.display = combo3 ? "block" : "none"; 
-            document.getElementById("secao-responsabilidade").style.display = (combo2 || combo3) ? "block" : "none"; 
-        } 
-
-        function bloquearBotao(status) { 
-            var btn = document.getElementById("btn-enviar"); 
-            btn.disabled = status; 
-            btn.style.backgroundColor = status ? "#bdc3c7" : "#27ae60"; 
-        } 
-
-        function ligarCamera(idVideo) { 
-            var video = document.getElementById(idVideo); 
-            video.style.display = "block"; 
-            navigator.mediaDevices.getUserMedia({ video: true }) 
-            .then(function(stream) { 
-                video.srcObject = stream; 
-                video.play(); 
-            }) 
-            .catch(function() { 
-                alert("Câmera não encontrada ou sem permissão."); 
-            }); 
-        } 
-
-        function avancarPagamento(event) { 
-            if (event) event.preventDefault(); 
-            
-            // GRAVAÇÃO DA MEMÓRIA: Guarda o nome para travar no próximo login
-            var nomeCliente = document.getElementById('nome_completo').value;
-            localStorage.setItem('cadmiv_nome', nomeCliente);
-
-            var dataAtual = new Date(); 
-            var dia = String(dataAtual.getDate()).padStart(2, '0'); 
-            var mes = String(dataAtual.getMonth() + 1).padStart(2, '0'); 
-            var ano = dataAtual.getFullYear(); 
-            var dataEmissaoFormatada = dia + '/' + mes + '/' + ano; 
-            var dataVencimentoFormatada = dia + '/' + mes + '/' + (ano + 1); 
-            localStorage.setItem('cadmiv_emissao', dataEmissaoFormatada); 
-            localStorage.setItem('cadmiv_vencimento', dataVencimentoFormatada); 
-            window.location.href = 'validar.html'; 
-        }
- // FUNÇÃO PARA FAZER O MACAQUINHO ALTERNAR O OLHO E MOSTRAR A SENHA
-function alternarOlhoCadastro() { 
-    var campoSenha = document.getElementById('senha-confirmacao'); 
-    var iconeOlho = document.getElementById('icone_olho_cadastro'); 
-    if (campoSenha.type === 'password') { 
-        campoSenha.type = 'text'; 
-        iconeOlho.innerText = '👁️'; 
-    } else { 
-        campoSenha.type = 'password'; 
-        iconeOlho.innerText = '🙈'; 
-    } 
+        video { width: 100%; max-width: 200px; display: none; margin-top: 10px; border-radius: 5px; background: black; }
+.tarja-botoes {
+        background-color: #27ae60;
+        padding: 20px;
+        border-radius: 5px;
+        margin-top: 25px;
+        text-align: center;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .tarja-botoes .btn-next {
+        background-color: #ffffff !important;
+        color: #27ae60 !important;
+        font-weight: bold;
+        border: 2px solid #ffffff;
+        max-width: 400px;
+        margin: 0 auto;
+    }
+    .tarja-botoes .btn-next:hover {
+        background-color: #e8f5e9 !important;
+        color: #1e7e34 !important;
+    }
+.tarja-botoes {
+    background-color: #27ae60;
+    padding: 20px;
+    border-radius: 5px;
+    margin-top: 25px;
+    margin-bottom: 25px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
-// --- COMANDO EXPRESSO DA SEGUNDA VIA DE CORTESIA ---
-document.getElementById('tarja-cortesia').addEventListener('click', function() {
-    // Busca o nome completo do cliente que já está armazenado no sistema
-    var nomeArmazenado = localStorage.getItem('nome_completo');
-    
-    // Se o sistema não achar o nome gravado ainda, ele tenta pegar o que estiver digitado no campo da tela
-    if (!nomeArmazenado) {
-        var campoNome = document.getElementById('nome_completo');
-        if (campoNome && campoNome.value.trim() !== "") {
-            nomeArmazenado = campoNome.value;
-            localStorage.setItem('nome_completo', nomeArmazenado);
+.tarja-botoes .btn-next {
+    background-color: #ffffff !important;
+    color: #27ae60 !important;
+    font-weight: bold;
+    border: 2px solid #ffffff;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+</style>
+   
+    <script>
+// 🗓️ MOTOR 1: INJETOR ATÔMICO UNIVERSAL (DATA ATUAL: 23/08/2026)
+window.onload = function() {
+    var hoje = new Date();
+    var dia = String(hoje.getDate()).padStart(2, '0');
+    var mes = String(hoje.getMonth() + 1).padStart(2, '0');
+    var ano = hoje.getFullYear();
+    var dataFormatada = dia + '/' + mes + '/' + ano;
+
+    // Procura cirurgicamente por qualquer campo de texto travado (cinza) no topo
+    var todosInputs = document.getElementsByTagName('input');
+    for (var i = 0; i < todosInputs.length; i++) {
+        var input = todosInputs[i];
+        if (input.id.includes('registro') || input.id.includes('data') || input.name.includes('data') || input.hasAttribute('readonly')) {
+            input.value = dataFormatada; // Carimba a data de hoje na marra!
         }
     }
+    
+    // Roda a checagem dos combos logo no início
+    gerenciarCombo();
+};
 
-    // Se mesmo assim não encontrar nenhum nome, avisa o usuário de forma amigável
-    if (!nomeArmazenado || nomeArmazenado.trim() === "") {
-        alert("Por favor, digite seu nome no campo correspondente antes de emitir a cortesia.");
+// 📇 MOTOR 2: ENGENHARIA DE VISIBILIDADE IMPLACÁVEL DOS DEPENDENTES
+function gerenciarCombo() {
+    var plano2 = document.getElementById("combo2") ? document.getElementById("combo2").checked : false;
+    var plano3 = document.getElementById("combo3") ? document.getElementById("combo3").checked : false;
+    
+    var blocoDep1 = document.getElementById("dep1") || document.getElementById("dependente1") || document.getElementById("dep_1") || document.querySelector(".dependent-container");
+    var blocoDep2 = document.getElementById("dep2") || document.getElementById("dependente2") || document.getElementById("dep_2");
+    var secaoResponsabilidade = document.getElementById("secao-responsabilidade") || document.getElementById("secao_responsabilidade");
+
+    if (blocoDep1) {
+        blocoDep1.style.setProperty("display", (plano2 || plano3) ? "block" : "none", "important");
+    }
+    if (blocoDep2) {
+        blocoDep2.style.setProperty("display", plano3 ? "block" : "none", "important");
+    }
+    if (secaoResponsabilidade) {
+        secaoResponsabilidade.style.setProperty("display", (plano2 || plano3) ? "block" : "none", "important");
+    }
+}
+
+// 🎛️ ESCUTA ATIVA DIRETAMENTE NOS CLIQUES DA TELA
+document.addEventListener("DOMContentLoaded", function() {
+    var botoesRadio = document.querySelectorAll('input[type="radio"]');
+    botoesRadio.forEach(function(radio) {
+        radio.addEventListener("click", gerenciarCombo);
+        radio.addEventListener("change", gerenciarCombo);
+    });
+});
+
+// 🔐 MOTOR 3: TRAVA CRONOLÓGICA CONTRA MENORES DE 18 ANOS (CADMIV)
+function validarMaioridadeCadmiv() {
+    var campoAno = document.getElementById("cadmiv_ano") || document.getElementById("nasc_ano");
+    if (!campoAno || !campoAno.value) return true;
+
+    if (campoAno.value.length === 4) {
+        var anoNasc = parseInt(campoAno.value, 10);
+        var idade = 2026 - anoNasc;
+
+        if (idade < 18 || anoNasc <= 1900 || isNaN(idade)) {
+            alert("🚨 CADASTRO RECUSADO:\nA plataforma CADMIV exige maioridade penal e jurídica (mínimo de 18 anos) para a homologação de veículos.");
+            campoAno.value = ""; 
+            return false;
+        }
+        return true;
+    }
+    return true;
+}
+
+function verificarIdadeCompleta(event) {
+    return validarMaioridadeCadmiv();
+}
+// 🚨 MOTOR DE FISCALIZAÇÃO SUPREMA - BARRA ENVIOS COM CAMPOS EM BRANCO
+function validarFormularioCompleto(event) {
+    // 1. Roda a trava cronológica da maioridade penal/jurídica que já criamos
+    if (typeof validarMaioridadeCadmiv === "function" && !validarMaioridadeCadmiv()) {
+        if (event && event.preventDefault) event.preventDefault();
+        return false;
+    }
+
+    // 2. Passa um pente fino em todas as caixas visíveis que possuem preenchimento obrigatório
+    var camposObrigatorios = document.querySelectorAll('input[required], select[required]');
+    var formularioValido = true;
+    var primeiroCampoVazio = null;
+
+    camposObrigatorios.forEach(function(campo) {
+        // Verifica se o campo está visível na tela e se o cliente deixou em branco
+        if (campo.offsetParent !== null && (!campo.value || campo.value.trim() === "")) {
+            formularioValido = false;
+            campo.style.border = "2px solid #ef4444"; // Sinaliza a caixa vazia de vermelho
+            if (!primeiroCampoVazio) primeiroCampoVazio = campo;
+        } else {
+            campo.style.border = "1px solid #ccc"; // Devolve o visual padrão se preenchido
+        }
+    });
+
+    // 3. Se houver falha, interrompe o trânsito da página para o PIX na hora!
+    if (!formularioValido) {
+        if (event && event.preventDefault) {
+            event.preventDefault();
+        }
+        
+        alert("🚨 ALERTA CADMIV:\nO cadastro não pôde ser enviado! Por favor, preencha todos os campos obrigatórios sinalizados antes de gerar o PIX.");
+        
+        if (primeiroCampoVazio) {
+            primeiroCampoVazio.focus(); // Coloca o cursor do monitor direto em cima do erro
+        }
+        return false;
+    }
+
+    // 4. Se tudo estiver preenchido com perfeição de elite, libera o avanço para o pagamento
+    if (typeof avancarPagamento === "function") {
+        avancarPagamento(event);
+    }
+    return true;
+}
+// 📷 MOTOR DE MÍDIA AVANÇADO: LIGA A CÂMERA DO TITULAR E DOS DEPENDENTES NA HORA
+function ligarCamera(idVideo) {
+    var elementoVideo = document.getElementById(idVideo);
+    if (!elementoVideo) return;
+
+    // Desliga a câmera se já estiver ativa para não travar o monitor
+    if (elementoVideo.srcObject) {
+        var stream = elementoVideo.srcObject;
+        var tracks = stream.getTracks();
+        tracks.forEach(function(track) { track.stop(); });
+        elementoVideo.srcObject = null;
+        elementoVideo.style.display = "none";
         return;
     }
 
-    // Redireciona DIRETO para a página do cartão final, pulando o validar.html (PIX)
-    window.location.href = "cartao.html";
-});
-// --- FIM DO COMANDO DE CORTESIA ---
-    </script> 
-</head> 
-<body> 
+    // Liga a câmera nativa com suporte total para arquivos locais (file://)
+    var configuracaoMidia = { video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: "user" } };
+    
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        navigator.mediaDevices.getUserMedia(configuracaoMidia)
+        .then(function(stream) {
+            elementoVideo.srcObject = stream;
+            elementoVideo.style.setProperty("display", "block", "important"); // Faz o quadro do vídeo brotar na tela
+            elementoVideo.style.marginTop = "10px";
+            elementoVideo.style.borderRadius = "4px";
+            elementoVideo.play();
+        })
+        .catch(function(erro) {
+            console.log("Erro na câmera: ", erro);
+            alert("🚨 SEGURANÇA CADMIV:\nA câmera não abriu porque o navegador exige uma conexão segura (HTTPS). Para testar localmente, use o botão marrom 'Buscar no Arquivo' para anexar a foto do cartão!");
+        });
+    } else {
+        alert("🚨 BLOQUEIO DO NAVEGADOR:\nEste navegador bloqueia o uso de câmeras em arquivos locais abertos direto do Bloco de Notas.");
+    }
+}
+
+    </script>
+ 
+ 
     <div class="container"> 
-        <h2>Formulário de Registro -- CADMIV --</h2>
- <!-- INICIO DA TARJA DE CORTESIA -->
-<div id="tarja-cortesia" style="background-color: #28a745; color: white; text-align: center; padding: 15px; cursor: pointer; font-weight: bold; border-radius: 5px; margin: 15px 0; font-size: 16px;">
-    🎉 Clique aqui, 2ª via do CARTÃO DIGITAL. ( Cortesia: GRÁTIS  )                                                                                                                                                         
+        <h2>Formulário de Cadastro -- CADMIV --</h2>
+<!-- INICIO DA TARJA DE SEGUNDA VIA PAGA -->
+<div id="tarja-cortesia" onclick="if(typeof avancarPagamento === 'function') { avancarPagamento(event); } else { window.location.href = 'validar.html'; }" style="background-color: #27ae60; color: white; padding: 12px; border-radius: 6px; text-align: center; font-weight: bold; font-size: 16px; cursor: pointer; margin-bottom: 15px;">
+    💳 CLIQUE AQUI PARA EMITIR SUA 2ª VIA DO CARTÃO DIGITAL POR APENAS R$ 29,99
 </div>
-<!-- FIM DA TARJA DE CORTESIA -->
-        <p style="text-align: center; color: #7f8c8d;">Plataforma Homologada para Registro de Patrimônio Privado.</p> 
-        <form> 
-            <div class="section-title">1. Dados do Proprietário e Entrega (Titular)</div> 
+<!-- FIM DA TARJA DE SEGUNDA VIA PAGA -->                                                                                                                 
+        <p style="text-align: center; color: #7f8c8d;">Plataforma Homologada para Cadastro de Patrimônio Privado.</p> 
+        <form onsubmit="event.preventDefault();" id="form-cadastro"> 
+            <div class="section-title">1. Dados do Proprietário  (Titular)</div> 
             <label>Nome Completo:</label> 
             <input type="text" id="nome_completo" placeholder="Digite seu nome completo" required> 
             
-            <label>Ano de Nascimento (Uso estrito para validação de maioridade 18+):</label> 
-            <input type="number" id="ano_nascimento" onchange="verificarIdade()" placeholder="Ex: 1985" required> 
-            <div id="alerta-idade" class="alert-box">❌ RESTRIÇÃO DE IDADE CRONOLÓGICA:<br>Só é permitido cadastrar-se nesta plataforma pessoas maiores de 18 anos de idade.</div> 
+            <!-- INÍCIO DA SEÇÃO DE DATA DE NASCIMENTO COMPLETA -->
+<div class="form-group">
+<!-- 🚨 AVISO RELUZENTE DE SEGURANÇA NACIONAL SUGERIDO PELO DIRETOR -->
+<div style="background-color: #fdf2f2 !important; border: 2px solid #ec7063 !important; padding: 12px !important; border-radius: 6px !important; margin-bottom: 12px !important; text-align: center !important; animation: reluzirAlerta 1.5s infinite alternate !important;">
+    <strong style="color: #c0392b !important; font-family: Arial, sans-serif !important; font-size: 13.5px !important; letter-spacing: 0.5px !important; text-transform: uppercase !important;">
+        ⚠ É expressamente proibido cadastrar nesta plataforma pessoas com menos de 18 anos de idade!
+    </strong>
+</div>
+<!-- 🎴 BLOCO ISOLADO FLUTUANTE DA CADMIV - INDESTRUTÍVEL -->
+<div style="background-color: #f8fafc !important; border: 2px solid #3b82f6 !important; padding: 15px !important; border-radius: 8px !important; margin-top: 15px !important; margin-bottom: 20px !important; font-family: Arial, sans-serif !important;">
+    
+    <!-- 🗓️ 1. DATA  ATUAL CARIMBADA E TRAVADA -->
+    <div style="margin-bottom: 15px !important;">
+        <label style="font-weight: bold !important; color: #1e293b !important; display: block !important; margin-bottom: 5px !important;">Data Oficial de Homologação:</label>
+        <input type="text" value="21/08/2026" id="data_emissao" style="background-color: #e2e8f0 !important; color: #1e293b !important; font-weight: bold !important; text-align: center !important; padding: 10px !important; border-radius: 4px !important; border: 1px solid #cbd5e1 !important; width: 100% !important; box-sizing: border-box !important;" readonly>
+    </div>
+
+    <!-- 📜 2. DECLARAÇÃO DE RESPONSABILIDADE JURÍDICA NACIONAL -->
+    <div style="background-color: #fff !important; border: 1px solid #cbd5e1 !important; padding: 12px !important; border-radius: 4px !important; margin-bottom: 15px !important; font-size: 13px !important; color: #334155 !important; line-height: 1.5 !important; max-height: 100px !important; overflow-y: auto !important;">
+        <strong>TERMO DE RESPONSABILIDADE DO TITULAR (CADMIV):</strong><br>
+        Ao clicar em prosseguir, o requerente declara sob as penas da lei penal e civil que todas as informações prestadas neste formulário de homologação veicular, incluindo os dados de chassis, motorização e credenciais de dependentes, são verídicas, assumindo total responsabilidade jurídica sobre o ato.
+    <!-- FIM DO TEXTO DO TERMO DE RESPONSABILIDADE -->
+    responsabilidade jurídica sobre o ato.
+    </div>
+
+    <!-- 🔐 ESSA É A TAG QUE VOCÊ VAI ADICIONAR PARA FECHAR A MOLDURA AZUL E CONSERTAR A TELA -->
+</div>
+
+<style>
+@keyframes reluzirAlerta { 
+    0% { box-shadow: 0 0 5px #ec7063; background-color: #fdf2f2; }
+    100% { box-shadow: 0 0 15px #c0392b; background-color: #fce4e4; }
+}
+</style>
+    <label>Data de Nascimento (Obrigatório - Maiores de 18 anos):</label>
+    <div style="display: flex; gap: 10px; width: 100%;">
+        <!-- Dia -->
+        <input type="number" id="nasc_dia" placeholder="Dia" min="1" max="31" oninput="verificarIdadeCompleta()" style="width: 25%; padding: 10px; border-radius: 4px; border: 1px solid #ccc; box-sizing: border-box;">
+        <!-- Mês -->
+        <select id="nasc_mes" onchange="verificarIdadeCompleta()" style="width: 40%; padding: 10px; border-radius: 4px; border: 1px solid #ccc; box-sizing: border-box;">
+            <option value="">Mês</option>
+            <option value="1">Janeiro</option><option value="2">Fevereiro</option><option value="3">Março</option>
+            <option value="4">Abril</option><option value="5">Maio</option><option value="6">Junho</option>
+            <option value="7">Julho</option><option value="8">Agosto</option><option value="9">Setembro</option>
+            <option value="10">Outubro</option><option value="11">Novembro</option><option value="12">Dezembro</option>
+        </select>
+        <!-- Ano -->
+        <input type="number" id="cadmiv_ano" placeholder="Ano" min="1900" max="2026" oninput="verificarIdadeCompleta()" style="width: 35%; padding: 10px; border-radius: 4px; border: 1px solid #ccc; box-sizing: border-box;" required>
+    </div>
+    <!-- Tarja de Alerta Informativo de Idade -->
+    <div id="alerta-idade" style="display: none; color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; padding: 10px; margin-top: 10px; border-radius: 4px; font-weight: bold;">
+        ❌ RESTRIÇÃO DE IDADE CRONOLÓGICA: O cadastro é permitido apenas para maiores de 18 anos de idade.
+    </div>
+</div>
+<!-- FIM DA SEÇÃO DE DATA DE NASCIMENTO --> 
             
             <label>E-mail:</label> 
-            <input type="email" placeholder="Digite seu e-mail corporativo" required> 
+            <input type="email" placeholder="Digite seu e-mail Preferencial" required> 
             
             <label>Telefone Celular (Será usado como seu Login de Acesso):</label> 
             <input type="text" placeholder="Ex: 11999998888" required> 
             
-            <div class="form-group" style="margin-bottom: 15px; text-align: left; margin-top: 15px;"> 
-                <label style="font-size: 14px; color: #34495e; font-weight: bold; display: block; margin-bottom: 5px;">Crie uma Senha de Acesso:</label> 
-            <div style="position: relative; display: flex; align-items: center; width: 100%;">
-    <input type="password" id="senha-confirmacao" placeholder="Digite sua senha para bloquear" style="padding-right: 45px; width: 100%; box-sizing: border-box;"> 
-    <button type="button" onclick="alternarOlhoCadastro()" id="icone_olho_cadastro" style="position: absolute; right: 10px; background: none; border: none; font-size: 18px; cursor: pointer; color: #7f8c8d; padding: 5px; top: 50%; transform: translateY(-50%); z-index: 10;">🙈</button> 
-</div>     
-            </div> 
+            <div class="form-group">
+    <label for="senha-confirmacao">Crie uma Senha de Acesso:</label>
+    
+    <!-- MOLDURA DE POSICIONAMENTO: Garante que o botão fique preso dentro da caixa -->
+    <div style="position: relative; width: 100%;">
+        
+        <input type="password" id="senha-confirmacao" placeholder="Digite sua senha para bloquear" style="padding-right: 45px; width: 100%; box-sizing: border-box; height: 40px; border: 1px solid #ccc; border-radius: 4px;">
+        
+        <!-- O MACAQUINHO AGORA TRAVADO NO CANTO DIREITO INTERNO -->
+        <button type="button" id="icone_olho_cadastro" class="btn-secondary" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 20px; padding: 5px; z-index: 10;" onclick="(function(){ var campo = document.getElementById('senha-confirmacao'); if(campo.type === 'password'){ campo.type = 'text'; document.getElementById('icone_olho_cadastro').innerHTML = '🐵'; } else { campo.type = 'password'; document.getElementById('icone_olho_cadastro').innerHTML = '🙈'; } })()">🙈</button>
+    
+    </div>
+</div> 
             
             <label>CEP:</label> 
             <input type="text" placeholder="00000-000" required> 
@@ -216,18 +370,19 @@ document.getElementById('tarja-cortesia').addEventListener('click', function() {
             <label>Estado:</label>
 <input type="text" placeholder="UF" required> 
             
-            <div class="health-title">🚨 Protocolo de Saúde e Emergência</div> 
+            <div class="health-title">🚨 Protocolo de  SAÚDE  e  EMERGÊNCIA</div> 
             
             <label>Em caso de Emergência, ligar para:</label> 
             <select required> 
                 <option value="">Selecione o contato...</option> 
                 <option value="pai">Pai</option> 
                 <option value="mae">Mãe</option> 
-                <option value="irmao">Irmão/Irmã</option> 
+                <option value="irmao">Irmão(a)</option> 
                 <option value="tio">Tio(a)</option> 
                 <option value="filho">Filho(a)</option> 
                 <option value="primo">Primo(a)</option> 
-                <option value="cunhado">Cunhado(a)</option> 
+                <option value="cunhado">Cunhado(a)</option>
+                <option value="enteado">Enteado(a)</option> 
                 <option value="amigo">Amigo(a)</option> 
             </select> 
             
@@ -254,7 +409,7 @@ document.getElementById('tarja-cortesia').addEventListener('click', function() {
             </select> 
             
             <label>Possui Alergia a algum Medicamento?</label> 
-            <input type="text" placeholder="Digite os medicamentos ou escreva 'Nenhuma'">
+            <input type="text" placeholder="Digite os medicamentos ou escreva 'Nenhuma" required>
 
             <label>Médico de sua preferência (Nome Completo):</label> 
             <input type="text" placeholder="Nome do Doutor(a)">
@@ -262,52 +417,54 @@ document.getElementById('tarja-cortesia').addEventListener('click', function() {
             <label>Telefone de contato do Médico:</label> 
             <input type="text" placeholder="(00) 00000-0000">
 
-            <div class="section-title">2. Dados do Veículo Autopropelido</div> 
+            <div class="section-title">2. Dados do Veículo Autopropelido Cadastrado</div> 
             
             <label>Modelo do Veículo:</label>
 <select required> 
                 <option value="">Selecione o modelo do veículo...</option> 
-                <option value="bike_comum">Bicicleta Comum (Sem ser elétrica)</option> 
-                <option value="bike_sem_acelerador">Bicicleta Elétrica sem acelerador</option> 
-                <option value="bike_com_acelerador">Bicicleta Elétrica com acelerador</option> 
-                <option value="bike_esportiva_alto_custo">Bicicleta Esportiva de Alto Custo</option> 
+                <option value="bike_comum">Bicicleta Comum (Sem ser Elétrica)</option> 
+                <option value="bike_sem_acelerador">Bicicleta Elétrica sem Acelerador</option> 
+                <option value="bike_com_acelerador">Bicicleta Elétrica com Acelerador</option> 
+                <option value="bike_esportiva_alto_custo">Bicicleta Esportiva de Alto Custo</option>
+                <option value="bike_triciclo_comum">Triciclo Comum (Sem ser Elétrico)</option>
+                <option value="bike_triciclo_especial">Triciclo Especial Elétrico com Acelerador</option>
                 <option value="patinete">Patinete</option> 
                 <option value="monociclo">Monociclo</option> 
             </select> 
             
             <label>Número de Identificação do Veículo (Chassi / Série):</label> 
-            <input type="text" placeholder="Digite o número de série" required>
+            <input type="text" id="chassi_veiculo" onblur="verificarChassiCadastrado()" placeholder="Digite o número do chassi" required>
 
-            <label>Número da Nota Fiscal de Compra:</label> 
+            <label>Número da Nota Fiscal de Compra do Veículo:</label> 
             <input type="text" placeholder="Número da NF" required>
 
-            <label>Ano de Fabricação:</label> 
+            <label>Ano de Fabricação do Veículo:</label> 
             <input type="text" placeholder="Ex: 2026" required>
 
             <label>Cor do Veículo:</label> 
             <input type="text" placeholder="Cor predominante" required>
 
-            <label>Estado de Conservação:</label> 
-            <select required> 
+            <label>Estado de Conservação do Veículo:</label> 
+            <select name="estado_conservacao" id="estado_conservacao" class="form-control" required>
                 <option value="">Selecione...</option> 
                 <option value="novo">Veículo Novo</option> 
                 <option value="usado">Veículo Usado</option> 
             </select> 
             
             <div class="info-box-used"> 
-                ⚠️ AVISO IMPORTANTE SOBRE TRANSFERÊNCIAS:<br> Caso você venda, doe ou passe este veículo a terceiros de forma que ele não pertença mais a você, é sua obrigação legal entrar no painel CADMIV e CANCELAR o registro imediatamente. 
+                ⚠️ AVISO IMPORTANTE sobre TRANSFERÊNCIA do VEÍCULO CADASTRADO na CADMIV:<br> Caso você venda, doe ou passe este veículo a terceiros de forma que ele não pertença mais a você, é sua obrigação legal entrar no Formulário de Cadastro da CADMIV e CANCELAR o veículo  IMEDIATAMENTE. 
             </div> 
             
-            <label>Este veículo já foi cadastrado anteriormente no CADMIV?</label> 
-            <select id="historico" onchange="verificarRegistro()" required> 
-                <option value="">Selecione...</option> 
-                <option value="nao">Não, este é o primeiro cadastro</option> 
-                <option value="sim">Sim, já possui registro anterior</option> 
-            </select> 
+            <label>Este veículo já foi  CADASTRADO  anteriormente no CADMIV?</label> 
+            <select name="cadastro_anterior" id="cadastro_anterior" class="form-control" onchange="verificarContestacaoVeiculo()" required>
+    <option value="">Selecione uma opção...</option>
+    <option value="Não">Não, este é o primeiro cadastro</option>
+    <option value="Sim">Sim, já possui cadastro anterior</option>
+</select> 
             
-            <div id="alerta-trava" class="alert-box">⚠️ BLOQUEIO DE SEGURANÇA JURÍDICA NACIONAL:<br>Este veículo já possui um registro ativo no sistema.</div> 
+            <div id="alerta-trava" class="alert-box">⚠️ BLOQUEIO DE SEGURANÇA JURÍDICA NACIONAL:<br>Este veículo já possui um Cadastro ativo no sistema.</div> 
 
-            <div class="section-title">3. Concretização do Registro Corporativo</div> 
+            <div class="section-title">3. Concretização do Cadastro Corporativo</div> 
             
             <div class="offer-box"> 
                 <strong>CONCRETIZAÇÃO E PROTEÇÃO OFICIAL DA SUA CREDENCIAL</strong><br><br> 
@@ -315,44 +472,58 @@ document.getElementById('tarja-cortesia').addEventListener('click', function() {
             </div> 
             
             <div class="price-option"> 
-                <input type="radio" name="combo" id="combo1" onchange="gerenciarCombo()" checked> 
+                <input type="radio" name="combo" id="combo1" onchange="forcarAberturaDependentes()"> 1 Cartão Digital  (Apenas Titular)<br>
                 <div><strong>Emitir 1 Cartão Digital (Apenas Titular)</strong><br><span class="price-label">Taxa Única: $24.99 (Via PIX Seguro)</span></div> 
             </div> 
             
             <div class="price-option"> 
-                <input type="radio" name="combo" id="combo2" onchange="gerenciarCombo()"> 
+               <input type="radio" name="combo" id="combo2" onchange="forcarAberturaDependentes()">2 Cartões Digitais (Titular + 1 Dependente)<br>
                 <div><strong>Emitir 2 Cartões Digitais (Titular + 1 Dependente)</strong><br><span class="price-label">Taxa Única: $39.99 (Via PIX Seguro)</span></div> 
             </div> 
             
             <div class="price-option"> 
-                <input type="radio" name="combo" id="combo3" onchange="gerenciarCombo()"> 
+                <input type="radio" name="combo" id="combo3" onchange="forcarAberturaDependentes()">3 Cartões Digitais (Titular + 2 Dependentes)
                 <div><strong>Emitir 3 Cartões Digitais (Combo-Familiar)</strong><br><span class="price-label">Taxa Única: $49.99 (Via PIX Seguro)</span></div> 
             </div> 
             
-            <p style="font-size: 13px; font-weight: bold; color: #7f8c8d; text-align: center; margin-top: 15px; line-height: 1.4;"> 📋 INFORMATIVO DE VALIDADE NACIONAL:<br> Esta credencial corporativa possui validade estrita de 1 (um) ano. </p> 
+            <p style="font-size: 13px; font-weight: bold; color: #7f8c8d; text-align: center; margin-top: 15px; line-height: 1.4;"> 📋 INFORMATIVO DE VALIDADE NACIONAL:<br> Esta credencial corporativa possui validade estrita de 1 (um) ano. </p>
+<div class="tarja-botoes" style="background-color: #27ae60; padding: 20px; border-radius: 5px; margin-top: 25px; margin-bottom: 25px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+ <button type="submit" id="btn-viajar" onclick="return validarFormularioCompleto(event);" class="btn-next" style="background-color: #ffffff !important; color: #27ae60 !important; font-weight: bold; border: 2px solid #ffffff; max-width: 400px; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 16px;">Salvar Cadastro Completo e Gerar PIX</button>   
+</div> 
 
-            <div id="dep1" class="dependent-container">
+            <div id="dep1" class="dependent-container" style="display: none;">
 <div class="family-title">👤 Cadastro Completo do Dependente 1</div> 
                 <label>Nome Completo do Dependente 1:</label> 
                 <input type="text" placeholder="Nome do dependente 1">
                 <label>Grau de Parentesco:</label> 
+<br><br>
+<!-- 📁 BOTÕES DE MÍDIA EXCLUSIVOS DO DEPENDENTE 1 -->
+<input type="file" id="f-dep1" style="display:none;">
+<button type="button" class="photo-btn" onclick="document.getElementById('f-dep1').click()" style="background-color: #b87333 !important; color: white !important; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; margin-right: 10px;">
+    🗂️ Buscar no Arquivo
+</button>
+<button type="button" class="photo-btn" onclick="ligarCamera('v-dep1')" style="background-color: #b87333 !important; color: white !important; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">
+    📷 Tirar Foto Agora
+</button>
+<video id="v-dep1" autoplay style="width: 100%; max-width: 300px; display: none; margin-top: 10px; border-radius: 4px;"></video>
                 <select>
   <option value="" disabled selected>Selecione um dependente...</option>
                     <option value="filho">Filho(a)</option> 
                     <option value="primo">Primo(a)</option> 
-                    <option value="irmao">Irmão/Irmã</option> 
+                    <option value="irmao">Irmão(a)</option> 
                     <option value="neto">Neto(a)</option> 
                     <option value="amigo">Amigo(a)</option>
-                    <option value="cunhado">Cunhado(a)</option> 
+                    <option value="cunhado">Cunhado(a)</option>
+                    <option value="enteado">Enteado(a)</option>
                 </select> 
-                <br><br> 
-                <input type="file" id="f-dep1" style="display:none;"> 
+                <br><br>
+                <div id="dep1" class="dependent-container" style="display:none;"> 
                 <button type="button" class="photo-btn" onclick="document.getElementById('f-dep1').click()">📁 Buscar no Arquivo</button> 
                 <button type="button" class="photo-btn" onclick="ligarCamera('v-dep1')">📷 Tirar Foto Agora</button> 
                 <video id="v-dep1"></video> 
             </div>
 
-            <div id="dep2" class="dependent-container"> 
+            <div id="dep2" class="dependent-container" style="display: none;"> 
                 <div class="family-title">👤 Cadastro Completo do Dependente 2 (Combo Familiar)</div> 
                 <label>Nome Completo do Dependente 2:</label> 
                 <input type="text" placeholder="Nome do dependente 2">
@@ -361,11 +532,11 @@ document.getElementById('tarja-cortesia').addEventListener('click', function() {
   <option value="" disabled selected>Selecione um dependente...</option>
                     <option value="filho">Filho(a)</option> 
                     <option value="primo">Primo(a)</option> 
-                    <option value="irmao">Irmão/Irmã</option> 
+                    <option value="irmao">Irmão(a)</option> 
                     <option value="neto">Neto(a)</option> 
                     <option value="amigo">Amigo(a)</option>
-                    <option value="cunhado">Cunhado(a)</option> 
-                </select> 
+                    <option value="cunhado">Cunhado(a)</option>
+                    <option value="enteado">Enteado(a)</option>
                 <br><br> 
                 <input type="file" id="f-dep2" style="display:none;"> 
                 <button type="button" class="photo-btn" onclick="document.getElementById('f-dep2').click()">📁 Buscar no Arquivo</button> 
@@ -378,18 +549,22 @@ document.getElementById('tarja-cortesia').addEventListener('click', function() {
                 <textarea rows="3" readonly style="margin-top:5px; background:#fff; resize:none;">Eu, na qualidade de proprietário titular cadastrado na plataforma CADMIV, vencionando para todos os fins de direito, a vinculação do meu Endereço Residencial e Contatos Telefônicos ao cadastro do dependente refirido acima, declaro ser responsável pelas informações prestadas.</textarea>
 <div style="margin-top: 10px; display: flex; align-items: center;"> 
                     <input type="checkbox" style="width: auto; margin-top: 0; margin-right: 10px; transform: scale(1.2);"> 
-                    <strong>Confirmo e aceito os termos de responsabilidade acima.</strong> 
+                    <strong>Confirmo e aceito os Termos de Responsabilidade Acima.</strong> 
                 </div> 
             </div>
 
-            <div class="form-group" style="margin-bottom: 15px; text-align: left; margin-top: 15px;">
-                <label style="font-size: 11px; color: #7f8c8d; font-weight: bold; text-transform: uppercase; display: block; margin-bottom: 5px;">Data de Emissão do Registro Patrimonial</label> 
-                <input type="text" id="data_registro" readonly style="width: 100%; padding: 12px; border: 1px solid #bdc3c7; border-radius: 6px; font-size: 14px; color: #7f8c8d; background-color: #e9ecef; cursor: not-allowed; font-weight: bold; box-sizing: border-box;"> 
-            </div> 
-
-            <button type="button" id="btn-enviar" onclick="avancarPagamento(event)" class="btn-next">Salvar Cadastro Completo e Gerar PIX</button> 
-        </form> 
-    </div> 
-</body> 
+            <!-- Início da Tarja Verde do Final do Formulário -->
+        <div class="tarja-botoes">
+            <button type="button" id="btn-enviar" onclick="avancarPagamento(event)" class="btn-next">
+                Salvar Cadastro Completo e Gerar PIX
+            </button>
+        </div>
+        <!-- Fim da Tarja Verde -->
+        
+    </form>
+</div>
+</body>
 </html>
+
+
 
