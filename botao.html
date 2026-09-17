@@ -1,0 +1,131 @@
+<!DOCTYPE html> 
+<html lang="pt-BR"> 
+<head> 
+    <meta charset="UTF-8"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <title>CADMIV - Registro e Segurança</title> 
+    <style> 
+        body { font-family: Arial, sans-serif; background-color: #f4f4f9; padding: 20px; text-align: center; color: #2c3e50; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; } 
+        .cadastro-container { background: white; padding: 40px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 100%; max-width: 460px; text-align: left; box-sizing: border-box; margin: 20px auto; } 
+        h2 { text-align: center; color: #2c3e50; margin-bottom: 5px; } 
+        p.subtitulo { text-align: center; color: #7f8c8d; font-size: 14px; margin-bottom: 25px; } 
+        label { font-weight: bold; display: block; margin-top: 15px; color: #34495e; } 
+        input { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #bdc3c7; border-radius: 5px; box-sizing: border-box; font-size: 14px; } 
+        
+        /* Campo bloqueado para o nome */
+        input:disabled { background-color: #e2e8f0; color: #a0aec0; cursor: not-allowed; }
+
+        .btn-salvar { background-color: #2980b9; color: white; border: none; padding: 15px; width: 100%; border-radius: 5px; font-weight: bold; font-size: 16px; margin-top: 25px; cursor: pointer; } 
+        .btn-salvar:hover { background-color: #2471a3; } 
+        
+        /* ESTILOS DO DISPOSITIVO DE ALERTA (DENTRO DO FORMULÁRIO) */
+        .cadmiv-informativo-login {
+            background-color: #f7fafc;
+            border: 1px solid #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 25px;
+        }
+        .cadmiv-informativo-login p {
+            font-size: 0.85rem;
+            color: #4a5568;
+            line-height: 1.4;
+            margin-bottom: 12px;
+        }
+        .cadmiv-card-alerta {
+            background-color: #fff5f5;
+            border: 2px solid #feb2b2;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 15px;
+        }
+        .cadmiv-header h3 {
+            margin: 0 0 15px 0;
+            color: #c53030;
+            font-size: 1.15rem;
+        }
+        .cadmiv-campo label {
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: #4a5568;
+            margin-top: 0;
+        }
+        .cadmiv-btn-bloqueio {
+            width: 100%;
+            background-color: #e53e3e;
+            color: white;
+            border: none;
+            padding: 12px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            margin-top: 10px;
+        }
+        .cadmiv-btn-bloqueio:hover {
+            background-color: #c53030;
+        }
+        .cadmiv-tarja-verde {
+            background-color: #48bb78;
+            color: white;
+            text-align: center;
+            padding: 12px;
+            border-radius: 6px;
+            font-weight: bold;
+            margin-top: 15px;
+            font-size: 1rem;
+        }
+    </style> 
+<script src="cliente.js" defer></script></head> 
+<body> 
+    <div class="cadastro-container">
+        <div class="header-title"><h1>CADMIV<h1></div>
+        <h2>Área do Cliente</h2><p id="cliente_status" role="status"></p><p><a href="cartao.html">Ver dados do cartão</a> · <button type="button" onclick="sair()">Sair</button></p> 
+        <p class="subtitulo">Atualize os seus dados de registro do veículo.</p> 
+
+        <!-- FORMULÁRIO PRINCIPAL DE REGISTRO -->
+        <form onsubmit="event.preventDefault(); salvarAlteracoes();"> 
+            
+            <!-- Campo Nome Bloqueado (disabled) conforme solicitado -->
+            <label>Nome do Cliente (Não alterável):</label> 
+            <input type="text" id="cliente_nome" value="" disabled> 
+            
+            <label>Telefone de Contato:</label> 
+            <input type="text" id="cliente_telefone" placeholder="Digite seu telefone atualizado" required> 
+            
+            <label>Modelo do Veículo:</label> 
+            <input type="text" id="cliente_modelo" placeholder="Modelo" disabled> 
+
+            <!-- INFORMATIVO E CARTÃO DE ALERTA FIXOS DENTRO DO FORMULÁRIO -->
+            <div class="cadmiv-informativo-login">
+                <p><strong>Botão de Alerta de Furto ou Roubo do Veículo Registrado na CADMIV.</strong> Caro cliente, caso tenha sido alvo de vandalismo e tenha gerado a perca do seu veículo, sendo considera Furtodo ou Roubado, acione o botão de Alerta.</p>
+                
+                <div id="card-alerta-emergencia" class="cadmiv-card-alerta">
+                    <div class="cadmiv-header">
+                        <h3>🚨 Alerta de Furto ou Roubo</h3>
+                    </div>
+                    
+                    <!-- Caixa branca para o cliente completar com a senha -->
+                    <div class="cadmiv-campo">
+                        <label for="senha-confirmacao">Confirme sua senha de acesso:</label>
+                        <input type="password" id="senha-confirmacao" placeholder="Digite sua senha para bloquear">
+                    </div>
+
+                    <button type="button" id="btn-ativar-alerta" class="cadmiv-btn-bloqueio" onclick="dispararAlertaCadmiv()">
+                        🔒 ATIVAR BLOQUEIO AGORA
+                    </button>
+
+                    <!-- TARJA VERDE QUE APARECE EXATAMENTE AQUI EMBAIXO -->
+                    <div id="tarja-verde-cadastro" class="cadmiv-tarja-verde" style="display: none;">
+                        ✅ Siga para o cadastro
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-salvar">Salvar Alterações</button> 
+        </form> 
+    </div> 
+
+     
+</body> 
+</html>

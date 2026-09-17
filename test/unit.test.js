@@ -1,0 +1,11 @@
+const test=require('node:test');
+const assert=require('node:assert/strict');
+const {normalizeChassi,adult,hashPassword,verifyPassword,validateRegistration}=require('../server');
+const fixture=require('./fixture');
+test('Chassi: caixa e separadores equivalentes',()=>{for(const v of ['ab-12 / cd.3',' AB12CD3 ','ab12cd3'])assert.equal(normalizeChassi(v),'AB12CD3');});
+test('Chassi: vazios, objetos, Unicode ambíguo e excesso recusados',()=>{for(const v of ['',{},'---','ábc','ＡＢ１２','x'.repeat(65),null])assert.throws(()=>normalizeChassi(v));});
+test('Maioridade: aniversário completo e datas impossíveis',()=>{const now=new Date('2026-09-16T12:00:00Z');assert.equal(adult('2008-09-16',now),'2008-09-16');for(const v of ['2008-09-17','2020-01-01','2000-02-30','2001-02-29','x'])assert.throws(()=>adult(v,now));});
+test('Marca obrigatória também no servidor',()=>{const b=fixture();assert.throws(()=>validateRegistration({...b,marca:' '}));assert.equal(validateRegistration(b).marca,'Marca Teste');});
+test('Plano familiar exige dependentes e aceite',()=>{const b={...fixture(),combo:'2'};assert.throws(()=>validateRegistration(b));b.dep1_nome='Dependente Teste';b.dep1_parentesco='filho';assert.throws(()=>validateRegistration(b));b.responsabilidade=true;assert.equal(validateRegistration(b).dependentes.length,1);});
+test('Senha possui salt, hash e comparação real',async()=>{const a=await hashPassword('senha-de-teste-longa');const b=await hashPassword('senha-de-teste-longa');assert.notEqual(a,b);assert.equal(await verifyPassword('senha-de-teste-longa',a),true);assert.equal(await verifyPassword('admin',a),false);});
+test('CPF inválido, e-mail, telefone e senha curta recusados',()=>{for(const patch of [{cpf:'11111111111'},{email:'abc'},{telefone:'abc'},{senha:'admin'}])assert.throws(()=>validateRegistration({...fixture(),...patch}));});

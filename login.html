@@ -17,41 +17,8 @@
         .footer-text { text-align: center; margin-top: 20px; font-size: 12px; color: #bdc3c7; } 
         .alert-box { background-color: #fadbd8; border-left: 5px solid #e74c3c; color: #78281f; padding: 15px; border-radius: 5px; margin-top: 15px; display: none; font-weight: bold; font-size: 13px; text-align: center; }
     </style> 
-    <script> 
-        function alternarVisibilidadeSenha() { 
-            var campoSenha = document.getElementById('login_senha'); 
-            var iconeOlho = document.getElementById('icone_olho'); 
-            if (campoSenha.type === 'password') { 
-                campoSenha.type = 'text'; 
-                iconeOlho.innerText = '👁️'; 
-            } else { 
-                campoSenha.type = 'password'; 
-                iconeOlho.innerText = '🙈'; 
-            } 
-        }
-
-        function realizarLogin() { 
-            var telefone = document.getElementById("login_telefone").value; 
-            var shadowSenha = document.getElementById("login_senha").value; 
-            var alertaBox = document.getElementById("alerta-login");
-
-            if (telefone === "" || shadowSenha === "") { 
-                alert("Por favor, preencha todos os campos obrigatórios."); 
-                return; 
-            } 
-
-            // CIRCUITO DE VALIDAÇÃO: Simula teste de segurança corporativa
-            if (shadowSenha === "123456" || shadowSenha === "admin" || shadowSenha.length >= 4) {
-                alertaBox.style.display = "none";
-                alert("Acesso autorizado! Entrando no formulário CADMIV."); 
-                window.location.href = "alerta.html"; // Redirecionamento corrigido!
-            } else {
-                // Ativa a recusa na tela caso a senha seja considerada inválida/falsa
-                alertaBox.style.display = "block";
-            }
-        } 
-    </script> 
-</head> 
+     
+<script src="cliente.js" defer></script></head> 
 <body> 
     <div class="login-container"> 
         <h2>Acesso ao seu Cadastro na CADMIV</h2> 

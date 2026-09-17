@@ -1,0 +1,79 @@
+# CADMIV — primeira rodada da fundação
+
+## Primeiro passo para o proprietário
+
+Este pacote é uma cópia de trabalho modificada. Os arquivos originais e o backup CADMIV-BACKUP-ANTES-DAS-ALTERACOES não foram alterados. Extraia o ZIP em uma NOVA pasta. Não extraia dentro do backup.
+
+A aplicação ainda precisa da configuração PostgreSQL/Render abaixo antes de funcionar na internet. Não basta abrir os HTMLs com duplo clique. Não substitua o site em produção antes de configurar o banco e testar em um serviço separado.
+
+## O que foi entregue
+
+- PostgreSQL real no lugar do objeto em memória, com tabelas de clientes, veículos, sessões e limite de tentativas.
+- Cadastro transacional: cliente, veículo e sessão são salvos juntos; se houver duplicidade, a operação inteira é desfeita.
+- Chassi normalizado no backend: maiúsculas e remoção de espaços, pontos, barras e hífens. Letras acentuadas e outros símbolos são recusados para evitar interpretações ambíguas.
+- Coluna de chassi normalizado gerada pelo próprio PostgreSQL e restrição UNIQUE. A mesma regra protege gravações diretas no banco. A pré-consulta do formulário é apenas uma orientação; a garantia final é do banco.
+- Campo obrigatório Marca do Veículo. Dados de contato, endereço, saúde, veículo e dependentes do formulário são persistidos. Dados de saúde e endereço ficam no registro privado do cliente.
+- Senhas com hash scrypt e salt; sessões aleatórias armazenadas no banco, com cookie HttpOnly/SameSite e Secure em produção. Limite de tentativas persistido no banco.
+- Login real, consulta dos próprios dados, alteração de telefone, saída da conta e alerta de furto/roubo autenticado para cadastro ativo.
+- Consulta pública devolve somente situação, mensagem, marca, modelo e cor. Não devolve nome, CPF, telefone, endereço ou saúde.
+- Arquivos internos, configurações e código do servidor não são disponibilizados pelo servidor HTTP.
+- Data completa de nascimento, maioridade, CPF, campos obrigatórios e tamanho dos dados são validados no backend.
+- index.html, apresentação e separação novo cliente / cliente cadastrado preservados. Formulário mantém estilos e seções, com correções de estrutura e dependentes.
+
+## O que ainda não está concluído
+
+Esta é a fundação solicitada, não o lançamento comercial completo.
+
+- PIX, confirmação de pagamento e ativação automática não estão integrados. Todo cadastro novo recebe PENDENTE. Nenhum clique confirma pagamento. A tela informa claramente essa limitação.
+- Upload de fotos, geração de QR individual, recuperação de senha, transferência de titularidade, renovação automática e administração ainda precisam de implementação.
+- O alerta pode ser registrado por um cliente autenticado cujo cadastro esteja ATIVO. Cadastros PENDENTES não podem simular ativação. Não há endpoint público para ativar um cadastro. O teste ativa apenas registros fictícios diretamente no banco de teste.
+- Nesta rodada há um titular e um veículo por CPF/telefone; um novo veículo para cliente existente exige uma próxima etapa. Não tente cadastrar novamente o mesmo veículo para alterar dados.
+- Somente telefone é editável na área do cliente nesta rodada. Nome, CPF e identificação do veículo são protegidos contra alteração pelo cliente.
+- O painel.html foi preservado como arquivo, mas sua rota retorna indisponível. Seus números anteriores eram demonstrativos, e não existe autenticação administrativa pronta.
+- node.js foi preservado como arquivo original; contém uma cópia antiga de configuração e NÃO deve ser executado. A aplicação inicia por server.js.
+- Não houve migração de cadastros históricos: os arquivos fornecidos usavam simulação/localStorage. Não se deve considerar esses dados automaticamente importados ou verificados.
+- A apresentação visual foi preservada no que era possível. Foram retirados os controles de upload sem armazenamento e as confirmações falsas que interferiam nesta fundação.
+
+## GitHub e Render — passo a passo
+
+1. Extraia o ZIP em uma pasta nova. A pasta CADMIV contém os arquivos a enviar. Guarde o backup antigo intacto.
+2. No GitHub, use uma branch de teste do repositório CADMIV. Envie o conteúdo da pasta CADMIV, incluindo server.js, schema.sql, cadastro.js, cliente.js, package.json e package-lock.json. Não envie node_modules nem um arquivo .env com senha real. O ZIP já exclui node_modules.
+3. No Render, crie um PostgreSQL e um Web Service de teste, na mesma conta e região. Use um banco vazio para esta primeira implantação. A URL interna é preferível para conexões entre serviços Render da mesma região.
+4. Conecte o Web Service à branch que contém os arquivos. Se os arquivos estiverem dentro de uma subpasta CADMIV no repositório, configure Root Directory como CADMIV. Se estiverem na raiz, deixe Root Directory vazio.
+5. Configure Build Command: `npm ci`. Configure Start Command: `npm start`. O projeto pede Node 24. Configure Health Check Path: `/healthz`.
+6. Nas variáveis de ambiente do Web Service, configure:
+   - `DATABASE_URL`: URL interna do PostgreSQL fornecida pelo Render, com usuário e senha. Este valor é segredo e não deve ir ao GitHub.
+   - `NODE_ENV`: `production`.
+   - `APP_ORIGIN`: endereço HTTPS exato do Web Service, sem barra final, por exemplo `https://seu-servico.onrender.com`. Se mudar para domínio próprio, atualize este valor para a origem usada pelos clientes.
+   - `PORT`: não precisa definir; o servidor usa a porta fornecida pelo Render.
+7. A primeira inicialização cria as tabelas e índices automaticamente, em transação. Inicializações seguintes não apagam registros. Não existe fallback para banco em memória: se a configuração falhar, o servidor não inicia.
+8. Confirme que `/healthz` responde com status ok. Depois teste cadastro, login, consulta e tentativa de chassi duplicado no serviço de teste. Um cadastro recém-criado deve continuar PENDENTE.
+9. Só depois de validar o serviço de teste, planeje a troca do serviço principal. Pagamento e ativação precisam estar concluídos antes de abrir um fluxo comercial completo.
+
+Conexões externas ao PostgreSQL Render precisam de TLS. Use a URL de conexão indicada pelo Render e sua configuração de SSL; não acrescente `rejectUnauthorized: false` por conta própria. A aplicação passa DATABASE_URL ao driver pg, sem substituir silenciosamente suas opções de conexão.
+
+O banco usa dados privados reais quando você começa a cadastrar clientes. Restrinja acesso administrativo e acesso externo ao banco, e configure backup/recuperação no provedor conforme sua necessidade. Não publique as credenciais.
+
+## Arquivos e fluxo
+
+- Entrada: index.html → apresentacao.html.
+- Novo cliente: fiscalizacao.html → termos.html → cadastro.html → validar.html → cartao.html (dados do cadastro com situação explícita).
+- Cliente cadastrado: login.html → botao.html (área do cliente).
+- alerta.html oferece autenticação e registro do alerta para conta ativa.
+- server.js centraliza validação, autenticação e API; schema.sql define a persistência; cadastro.js e cliente.js ligam as telas ao servidor.
+
+As dependências de produção são somente Express e pg. A criptografia usa o próprio Node.js. O arquivo de lock registra as versões instaladas.
+
+## Testes e reprodução
+
+Consulte TESTES.md para o resultado desta entrega e as limitações. `npm test` executa testes unitários e informa explicitamente quando os testes de integração/DOM estão ignorados por falta de configuração.
+
+Para executar os testes de integração com PostgreSQL de servidor, defina `CADMIV_TEST_DATABASE_URL` para um banco de teste VAZIO, reservado para testes. Nunca use o banco de produção. A suíte recusa um banco que já tenha a tabela cadmiv_clientes. Os registros fictícios ficam nesse banco ao terminar.
+
+Para teste local da aplicação com PostgreSQL instalado, copie .env.example para .env, preencha seus valores e execute `node --env-file=.env server.js`. No Render, use as variáveis da interface e `npm start`.
+
+## Documentação consultada
+
+- Render, implantação Express: https://render.com/docs/deploy-node-express-app
+- Render, PostgreSQL e conexões: https://render.com/docs/postgresql-creating-connecting
+- Driver pg e TLS: https://node-postgres.com/features/ssl

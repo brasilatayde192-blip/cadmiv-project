@@ -23,11 +23,12 @@
         .cadmiv-tarja-link { display: block; background-color: #48bb78; color: white; text-align: center; padding: 14px; border-radius: 6px; font-weight: bold; margin-top: 20px; font-size: 1rem; text-decoration: none; transition: background 0.2s; }
         .cadmiv-tarja-link:hover { background-color: #38a169; }
     </style> 
-</head> 
+<script src="cliente.js" defer></script></head> 
 <body> 
 
-    <div class="cadmiv-container"> 
-        <h2>Cartão Digital de Alerta</h2> 
+    <div class="cadmiv-container">
+<h1>CADMIV</h1>
+       <h2>CARTÃO  de   ALERTA</h2> 
 
         <div class="cadmiv-secao-alerta">
             <!-- Botão de pânico inicial -->
@@ -67,36 +68,6 @@
         </div>
     </div> 
 
-    <script> 
-        function abrirVerificacaoAlerta() {
-            document.getElementById('caixa-validacao').style.display = 'block';
-        }
-
-        function confirmarBloqueioTotal() {
-            var idInput = document.getElementById('alerta_id').value;
-            var senhaInput = document.getElementById('alerta_senha').value;
-
-            if (idInput === "" || senhaInput === "") {
-                alert("Erro: Você precisa digitar seu ID e Senha para prosseguir.");
-                return;
-            }
-
-            alert("🚨 PROTOCOLO ATIVADO COM SUCESSO!\nO bloqueio do veículo (Autopropelido) foi registrado no sistema CADMIV.");
-            document.getElementById('alerta_id').value = "";
-            document.getElementById('alerta_senha').value = "";
-            document.getElementById('caixa-validacao').style.display = 'none';
-        }
-function alternarOlhoAlerta() { 
-    var campoSenha = document.getElementById('alerta_senha'); 
-    var iconeOlho = document.getElementById('icone_olho_alerta'); 
-    if (campoSenha.type === 'password') { 
-        campoSenha.type = 'text'; 
-        iconeOlho.innerText = '👁️'; 
-    } else { 
-        campoSenha.type = 'password'; 
-        iconeOlho.innerText = '🙈'; 
-    } 
-}
-    </script> 
+     
 </body> 
 </html>
