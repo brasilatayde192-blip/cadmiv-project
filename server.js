@@ -1,5 +1,6 @@
 'use strict';
 const express = require('express');
+const QRCode = require('qrcode');
 const path = require('node:path');
 const fs = require('node:fs');
 const crypto = require('node:crypto');
@@ -125,6 +126,13 @@ function createApp(db,{production=false,origin='http://localhost:10000'}={}) {
     setCookie(res,await session(db,rows[0].id));res.json({ok:true});
   }));
   app.post('/api/logout',wrap(async(req,res)=>{await db.query('DELETE FROM cadmiv_sessoes WHERE token_hash=$1',[digest(cookie(req))]);setCookie(res,'',0);res.json({ok:true});}));
+  app.get('/api/me/qr',wrap(async(req,res)=>{
+    const id=await current(req);
+    const {rows}=await db.query('SELECT codigo FROM cadmiv_veiculos WHERE cliente_id=$1',[id]);
+    if(!rows.length)throw fail(404,'Veículo não localizado.');
+    const url=new URL('/fiscalizacao.html',origin);url.hash='codigo='+rows[0].codigo;
+    res.type('image/svg+xml').send(await QRCode.toString(url.href,{type:'svg',margin:4,errorCorrectionLevel:'M'}));
+  }));
   app.get('/api/me',wrap(async(req,res)=>{
     const id=await current(req);const {rows}=await db.query(`SELECT c.nome,c.cpf,c.telefone,c.email,c.privado,c.dependentes,v.codigo,v.chassi_normalizado AS chassi,v.marca,v.modelo,v.cor,v.status,v.criado_em FROM cadmiv_clientes c JOIN cadmiv_veiculos v ON v.cliente_id=c.id WHERE c.id=$1`,[id]);res.json(rows[0]);
   }));
@@ -139,10 +147,10 @@ function createApp(db,{production=false,origin='http://localhost:10000'}={}) {
     if(!result.rows.length)throw fail(409,'O cadastro ainda não está ativo. Entre em contato com o suporte.');res.json({status:'ROUBO'});
   }));
   app.post('/api/consultar',wrap(async(req,res)=>{
-    const result=req.body.chassi!==undefined ? await db.query('SELECT status,marca,modelo,cor FROM cadmiv_veiculos WHERE chassi_normalizado=$1',[normalizeChassi(req.body.chassi)]) : await db.query('SELECT status,marca,modelo,cor FROM cadmiv_veiculos WHERE codigo=$1',[text(req.body.codigo,'código',64)]);
+    const result=req.body.chassi!==undefined ? await db.query('SELECT status,marca,modelo,cor,chassi_normalizado AS chassi FROM cadmiv_veiculos WHERE chassi_normalizado=$1',[normalizeChassi(req.body.chassi)]) : await db.query('SELECT status,marca,modelo,cor,chassi_normalizado AS chassi FROM cadmiv_veiculos WHERE codigo=$1',[text(req.body.codigo,'código',64)]);
     if(!result.rows.length)return res.json({status:'INVALIDO',mensagem:'Veículo não localizado na base CADMIV.'});
     const messages={PENDENTE:'Cadastro em andamento — ainda não ativo.',ATIVO:'Cadastro ativo.',ROUBO:'Alerta de furto ou roubo registrado pelo titular.',DESATIVADO:'Cadastro desativado.',ADORMECIDO:'Cadastro aguardando renovação.'};
-    const r=result.rows[0];res.json({status:r.status,mensagem:messages[r.status],marca:r.marca,modelo:r.modelo,cor:r.cor});
+    const r=result.rows[0];res.json({status:r.status,mensagem:messages[r.status],marca:r.marca,modelo:r.modelo,cor:r.cor,chassi:r.chassi});
   }));
   app.get('/',(req,res)=>res.sendFile(path.join(__dirname,'index.html')));
   app.get('/validar',(req,res)=>res.redirect('/validar.html'));

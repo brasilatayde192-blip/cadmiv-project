@@ -13,7 +13,7 @@ async function realizarLogin(){
 }
 async function consultarChassi(){
  const result=document.getElementById('resultado_consulta');result.style.display='block';result.className='status-result';result.textContent='Consultando...';
- try{const d=await api('/api/consultar',{chassi:document.getElementById('input_agente').value});result.textContent=[d.mensagem,d.marca,d.modelo,d.cor].filter(Boolean).join(' — ');if(d.status==='ROUBO')result.classList.add('status-alert-furto');}
+ try{const d=await api('/api/consultar',{chassi:document.getElementById('input_agente').value});result.textContent=[d.mensagem,d.marca,d.modelo,d.cor,d.chassi?'Chassi: '+d.chassi:'',d.chassi?'Compare estes dados com o veículo apresentado.':''].filter(Boolean).join(' — ');if(d.status==='ROUBO')result.classList.add('status-alert-furto');}
  catch(e){result.textContent=e.message;}
 }
 function avancarFluxo(){location.assign('termos.html');}
@@ -37,10 +37,19 @@ async function carregarCliente(){
  set('cliente_nome',d.nome);set('cliente_telefone',d.telefone);set('cliente_modelo',d.marca+' — '+d.modelo);
  set('cartao_status','Situação: '+d.status+(d.status==='PENDENTE'?' — NÃO ATIVO':''));
  set('cliente_status','Situação: '+d.status+(d.status==='PENDENTE'?' — cadastro salvo, ainda não ativo.':''));
- set('caixa_nome_real',d.nome);set('caixa_cpf_real','CPF: '+d.cpf);set('caixa_chassi_real',d.marca+' — '+d.modelo+' — CHASSI: '+d.chassi);
- set('caixa_codigo_real','Registro: '+d.codigo);set('caixa_data_real','CADASTRADO EM: '+new Date(d.criado_em).toLocaleDateString('pt-BR'));
+ set('caixa_nome_real',d.nome);set('caixa_chassi_real',d.marca+' — '+d.modelo+' — CHASSI: '+d.chassi);
+ const qr=document.getElementById('qr-veiculo'),link=document.getElementById('link-consulta');
+ if(qr&&link){qr.src='/api/me/qr';qr.hidden=false;link.href='fiscalizacao.html#codigo='+encodeURIComponent(d.codigo);link.hidden=false;}
+ set('caixa_codigo_real','Referência: '+d.codigo.slice(0,8).toUpperCase()+'…'+d.codigo.slice(-4).toUpperCase());set('caixa_data_real','CADASTRADO EM: '+new Date(d.criado_em).toLocaleDateString('pt-BR'));
 }
 document.addEventListener('DOMContentLoaded',()=>{
+ if(document.getElementById('resultado_consulta')){
+  const codigo=new URLSearchParams(location.hash.slice(1)).get('codigo');
+  if(codigo){
+   const result=document.getElementById('resultado_consulta');result.style.display='block';result.textContent='Consultando situação atual...';
+   api('/api/consultar',{codigo}).then(d=>{result.textContent=[d.mensagem,d.marca,d.modelo,d.cor,d.chassi?'Chassi: '+d.chassi:'',d.chassi?'Compare estes dados com o veículo apresentado.':''].filter(Boolean).join(' — ');if(d.status==='ROUBO')result.classList.add('status-alert-furto');}).catch(()=>{result.textContent='Não foi possível confirmar a situação. Tente novamente com conexão à internet.';});
+  }
+ }
  // Remove vestígios da versão antiga, que usava armazenamento local e dados pessoais na URL.
  for(const key of ['nome','cpf','chassi','codigo','cadmiv_nome','cadmiv_cpf','cadmiv_chassi','cadmiv_codigo'])localStorage.removeItem(key);
  if(location.search && location.pathname.endsWith('cartao.html'))history.replaceState(null,'',location.pathname);
