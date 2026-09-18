@@ -42,6 +42,27 @@ document.addEventListener('DOMContentLoaded',()=>{
  document.getElementById('chassi_veiculo').addEventListener('input',e=>{chassiRequest++;e.target.setCustomValidity('');document.getElementById('alerta-trava').style.display='none';});
  gerenciarCombo();
  const form=document.getElementById('form-cadastro');let saving=false;
+ const avisosTraduzidos=new Set();
+ function limparAvisosTraduzidos(){
+  for(const campo of avisosTraduzidos)campo.setCustomValidity('');
+  avisosTraduzidos.clear();
+ }
+ form.addEventListener('input',limparAvisosTraduzidos);
+ form.addEventListener('change',limparAvisosTraduzidos);
+ form.addEventListener('invalid',e=>{
+  const campo=e.target,v=campo.validity;
+  if(v.customError)return;
+  let aviso='Confira o valor preenchido neste campo.';
+  if(v.valueMissing)aviso=campo.type==='checkbox'?'Marque esta opção para continuar.':campo.type==='radio'?'Selecione uma das opções.':campo.tagName==='SELECT'?'Selecione uma opção.':'Preencha este campo.';
+  else if(v.typeMismatch)aviso=campo.type==='email'?'Informe um e-mail válido.':'Informe um valor válido.';
+  else if(v.tooShort)aviso='Digite pelo menos '+campo.minLength+' caracteres.';
+  else if(v.tooLong)aviso='Digite no máximo '+campo.maxLength+' caracteres.';
+  else if(v.rangeUnderflow)aviso='Informe um valor igual ou maior que '+campo.min+'.';
+  else if(v.rangeOverflow)aviso='Informe um valor igual ou menor que '+campo.max+'.';
+  else if(v.badInput||v.stepMismatch)aviso='Informe um número válido.';
+  campo.setCustomValidity(aviso);avisosTraduzidos.add(campo);
+ },true);
+
  form.addEventListener('submit',async e=>{
   e.preventDefault();if(saving||!form.reportValidity())return;
   const b=Object.fromEntries(new FormData(form));
