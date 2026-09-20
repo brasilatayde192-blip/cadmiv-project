@@ -1,4 +1,4 @@
-# CADMIV — primeira rodada da fundação
+# CADMIV — atualização de 19/09/2026
 
 ## Primeiro passo para o proprietário
 
@@ -15,7 +15,7 @@ A aplicação ainda precisa da configuração PostgreSQL/Render abaixo antes de 
 - Campo obrigatório Marca do Veículo. Dados de contato, endereço, saúde, veículo e dependentes do formulário são persistidos. Dados de saúde e endereço ficam no registro privado do cliente.
 - Senhas com hash scrypt e salt; sessões aleatórias armazenadas no banco, com cookie HttpOnly/SameSite e Secure em produção. Limite de tentativas persistido no banco.
 - Login real, consulta dos próprios dados, alteração de telefone, saída da conta e alerta de furto/roubo autenticado para cadastro ativo.
-- Consulta pública devolve somente situação, mensagem, marca, modelo e cor. Não devolve nome, CPF, telefone, endereço ou saúde.
+- Consulta pública devolve somente situação, mensagem, marca, modelo, cor e chassi. Não devolve nome, CPF, telefone, endereço ou saúde.
 - Arquivos internos, configurações e código do servidor não são disponibilizados pelo servidor HTTP.
 - Data completa de nascimento, maioridade, CPF, campos obrigatórios e tamanho dos dados são validados no backend.
 - index.html, apresentação e separação novo cliente / cliente cadastrado preservados. Formulário mantém estilos e seções, com correções de estrutura e dependentes.
@@ -25,10 +25,10 @@ A aplicação ainda precisa da configuração PostgreSQL/Render abaixo antes de 
 Esta é a fundação solicitada, não o lançamento comercial completo.
 
 - PIX, confirmação de pagamento e ativação automática não estão integrados. Todo cadastro novo recebe PENDENTE. Nenhum clique confirma pagamento. A tela informa claramente essa limitação.
-- Upload de fotos, geração de QR individual, recuperação de senha, transferência de titularidade, renovação automática e administração ainda precisam de implementação.
+- Transferência de titularidade, cancelamento do cadastro, renovação automática e administração ainda precisam de implementação.
 - O alerta pode ser registrado por um cliente autenticado cujo cadastro esteja ATIVO. Cadastros PENDENTES não podem simular ativação. Não há endpoint público para ativar um cadastro. O teste ativa apenas registros fictícios diretamente no banco de teste.
 - Nesta rodada há um titular e um veículo por CPF/telefone; um novo veículo para cliente existente exige uma próxima etapa. Não tente cadastrar novamente o mesmo veículo para alterar dados.
-- Somente telefone é editável na área do cliente nesta rodada. Nome, CPF e identificação do veículo são protegidos contra alteração pelo cliente.
+- Telefone e fotos dos cartões são editáveis na área do cliente nesta rodada. Nome, CPF e identificação do veículo são protegidos contra alteração pelo cliente.
 - O painel.html foi preservado como arquivo, mas sua rota retorna indisponível. Seus números anteriores eram demonstrativos, e não existe autenticação administrativa pronta.
 - node.js foi preservado como arquivo original; contém uma cópia antiga de configuração e NÃO deve ser executado. A aplicação inicia por server.js.
 - Não houve migração de cadastros históricos: os arquivos fornecidos usavam simulação/localStorage. Não se deve considerar esses dados automaticamente importados ou verificados.
@@ -62,7 +62,7 @@ O banco usa dados privados reais quando você começa a cadastrar clientes. Rest
 - alerta.html oferece autenticação e registro do alerta para conta ativa.
 - server.js centraliza validação, autenticação e API; schema.sql define a persistência; cadastro.js e cliente.js ligam as telas ao servidor.
 
-As dependências de produção são somente Express e pg. A criptografia usa o próprio Node.js. O arquivo de lock registra as versões instaladas.
+As dependências de produção são Express, pg, qrcode e sharp (tratamento das fotos). A criptografia usa o próprio Node.js. O arquivo de lock registra as versões instaladas.
 
 ## Testes e reprodução
 
@@ -77,3 +77,32 @@ Para teste local da aplicação com PostgreSQL instalado, copie .env.example par
 - Render, implantação Express: https://render.com/docs/deploy-node-express-app
 - Render, PostgreSQL e conexões: https://render.com/docs/postgresql-creating-connecting
 - Driver pg e TLS: https://node-postgres.com/features/ssl
+
+## Atualização de 18/09/2026
+
+Cartão sem CPF e QR individual gerado no servidor com a biblioteca qrcode. O QR abre fiscalizacao.html com um código aleatório no fragmento do endereço; a página consulta a situação atual do banco. Não inclui dados pessoais. Marca, modelo, cor e chassi permitem comparação manual com o veículo. Cadastros pendentes permanecem pendentes. A leitura não comprova a identidade do portador nem a regularidade de trânsito. A imagem QR genérica antiga foi removida.
+
+## Recuperação de senha — 18/09/2026
+
+O login oferece Esqueci minha senha. O cliente informa telefone e e-mail cadastrados e recebe um link de uso único válido por 30 minutos. A senha anterior nunca é enviada nem exibida. Após a troca, todas as sessões e links de recuperação da conta são invalidados. A recuperação não altera a situação do veículo.
+
+A integração inicial usa a API HTTPS do Resend, sem dependência adicional. O Render Free bloqueia as portas SMTP comuns. Configure apenas no Environment do Render: RESEND_API_KEY (segredo) e MAIL_FROM (remetente autorizado no serviço). APP_ORIGIN precisa ser o endereço HTTPS correto; o comando APP_ORIGIN="$RENDER_EXTERNAL_URL" npm start continua válido. Nunca coloque chaves no GitHub. É necessário verificar o domínio/remetente conforme o provedor e testar a entrega; nenhum envio real foi feito nesta implementação.
+
+Sem essas duas variáveis, a solicitação responde que a recuperação ainda não está disponível; o restante da aplicação funciona. A resposta com o serviço configurado é genérica e não confirma a existência da conta. Máximo de três envios por telefone em dez minutos e limite de pedidos por IP. Tokens são armazenados somente como hash. O envio ocorre em segundo plano no processo do servidor: reinício durante o envio pode interrompê-lo, exigindo um novo pedido. Falhas de entrega são registradas sem token, endereço ou senha.
+
+Um cadastro feito com e-mail fictício não poderá receber a recuperação. Use uma caixa sob seu controle no teste de entrega. Não há recuperação automática sem acesso ao e-mail; validação de identidade para atendimento manual e alteração do e-mail não foram implementadas.
+
+Fontes: https://render.com/docs/free#other-limitations ; https://resend.com/docs/api-reference/emails/send-email ; https://cheatsheetseries.owasp.org/cheatsheets/Forgot_Password_Cheat_Sheet.html
+
+
+## Atualização 19/09 — fotos, segunda via e impressão
+
+Este pacote completo substitui os arquivos da branch cadmiv-teste; não é necessário criar outro serviço ou outro banco. Mantenha as variáveis e os comandos existentes no Render. Envie todos os arquivos, especialmente cartao.js, fotos.js, server.js, schema.sql, package.json e package-lock.json. O servidor cria a tabela de fotos na próxima inicialização sem apagar cadastros.
+
+Depois de entrar na conta, abra “Fotos / visualizar e imprimir segunda via”. Escolha Titular ou um dependente cadastrado. Abra “Adicionar ou trocar a foto deste cartão”; escolha uma imagem JPEG/PNG/WebP de até 10 MB ou use a câmera, confira a prévia e salve. A câmera depende da permissão do navegador e de uma câmera disponível; escolher arquivo continua disponível. Fotos são opcionais em todos os planos e salvas individualmente.
+
+O navegador reduz as imagens; o servidor valida, reprocessa e remove metadados, limita a 480 × 640 pixels e 200 KB por foto. As fotos ficam no PostgreSQL, protegidas pela sessão do titular, e não são incluídas na consulta pública nem no QR-code. A foto não comprova identidade.
+
+A segunda via reutiliza o cadastro existente. O layout de impressão foi compactado, com controles ocultos e um cartão por folha A4 ou Carta em retrato. Confira a prévia antes de imprimir: escolha escala 100%, desative cabeçalhos/rodapés e confirme que aparece uma página. A paginação real ainda precisa dessa conferência: a execução do navegador de teste foi bloqueada pelo ambiente local.
+
+Os avisos de cancelamento e empréstimo foram incluídos no formulário e nos termos. Não há cobrança, cancelamento ou transferência implementados nesta etapa. A redação preserva os reembolsos legais e trata a autorização de empréstimo como recomendação. Referências: Código de Defesa do Consumidor, arts. 49 e 51, https://www.planalto.gov.br/ccivil_03/leis/l8078compilado.htm .

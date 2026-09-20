@@ -24,3 +24,18 @@ CREATE TABLE IF NOT EXISTS cadmiv_sessoes (
 );
 CREATE INDEX IF NOT EXISTS cadmiv_sessoes_expira ON cadmiv_sessoes(expira);
 CREATE TABLE IF NOT EXISTS cadmiv_limites(chave text PRIMARY KEY,quantidade integer NOT NULL,expira timestamptz NOT NULL);
+
+CREATE TABLE IF NOT EXISTS cadmiv_recuperacoes (
+ token_hash text PRIMARY KEY,
+ cliente_id uuid NOT NULL REFERENCES cadmiv_clientes(id) ON DELETE CASCADE,
+ expira timestamptz NOT NULL
+);
+CREATE INDEX IF NOT EXISTS cadmiv_recuperacoes_cliente ON cadmiv_recuperacoes(cliente_id);
+CREATE INDEX IF NOT EXISTS cadmiv_recuperacoes_expira ON cadmiv_recuperacoes(expira);
+
+CREATE TABLE IF NOT EXISTS cadmiv_fotos (
+ cliente_id uuid NOT NULL REFERENCES cadmiv_clientes(id) ON DELETE CASCADE,
+ posicao smallint NOT NULL CHECK(posicao BETWEEN 0 AND 2),
+ imagem bytea NOT NULL CHECK(octet_length(imagem)<=200000),
+ PRIMARY KEY(cliente_id,posicao)
+);

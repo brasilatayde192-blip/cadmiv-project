@@ -1,6 +1,8 @@
 'use strict';
 const express = require('express');
 const QRCode = require('qrcode');
+const { createResetMailer } = require('./email');
+const { prepararFoto } = require('./fotos');
 const path = require('node:path');
 const fs = require('node:fs');
 const crypto = require('node:crypto');
@@ -82,9 +84,11 @@ async function migrate(db) {
   try { await c.query('BEGIN'); await c.query('SELECT pg_advisory_xact_lock(72410831)'); await c.query(fs.readFileSync(path.join(__dirname,'schema.sql'),'utf8')); await c.query('COMMIT'); }
   catch(e) { await c.query('ROLLBACK'); throw e; } finally { c.release(); }
 }
-function createApp(db,{production=false,origin='http://localhost:10000'}={}) {
-  const app=express(); app.disable('x-powered-by'); if(production) app.set('trust proxy',1);
+function createApp(db,{production=false,origin='http://localhost:10000',sendResetEmail=null}={}) {
+  const resetTasks=new Set();
+  const app=express(); app.locals.resetTasks=resetTasks; app.disable('x-powered-by'); if(production) app.set('trust proxy',1);
   app.use((req,res,next)=>{res.set({'Cache-Control':'no-store','Referrer-Policy':'no-referrer','X-Content-Type-Options':'nosniff','X-Frame-Options':'DENY'});next();});
+  app.use('/api/me/foto',express.json({limit:'1mb'}));
   app.use(express.json({limit:'32kb'}));
   const wrap=fn=>(req,res,next)=>Promise.resolve(fn(req,res,next)).catch(next);
   app.use('/api',(req,res,next)=>{
@@ -92,11 +96,12 @@ function createApp(db,{production=false,origin='http://localhost:10000'}={}) {
     next();
   });
   app.use('/api',wrap(async(req,res,next)=>{
-    const key=digest(req.ip+':'+(req.path==='/login'?'login':'api'));
+    const sensitive=req.path==='/login'||req.path.startsWith('/senha/');
+    const key=digest(req.ip+':'+(sensitive?'acesso':'api'));
     const {rows}=await db.query(`INSERT INTO cadmiv_limites(chave,quantidade,expira) VALUES($1,1,now()+interval '10 minutes')
       ON CONFLICT(chave) DO UPDATE SET quantidade=CASE WHEN cadmiv_limites.expira<now() THEN 1 ELSE cadmiv_limites.quantidade+1 END,
       expira=CASE WHEN cadmiv_limites.expira<now() THEN now()+interval '10 minutes' ELSE cadmiv_limites.expira END RETURNING quantidade`,[key]);
-    if(rows[0].quantidade>(req.path==='/login'?20:150)){res.set('Retry-After','600');return res.status(429).json({erro:'Muitas tentativas. Aguarde alguns minutos.'});} next();
+    if(rows[0].quantidade>(sensitive?20:150)){res.set('Retry-After','600');return res.status(429).json({erro:'Muitas tentativas. Aguarde alguns minutos.'});} next();
   }));
   function cookie(req){return (req.headers.cookie||'').split(';').map(s=>s.trim()).find(s=>s.startsWith('cadmiv_session='))?.slice('cadmiv_session='.length)||'';}
   async function current(req){
@@ -118,14 +123,75 @@ function createApp(db,{production=false,origin='http://localhost:10000'}={}) {
       const token=await session(c,id);await c.query('COMMIT');setCookie(res,token);res.status(201).json({codigo,status:'PENDENTE'});
     }catch(e){await c.query('ROLLBACK');throw e;}finally{c.release();}
   }));
+  app.post('/api/senha/solicitar',wrap(async(req,res)=>{
+    if(!sendResetEmail)throw fail(503,'A recuperação por e-mail ainda não está disponível. Tente novamente mais tarde.');
+    const telefone=phone(req.body.telefone),email=text(req.body.email,'e-mail',254).toLowerCase();
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))throw fail(400,'Informe um e-mail válido.');
+    const key=digest('recuperacao:'+telefone);
+    const {rows:limit}=await db.query(`INSERT INTO cadmiv_limites(chave,quantidade,expira) VALUES($1,1,now()+interval '10 minutes')
+      ON CONFLICT(chave) DO UPDATE SET quantidade=CASE WHEN cadmiv_limites.expira<now() THEN 1 ELSE cadmiv_limites.quantidade+1 END,
+      expira=CASE WHEN cadmiv_limites.expira<now() THEN now()+interval '10 minutes' ELSE cadmiv_limites.expira END RETURNING quantidade`,[key]);
+    res.status(202).json({mensagem:'Se o telefone e o e-mail corresponderem ao cadastro, enviaremos um link. Confira também a pasta de spam. O link vale por 30 minutos.'});
+    if(limit[0].quantidade>3)return;
+    // O envio ocorre após a resposta, sem revelar a existência da conta pelo tempo do provedor.
+    const task=(async()=>{
+      const {rows}=await db.query('SELECT id,email FROM cadmiv_clientes WHERE telefone=$1 AND lower(email)=$2',[telefone,email]);
+      if(!rows.length)return;
+      const token=crypto.randomBytes(32).toString('hex'),tokenHash=digest(token);
+      await db.query("INSERT INTO cadmiv_recuperacoes(token_hash,cliente_id,expira) VALUES($1,$2,now()+interval '30 minutes')",[tokenHash,rows[0].id]);
+      const url=new URL('/redefinir-senha.html',origin);url.hash='token='+token;
+      try{await sendResetEmail({to:rows[0].email,url:url.href});}
+      catch(e){await db.query('DELETE FROM cadmiv_recuperacoes WHERE token_hash=$1',[tokenHash]);throw e;}
+    })().catch(()=>console.error('Falha no envio de recuperação. Verifique o serviço de e-mail.'));
+    resetTasks.add(task);task.finally(()=>resetTasks.delete(task));
+  }));
+  app.post('/api/senha/redefinir',wrap(async(req,res)=>{
+    const token=req.body.token,senha=req.body.senha;
+    if(typeof token!=='string'||! /^[a-f0-9]{64}$/.test(token))throw fail(400,'Link inválido ou expirado. Solicite outro link.');
+    if(typeof senha!=='string'||senha.length<12||senha.length>128)throw fail(400,'Use uma senha de 12 a 128 caracteres.');
+    const passwordHash=await hashPassword(senha),c=await db.connect();
+    try{
+      await c.query('BEGIN');
+      const {rows}=await c.query('SELECT cliente_id FROM cadmiv_recuperacoes WHERE token_hash=$1 AND expira>now()',[digest(token)]);
+      if(!rows.length)throw fail(400,'Link inválido ou expirado. Solicite outro link.');
+      const id=rows[0].cliente_id;
+      await c.query('SELECT id FROM cadmiv_clientes WHERE id=$1 FOR UPDATE',[id]);
+      const used=await c.query('DELETE FROM cadmiv_recuperacoes WHERE token_hash=$1 AND expira>now() RETURNING cliente_id',[digest(token)]);
+      if(!used.rows.length)throw fail(400,'Link inválido ou expirado. Solicite outro link.');
+      await c.query('UPDATE cadmiv_clientes SET senha_hash=$1 WHERE id=$2',[passwordHash,id]);
+      await c.query('DELETE FROM cadmiv_recuperacoes WHERE cliente_id=$1',[id]);
+      await c.query('DELETE FROM cadmiv_sessoes WHERE cliente_id=$1',[id]);
+      await c.query('COMMIT');setCookie(res,'',0);res.json({mensagem:'Senha alterada. Entre com seu telefone e a nova senha.'});
+    }catch(e){await c.query('ROLLBACK');throw e;}finally{c.release();}
+  }));
   app.post('/api/login',wrap(async(req,res)=>{
-    const {rows}=await db.query('SELECT id,senha_hash FROM cadmiv_clientes WHERE telefone=$1',[phone(req.body.telefone)]);
-    const valid=await verifyPassword(req.body.senha,rows[0]?.senha_hash||'0'.repeat(32)+':'+'0'.repeat(128));
-    if(!rows.length||!valid)throw fail(401,'Telefone ou senha incorretos.');
-    if(cookie(req))await db.query('DELETE FROM cadmiv_sessoes WHERE token_hash=$1',[digest(cookie(req))]);
-    setCookie(res,await session(db,rows[0].id));res.json({ok:true});
+    const telefone=phone(req.body.telefone),c=await db.connect();
+    try{
+      await c.query('BEGIN');
+      const {rows}=await c.query('SELECT id,senha_hash FROM cadmiv_clientes WHERE telefone=$1 FOR UPDATE',[telefone]);
+      const valid=await verifyPassword(req.body.senha,rows[0]?.senha_hash||'0'.repeat(32)+':'+'0'.repeat(128));
+      if(!rows.length||!valid)throw fail(401,'Telefone ou senha incorretos.');
+      if(cookie(req))await c.query('DELETE FROM cadmiv_sessoes WHERE token_hash=$1',[digest(cookie(req))]);
+      const token=await session(c,rows[0].id);await c.query('COMMIT');setCookie(res,token);res.json({ok:true});
+    }catch(e){await c.query('ROLLBACK');throw e;}finally{c.release();}
   }));
   app.post('/api/logout',wrap(async(req,res)=>{await db.query('DELETE FROM cadmiv_sessoes WHERE token_hash=$1',[digest(cookie(req))]);setCookie(res,'',0);res.json({ok:true});}));
+  app.get('/api/me/foto/:posicao',wrap(async(req,res)=>{
+    const id=await current(req),posicao=Number(req.params.posicao);
+    if(!/^[0-2]$/.test(req.params.posicao))throw fail(400,'Cartão inválido.');
+    const {rows}=await db.query('SELECT imagem FROM cadmiv_fotos WHERE cliente_id=$1 AND posicao=$2',[id,posicao]);
+    if(!rows.length)return res.status(404).end();
+    res.type('image/jpeg').send(Buffer.from(rows[0].imagem));
+  }));
+  app.post('/api/me/foto',wrap(async(req,res)=>{
+    const id=await current(req),posicao=req.body.posicao;
+    const {rows}=await db.query('SELECT dependentes FROM cadmiv_clientes WHERE id=$1',[id]);
+    if(!Number.isInteger(posicao)||posicao<0||posicao>2||posicao>rows[0].dependentes.length)throw fail(400,'Cartão inválido para este cadastro.');
+    if(req.body.foto===null){await db.query('DELETE FROM cadmiv_fotos WHERE cliente_id=$1 AND posicao=$2',[id,posicao]);return res.json({ok:true});}
+    let imagem;try{imagem=await prepararFoto(req.body.foto);}catch(e){throw fail(400,e.message);}
+    await db.query('INSERT INTO cadmiv_fotos(cliente_id,posicao,imagem) VALUES($1,$2,$3) ON CONFLICT(cliente_id,posicao) DO UPDATE SET imagem=EXCLUDED.imagem',[id,posicao,imagem]);
+    res.json({ok:true});
+  }));
   app.get('/api/me/qr',wrap(async(req,res)=>{
     const id=await current(req);
     const {rows}=await db.query('SELECT codigo FROM cadmiv_veiculos WHERE cliente_id=$1',[id]);
@@ -154,7 +220,7 @@ function createApp(db,{production=false,origin='http://localhost:10000'}={}) {
   }));
   app.get('/',(req,res)=>res.sendFile(path.join(__dirname,'index.html')));
   app.get('/validar',(req,res)=>res.redirect('/validar.html'));
-  for(const page of ['index.html','apresentacao.html','fiscalizacao.html','termos.html','cadastro.html','login.html','alerta.html','cadastro.js','cliente.js'])app.get('/'+page,(req,res)=>res.sendFile(path.join(__dirname,page)));
+  for(const page of ['index.html','apresentacao.html','fiscalizacao.html','termos.html','cadastro.html','login.html','alerta.html','cadastro.js','cliente.js','recuperar-senha.html','redefinir-senha.html','senha.js','cartao.js'])app.get('/'+page,(req,res)=>res.sendFile(path.join(__dirname,page)));
   for(const page of ['botao.html','cartao.html','validar.html'])app.get('/'+page,wrap(async(req,res)=>{try{await current(req);}catch(e){if(e.status===401)return res.redirect('/login.html');throw e;}res.sendFile(path.join(__dirname,page));}));
   app.get('/painel.html',(req,res)=>res.status(403).send('Painel administrativo indisponível nesta etapa. Os indicadores antigos eram demonstrativos.'));
   app.use((req,res)=>res.status(404).json({erro:'Página não encontrada.'}));
@@ -171,8 +237,8 @@ async function start(){
   const db=new Pool({connectionString:process.env.DATABASE_URL,max:10,connectionTimeoutMillis:10000,idleTimeoutMillis:30000});
   db.on('error',e=>console.error('Conexão PostgreSQL interrompida:',e.code||'DATABASE'));
   await migrate(db);
-  const server=createApp(db,{production,origin}).listen(process.env.PORT||10000,'0.0.0.0',()=>console.log('CADMIV iniciado com PostgreSQL.'));
-  const cleanup=setInterval(()=>db.query('DELETE FROM cadmiv_sessoes WHERE expira<now(); DELETE FROM cadmiv_limites WHERE expira<now()').catch(()=>{}),3600000);cleanup.unref();
+  const server=createApp(db,{production,origin,sendResetEmail:createResetMailer()}).listen(process.env.PORT||10000,'0.0.0.0',()=>console.log('CADMIV iniciado com PostgreSQL.'));
+  const cleanup=setInterval(()=>db.query('DELETE FROM cadmiv_sessoes WHERE expira<now(); DELETE FROM cadmiv_limites WHERE expira<now(); DELETE FROM cadmiv_recuperacoes WHERE expira<now()').catch(()=>{}),3600000);cleanup.unref();
   const shutdown=()=>{clearInterval(cleanup);server.close(()=>db.end().finally(()=>process.exit(0)));setTimeout(()=>process.exit(1),10000).unref();};process.on('SIGTERM',shutdown);process.on('SIGINT',shutdown);
 }
 if(require.main===module)start().catch(e=>{console.error('CADMIV não iniciou:',e.code||(e.message.startsWith('Configure')?e.message:'verifique banco e configuração'));process.exit(1);});

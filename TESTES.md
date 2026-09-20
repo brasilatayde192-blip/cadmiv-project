@@ -53,3 +53,18 @@ Para repetir a verificação embarcada/DOM sem adicionar bibliotecas ao package.
 ## Preservação
 
 A base de trabalho foi uma cópia dos 14 arquivos da pasta GPT-CADMIV, compatível com os anexos recuperados da conversa. Os originais não foram escritos. O backup CADMIV-BACKUP-ANTES-DAS-ALTERACOES não foi modificado nem sobrescrito.
+
+## Atualização de 18/09/2026 — cartão e consulta
+
+31 testes passaram, sem falhas ou testes ignorados, em ambiente local com PostgreSQL embarcado e DOM. Inclui QR individual protegido por sessão, SVG correspondente ao link com código aleatório, cartão sem campo CPF e lista restrita de campos públicos (situação, mensagem, marca, modelo, cor e chassi). npm audit: zero vulnerabilidades conhecidas nesta execução. Leitura com câmera de celular e nova publicação no Render ainda pendentes.
+
+## Recuperação de senha — 18/09/2026
+
+35 testes aprovados: 33 na suíte existente ampliada e 2 testes adicionais do provedor de e-mail e da tela de redefinição. Verificados: resposta genérica para conta ausente ou e-mail divergente, token armazenado como hash, senha mínima, uso único inclusive em pedidos concorrentes no adaptador embarcado, expiração, invalidação de sessões, recusa da senha antiga, login com senha nova, limite por telefone, descarte do token em falha de envio, remoção do token do endereço e confirmação de senha. Serviço de e-mail simulado; nenhum e-mail real enviado. Entrega real, configuração do remetente e validação no Render continuam pendentes.
+
+
+## Resultado 19/09/2026
+
+37 testes aprovados (suíte de 36 mais o novo teste de cartões, corrigido e reexecutado), sem falhas pendentes. Fotos do titular e dois dependentes: persistência após reinício, isolamento entre contas, recusa sem sessão, posição inválida e imagem corrompida, reprocessamento JPEG, dimensões e remoção. Consulta pública mantém apenas os campos permitidos. DOM: seleção de dependente, remoção na posição correta, bloqueio de impressão quando a foto não carrega e encerramento de câmera cuja abertura termina depois de trocar o cartão. npm audit após instalação de sharp: zero vulnerabilidades conhecidas.
+
+O layout de impressão foi revisto, mas o navegador headless encontrou restrições de acesso neste ambiente. Não foi possível confirmar visualmente a paginação A4/Carta ou a captura por câmera real. Conferir a prévia de uma página e testar câmera/upload no Render antes de uso definitivo. Os testes de DOM simulam as APIs de imagem/câmera; não equivalem a esses testes visuais.
