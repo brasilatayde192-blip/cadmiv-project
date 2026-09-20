@@ -8,7 +8,8 @@ function gerenciarCombo(){
  for(let i=1;i<=2;i++){
   const block=document.getElementById('dep'+i),active=i<=count;
   block.style.display=active?'block':'none';
-  block.querySelectorAll('input,select').forEach(el=>{el.disabled=!active;el.required=active;});
+  block.querySelectorAll('input,select,button').forEach(el=>{el.disabled=!active;el.required=active&&!!el.name;});
+  if(!active&&typeof fecharFotoCadastro==='function')fecharFotoCadastro(i);
  }
  document.getElementById('secao-responsabilidade').style.display=count?'block':'none';
  document.getElementById('responsabilidade').disabled=!count;
@@ -37,6 +38,7 @@ async function verificarChassiCadastrado(){
  }catch(e){if(request===chassiRequest){message.style.display='block';message.textContent='Não foi possível verificar agora. A conferência será repetida ao salvar.';}}
 }
 document.addEventListener('DOMContentLoaded',()=>{
+ iniciarFotosCadastro();
  document.getElementById('data_emissao').value=new Date().toLocaleDateString('pt-BR');
  document.getElementById('cadmiv_ano').max=new Date().getFullYear();
  document.getElementById('chassi_veiculo').addEventListener('input',e=>{chassiRequest++;e.target.setCustomValidity('');document.getElementById('alerta-trava').style.display='none';});
@@ -70,8 +72,37 @@ document.addEventListener('DOMContentLoaded',()=>{
   b.responsabilidade=document.getElementById('responsabilidade').checked&&!document.getElementById('responsabilidade').disabled;
   const message=document.getElementById('mensagem-cadastro');saving=true;
   form.querySelectorAll('[type="submit"]').forEach(el=>el.disabled=true);message.textContent='Salvando cadastro...';
-  try{await apiCadastro('/api/cadastros',b);window.location.assign('validar.html');}
+  try{b.fotos=obterFotosCadastro(Number(b.combo));fecharTodasCameras();await apiCadastro('/api/cadastros',b);window.location.assign('validar.html');}
   catch(err){message.textContent=err.message;message.scrollIntoView({block:'center'});}
   finally{saving=false;form.querySelectorAll('[type="submit"]').forEach(el=>el.disabled=false);}
  });
 });
+
+const fotosCadastro=new Map();
+function fecharFotoCadastro(i){const f=fotosCadastro.get(i);if(!f)return;f.version++;if(f.stream)f.stream.getTracks().forEach(t=>t.stop());f.stream=null;f.el.querySelector('[data-video]').srcObject=null;for(const key of ['video','capturar','fechar'])f.el.querySelector('[data-'+key+']').hidden=true;}
+function fecharTodasCameras(){for(const i of fotosCadastro.keys())fecharFotoCadastro(i);}
+function obterFotosCadastro(count){
+ const result=[];for(let i=0;i<count;i++){const f=fotosCadastro.get(i);if(f?.busy)throw Error('Aguarde a preparação da foto antes de salvar.');result.push(f?.data||null);}return result;
+}
+function iniciarFotosCadastro(){
+ for(const el of document.querySelectorAll('[data-foto]')){
+  const i=Number(el.dataset.foto),f={el,data:null,version:0,fileVersion:0,busy:false,stream:null};fotosCadastro.set(i,f);
+  const q=k=>el.querySelector('[data-'+k+']'),aviso=m=>q('aviso').textContent=m;
+  function preview(source,width,height){const scale=Math.min(1,480/width,640/height),canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(width*scale));canvas.height=Math.max(1,Math.round(height*scale));const ctx=canvas.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.drawImage(source,0,0,canvas.width,canvas.height);f.data=canvas.toDataURL('image/jpeg',.82);q('preview').src=f.data;q('preview').hidden=false;q('vazio').hidden=true;q('remover').hidden=false;aviso('Foto preparada para salvar com o cadastro.');}
+  q('buscar').addEventListener('click',()=>q('arquivo').click());
+  q('arquivo').addEventListener('change',async()=>{
+   const file=q('arquivo').files[0];if(!file)return;fecharFotoCadastro(i);const version=++f.fileVersion;
+   if(!['image/jpeg','image/png','image/webp'].includes(file.type)||file.size>10*1024*1024){aviso('Escolha uma foto JPEG, PNG ou WebP de até 10 MB.');q('arquivo').value='';return;}
+   f.busy=true;aviso('Preparando foto...');const url=URL.createObjectURL(file);
+   try{const img=new Image();img.src=url;await img.decode();if(version===f.fileVersion)preview(img,img.naturalWidth,img.naturalHeight);}catch{if(version===f.fileVersion)aviso('Não foi possível abrir a foto. Escolha outro arquivo.');}finally{URL.revokeObjectURL(url);if(version===f.fileVersion){f.busy=false;q('arquivo').value='';}}
+  });
+  q('camera').addEventListener('click',async()=>{
+   fecharTodasCameras();if(!navigator.mediaDevices?.getUserMedia){aviso('Câmera indisponível. Use Buscar no Arquivo.');return;}
+   const version=f.version;try{const stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:{ideal:640},height:{ideal:480}},audio:false});if(version!==f.version){stream.getTracks().forEach(t=>t.stop());return;}f.stream=stream;q('video').srcObject=stream;for(const key of ['video','capturar','fechar'])q(key).hidden=false;aviso('Clique em Capturar Foto quando estiver pronto.');}catch{if(version===f.version)aviso('Autorize a câmera no navegador ou use Buscar no Arquivo.');}
+  });
+  q('capturar').addEventListener('click',()=>{const v=q('video');if(!v.videoWidth)return;f.fileVersion++;f.busy=false;preview(v,v.videoWidth,v.videoHeight);fecharFotoCadastro(i);});
+  q('fechar').addEventListener('click',()=>fecharFotoCadastro(i));
+  q('remover').addEventListener('click',()=>{fecharFotoCadastro(i);f.fileVersion++;f.busy=false;f.data=null;q('preview').hidden=true;q('preview').removeAttribute('src');q('vazio').hidden=false;q('remover').hidden=true;q('arquivo').value='';aviso('Foto removida.');});
+ }
+ window.addEventListener('pagehide',fecharTodasCameras);
+}

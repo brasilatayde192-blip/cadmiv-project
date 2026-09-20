@@ -110,10 +110,10 @@
     <script src="cadastro.js" defer></script>
  
  
-    </head><body>
+    <style>.cadastro-foto{border:1px solid #cbd5e1;border-radius:6px;padding:14px;margin:14px 0;background:#fff}.cadastro-foto button{background:#936631;color:white;border:0;border-radius:5px;padding:10px 14px;margin:5px 0;cursor:pointer;font:inherit}.cadastro-foto button:disabled{opacity:.5}.foto-preview{width:110px;height:145px;border:1px dashed #aaa;display:flex;align-items:center;justify-content:center;margin:10px 0}.foto-preview img{width:100%;height:100%;object-fit:contain}.cadastro-foto video{width:100%;max-width:320px;max-height:240px}.cadastro-foto [data-aviso]{font-size:14px;line-height:1.4}.cadastro-foto [hidden]{display:none!important}</style></head><body>
 <div class="container">
         <h1>CADMIV</h1>
-        <h2>Formulário de CADASTRO</h2><p>Após salvar o cadastro, adicione as fotos do titular e dos dependentes na área dos cartões. O pagamento será disponibilizado em uma próxima etapa.</p><p id="mensagem-cadastro" role="status" aria-live="polite"></p>
+        <h2>Formulário de CADASTRO</h2><p id="mensagem-cadastro" role="status" aria-live="polite"></p>
 <!-- INÍCIO DA SEÇÃO DE DATA DE NASCIMENTO COMPLETA -->
 <form id="form-cadastro" method="post" action="/api/cadastros"><div class="form-group">
 <!-- 🚨 AVISO RELUZENTE DE SEGURANÇA NACIONAL SUGERIDO PELO DIRETOR -->
@@ -145,7 +145,8 @@
     <input type="text" id="cpf_titular" name="cpf" placeholder="000.000.000-00" maxlength="14" oninput="mascaraCPF(this)" style="width: 100% !important; padding: 10px !important; border: 1px solid #cbd5e1 !important; border-radius: 4px !important; box-sizing: border-box !important;" required>
 </div> 
 
-    <!-- 📜 2. DECLARAÇÃO DE RESPONSABILIDADE JURÍDICA NACIONAL -->
+    <section class="cadastro-foto" data-foto="0" aria-label="Foto do Titular"><strong>Foto do Titular</strong><div class="foto-preview"><img data-preview alt="Prévia da foto do Titular" hidden><span data-vazio>Sem foto</span></div><input data-arquivo type="file" accept="image/jpeg,image/png,image/webp" hidden aria-label="Buscar foto do Titular"><button type="button" data-buscar>Buscar no Arquivo</button> <button type="button" data-camera>Tirar Foto Agora</button><video data-video autoplay playsinline muted hidden></video><button type="button" data-capturar hidden>Capturar Foto</button> <button type="button" data-fechar hidden>Fechar Câmera</button> <button type="button" data-remover hidden>Remover Foto</button><p data-aviso role="status" aria-live="polite"></p></section>
+<!-- 📜 2. DECLARAÇÃO DE RESPONSABILIDADE JURÍDICA NACIONAL -->
     <div style="background-color: #fff !important; border: 1px solid #cbd5e1 !important; padding: 12px !important; border-radius: 4px !important; margin-bottom: 15px !important; font-size: 13px !important; color: #334155 !important; line-height: 1.5 !important; max-height: 100px !important; overflow-y: auto !important;">
         <strong>TERMO DE RESPONSABILIDADE DO TITULAR (CADMIV):</strong><br>
         Ao clicar em prosseguir, o requerente declara sob as penas da lei penal e civil que todas as informações prestadas neste formulário de CADASTRO veicular, incluindo os dados de chassis, motorização e dados de dependentes, são verídicas, assumindo total responsabilidade jurídica sobre o ato.
@@ -366,7 +367,7 @@
                     <option value="cunhado">Cunhado(a)</option>
                     <option value="enteado">Enteado(a)</option>
                     <option value="amigo">Amigo(a)</option>
-                </select> 
+                </select><section class="cadastro-foto" data-foto="1" aria-label="Foto do Dependente 1"><strong>Foto do Dependente 1</strong><div class="foto-preview"><img data-preview alt="Prévia da foto do Dependente 1" hidden><span data-vazio>Sem foto</span></div><input data-arquivo type="file" accept="image/jpeg,image/png,image/webp" hidden aria-label="Buscar foto do Dependente 1"><button type="button" data-buscar>Buscar no Arquivo</button> <button type="button" data-camera>Tirar Foto Agora</button><video data-video autoplay playsinline muted hidden></video><button type="button" data-capturar hidden>Capturar Foto</button> <button type="button" data-fechar hidden>Fechar Câmera</button> <button type="button" data-remover hidden>Remover Foto</button><p data-aviso role="status" aria-live="polite"></p></section> 
                 <br><br>
                 </div>
 
@@ -387,7 +388,7 @@
                     <option value="cunhado">Cunhado(a)</option>
                     <option value="enteado">Enteado(a)</option>
                     <option value="amigo">Amigo(a)</option>
-                </select><br><br> 
+                </select><section class="cadastro-foto" data-foto="2" aria-label="Foto do Dependente 2"><strong>Foto do Dependente 2</strong><div class="foto-preview"><img data-preview alt="Prévia da foto do Dependente 2" hidden><span data-vazio>Sem foto</span></div><input data-arquivo type="file" accept="image/jpeg,image/png,image/webp" hidden aria-label="Buscar foto do Dependente 2"><button type="button" data-buscar>Buscar no Arquivo</button> <button type="button" data-camera>Tirar Foto Agora</button><video data-video autoplay playsinline muted hidden></video><button type="button" data-capturar hidden>Capturar Foto</button> <button type="button" data-fechar hidden>Fechar Câmera</button> <button type="button" data-remover hidden>Remover Foto</button><p data-aviso role="status" aria-live="polite"></p></section><br><br> 
                  
                  
                  
@@ -406,7 +407,7 @@
             <!-- Início da Tarja Verde do Final do Formulário -->
         <div class="tarja-botoes">
             <button type="submit" id="btn-enviar" class="btn-next">
-                Salvar Cadastro
+                Salvar Cadastro e Gerar PIX
             </button>
         </div>
         <!-- Fim da Tarja Verde -->

@@ -68,3 +68,8 @@ A base de trabalho foi uma cópia dos 14 arquivos da pasta GPT-CADMIV, compatív
 37 testes aprovados (suíte de 36 mais o novo teste de cartões, corrigido e reexecutado), sem falhas pendentes. Fotos do titular e dois dependentes: persistência após reinício, isolamento entre contas, recusa sem sessão, posição inválida e imagem corrompida, reprocessamento JPEG, dimensões e remoção. Consulta pública mantém apenas os campos permitidos. DOM: seleção de dependente, remoção na posição correta, bloqueio de impressão quando a foto não carrega e encerramento de câmera cuja abertura termina depois de trocar o cartão. npm audit após instalação de sharp: zero vulnerabilidades conhecidas.
 
 O layout de impressão foi revisto, mas o navegador headless encontrou restrições de acesso neste ambiente. Não foi possível confirmar visualmente a paginação A4/Carta ou a captura por câmera real. Conferir a prévia de uma página e testar câmera/upload no Render antes de uso definitivo. Os testes de DOM simulam as APIs de imagem/câmera; não equivalem a esses testes visuais.
+
+
+## Resultado 20/09/2026
+
+38 testes passaram na suíte completa. Após acrescentar a verificação do formulário com fotos, os 6 testes desse arquivo também passaram: total atual de 39 testes, sem falhas pendentes. Verificados cadastro e fotos gravados em transação, recusa de imagem corrompida sem criar cliente, foto de dependente fora do plano, ausência de foto, conflito de chassi sem foto órfã, câmera encerrada quando um dependente é desativado, isolamento de foto por posição e bloqueio de impressão se a foto não carrega. As APIs de câmera e canvas foram simuladas no teste DOM. Não houve teste físico de câmera, nova validação visual da impressão ou transação PIX.

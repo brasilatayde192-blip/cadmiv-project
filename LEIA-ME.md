@@ -1,4 +1,4 @@
-# CADMIV — atualização de 19/09/2026
+# CADMIV — atualização de 20/09/2026
 
 ## Primeiro passo para o proprietário
 
@@ -28,7 +28,7 @@ Esta é a fundação solicitada, não o lançamento comercial completo.
 - Transferência de titularidade, cancelamento do cadastro, renovação automática e administração ainda precisam de implementação.
 - O alerta pode ser registrado por um cliente autenticado cujo cadastro esteja ATIVO. Cadastros PENDENTES não podem simular ativação. Não há endpoint público para ativar um cadastro. O teste ativa apenas registros fictícios diretamente no banco de teste.
 - Nesta rodada há um titular e um veículo por CPF/telefone; um novo veículo para cliente existente exige uma próxima etapa. Não tente cadastrar novamente o mesmo veículo para alterar dados.
-- Telefone e fotos dos cartões são editáveis na área do cliente nesta rodada. Nome, CPF e identificação do veículo são protegidos contra alteração pelo cliente.
+- O telefone é editável na área do cliente; as fotos são escolhidas durante o cadastro. Nome, CPF e identificação do veículo são protegidos contra alteração pelo cliente.
 - O painel.html foi preservado como arquivo, mas sua rota retorna indisponível. Seus números anteriores eram demonstrativos, e não existe autenticação administrativa pronta.
 - node.js foi preservado como arquivo original; contém uma cópia antiga de configuração e NÃO deve ser executado. A aplicação inicia por server.js.
 - Não houve migração de cadastros históricos: os arquivos fornecidos usavam simulação/localStorage. Não se deve considerar esses dados automaticamente importados ou verificados.
@@ -99,10 +99,20 @@ Fontes: https://render.com/docs/free#other-limitations ; https://resend.com/docs
 
 Este pacote completo substitui os arquivos da branch cadmiv-teste; não é necessário criar outro serviço ou outro banco. Mantenha as variáveis e os comandos existentes no Render. Envie todos os arquivos, especialmente cartao.js, fotos.js, server.js, schema.sql, package.json e package-lock.json. O servidor cria a tabela de fotos na próxima inicialização sem apagar cadastros.
 
-Depois de entrar na conta, abra “Fotos / visualizar e imprimir segunda via”. Escolha Titular ou um dependente cadastrado. Abra “Adicionar ou trocar a foto deste cartão”; escolha uma imagem JPEG/PNG/WebP de até 10 MB ou use a câmera, confira a prévia e salve. A câmera depende da permissão do navegador e de uma câmera disponível; escolher arquivo continua disponível. Fotos são opcionais em todos os planos e salvas individualmente.
+Na atualização de 20/09, as fotos passaram para as caixas do titular e dos dependentes dentro do formulário de cadastro. Use Buscar no Arquivo ou Tirar Foto Agora; confira a prévia. Cadastro e fotos são salvos juntos. As fotos são opcionais e a câmera exige permissão do navegador. Na área do cliente, escolha Visualizar cartões / Imprimir Segunda Via.
 
 O navegador reduz as imagens; o servidor valida, reprocessa e remove metadados, limita a 480 × 640 pixels e 200 KB por foto. As fotos ficam no PostgreSQL, protegidas pela sessão do titular, e não são incluídas na consulta pública nem no QR-code. A foto não comprova identidade.
 
 A segunda via reutiliza o cadastro existente. O layout de impressão foi compactado, com controles ocultos e um cartão por folha A4 ou Carta em retrato. Confira a prévia antes de imprimir: escolha escala 100%, desative cabeçalhos/rodapés e confirme que aparece uma página. A paginação real ainda precisa dessa conferência: a execução do navegador de teste foi bloqueada pelo ambiente local.
 
 Os avisos de cancelamento e empréstimo foram incluídos no formulário e nos termos. Não há cobrança, cancelamento ou transferência implementados nesta etapa. A redação preserva os reembolsos legais e trata a autorização de empréstimo como recomendação. Referências: Código de Defesa do Consumidor, arts. 49 e 51, https://www.planalto.gov.br/ccivil_03/leis/l8078compilado.htm .
+
+
+## Atualização 20/09 — formulário e cartão
+
+- index.html, apresentacao.html, fiscalizacao.html e termos.html preservados byte a byte em relação ao pacote de 19/09. Nenhum backup original foi alterado.
+- Aviso abaixo do título do cadastro removido. Fotos JPEG/PNG/WebP de até 10 MB são reduzidas no navegador e validadas no servidor; um problema de foto impede a gravação do cadastro inteiro, para permitir correção e nova tentativa. Titular e até dois dependentes possuem caixas próprias.
+- Cartão sem os informativos de situação na página: a situação real no banco e na consulta pública não foi alterada. CPF continua ausente do cartão. Quatro disposições e texto de consulta ficam dentro da moldura, com marca/modelo, data original de registro e www.cadmiv.com.br. O botão de retorno ao início está abaixo do cartão.
+- Botão Salvar Cadastro e Gerar PIX preparado conforme solicitado. PIX real e liberação de impressão mediante pagamento NÃO foram integrados, aguardando a escolha do banco/provedor. A tela seguinte informa que não há cobrança. A impressão continua disponível para testar o cartão; não lançar comercialmente esse fluxo antes da integração.
+- Para atualizar o serviço de testes, envie todo o conteúdo deste pacote para a branch cadmiv-teste e confirme o deploy. Preserve as configurações existentes do Render. Os arquivos ZIP e backups não devem ser enviados ao repositório.
+- Teste um cadastro novo com fotos, confira titular/dependentes e a prévia de impressão. Ainda é necessário conferir a paginação em navegador e o uso de câmera física.

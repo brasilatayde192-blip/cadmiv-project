@@ -60,6 +60,15 @@ test('Integração HTTP e PostgreSQL (banco isolado)',{skip:!configured},async t
    const pub=JSON.parse((await request('/api/consultar',{chassi:pessoa.chassi})).body);assert.deepEqual(Object.keys(pub).sort(),['chassi','cor','marca','mensagem','modelo','status']);
    assert.equal((await request('/api/me/foto',{posicao:2,foto:null},dono)).status,200);assert.equal((await request('/api/me/foto/2',undefined,dono)).status,404);
   });
+  await t.test('Cadastro grava fotos na mesma transação e rejeita imagens e posições inválidas',async()=>{
+   const sharp=require('sharp'),bytes=await sharp({create:{width:48,height:64,channels:3,background:'#269655'}}).png().toBuffer(),foto='data:image/png;base64,'+bytes.toString('base64');
+   const pessoa={...fixture(12),combo:'3',dep1_nome:'Foto Um',dep1_parentesco:'Filho',dep2_nome:'Foto Dois',dep2_parentesco:'Filho',responsabilidade:true,fotos:[foto,null,foto]};
+   const bad=await request('/api/cadastros',{...pessoa,fotos:[foto,'data:image/png;base64,AAAA']});assert.equal(bad.status,400);assert.equal((await db.query('SELECT 1 FROM cadmiv_clientes WHERE telefone=$1',[pessoa.telefone])).rows.length,0);
+   assert.equal((await request('/api/cadastros',{...fixture(13),fotos:[foto,foto]})).status,400);
+   const r=await request('/api/cadastros',pessoa);assert.equal(r.status,201,r.body);assert.equal((await request('/api/me/foto/0',undefined,r.cookie)).status,200);assert.equal((await request('/api/me/foto/1',undefined,r.cookie)).status,404);assert.equal((await request('/api/me/foto/2',undefined,r.cookie)).status,200);
+   const before=(await db.query('SELECT count(*)::int AS n FROM cadmiv_fotos')).rows[0].n;
+   assert.equal((await request('/api/cadastros',{...fixture(13),chassi:pessoa.chassi,fotos:[foto]})).status,409);assert.equal((await db.query('SELECT count(*)::int AS n FROM cadmiv_fotos')).rows[0].n,before);
+  });
   await t.test('Recuperação usa link único, expira e encerra sessões antigas',async()=>{
    await db.query('DELETE FROM cadmiv_limites');
    const person=fixture(8),registered=await request('/api/cadastros',person),oldCookie=registered.cookie;

@@ -37,7 +37,7 @@ async function carregarCliente(){
  const set=(id,value)=>{const el=document.getElementById(id);if(el){if(el.tagName==='INPUT')el.value=value;else el.textContent=value;}};
  set('cliente_nome',d.nome);set('cliente_telefone',d.telefone);set('cliente_modelo',d.marca+' — '+nomeModelo(d.modelo));
  set('cartao_status','Situação: '+d.status+(d.status==='PENDENTE'?' — NÃO ATIVO':''));
- set('cliente_status','Situação: '+d.status+(d.status==='PENDENTE'?' — cadastro salvo, ainda não ativo.':''));
+ if(!document.getElementById('pessoa-cartao'))set('cliente_status','Situação: '+d.status+(d.status==='PENDENTE'?' — cadastro salvo, ainda não ativo.':''));
  if(typeof iniciarCartoes==='function')iniciarCartoes(d);
  set('caixa_nome_real',d.nome);set('caixa_chassi_real',d.marca+' — '+nomeModelo(d.modelo)+' — CHASSI: '+d.chassi);
  const qr=document.getElementById('qr-veiculo'),link=document.getElementById('link-consulta');

@@ -89,6 +89,7 @@ function createApp(db,{production=false,origin='http://localhost:10000',sendRese
   const app=express(); app.locals.resetTasks=resetTasks; app.disable('x-powered-by'); if(production) app.set('trust proxy',1);
   app.use((req,res,next)=>{res.set({'Cache-Control':'no-store','Referrer-Policy':'no-referrer','X-Content-Type-Options':'nosniff','X-Frame-Options':'DENY'});next();});
   app.use('/api/me/foto',express.json({limit:'1mb'}));
+  app.use('/api/cadastros',express.json({limit:'3mb'}));
   app.use(express.json({limit:'32kb'}));
   const wrap=fn=>(req,res,next)=>Promise.resolve(fn(req,res,next)).catch(next);
   app.use('/api',(req,res,next)=>{
@@ -114,12 +115,16 @@ function createApp(db,{production=false,origin='http://localhost:10000',sendRese
   app.get('/healthz',wrap(async(req,res)=>{await db.query('SELECT 1');res.json({status:'ok'});}));
   app.post('/api/chassi/verificar',wrap(async(req,res)=>{const {rows}=await db.query('SELECT 1 FROM cadmiv_veiculos WHERE chassi_normalizado=$1',[normalizeChassi(req.body.chassi)]);res.json({cadastrado:rows.length>0});}));
   app.post('/api/cadastros',wrap(async(req,res)=>{
-    const b=validateRegistration(req.body),passwordHash=await hashPassword(b.senha),c=await db.connect();
+    const b=validateRegistration(req.body),fotos=req.body.fotos??[],imagens=[];
+    if(!Array.isArray(fotos)||fotos.length>Number(b.combo))throw fail(400,'Confira as fotos do plano escolhido.');
+    for(const foto of fotos){if(foto===null){imagens.push(null);continue;}try{imagens.push(await prepararFoto(foto));}catch(e){throw fail(400,e.message);}}
+    const passwordHash=await hashPassword(b.senha),c=await db.connect();
     try{
       await c.query('BEGIN');
       const id=crypto.randomUUID(),vehicleId=crypto.randomUUID(),codigo=crypto.randomBytes(24).toString('hex');
       await c.query(`INSERT INTO cadmiv_clientes(id,nome,cpf,telefone,email,nascimento,senha_hash,privado,dependentes,responsabilidade) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`,[id,b.nome,b.cpf,b.telefone,b.email,b.nascimento,passwordHash,JSON.stringify(b.privado),JSON.stringify(b.dependentes),b.responsabilidade]);
       await c.query(`INSERT INTO cadmiv_veiculos(id,cliente_id,codigo,chassi,marca,modelo,cor,nota_fiscal,ano,estado_conservacao,combo) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`,[vehicleId,id,codigo,b.chassi,b.marca,b.modelo,b.cor,b.nota_fiscal,b.ano,b.estado_conservacao,b.combo]);
+      for(let i=0;i<imagens.length;i++)if(imagens[i])await c.query('INSERT INTO cadmiv_fotos(cliente_id,posicao,imagem) VALUES($1,$2,$3)',[id,i,imagens[i]]);
       const token=await session(c,id);await c.query('COMMIT');setCookie(res,token);res.status(201).json({codigo,status:'PENDENTE'});
     }catch(e){await c.query('ROLLBACK');throw e;}finally{c.release();}
   }));
