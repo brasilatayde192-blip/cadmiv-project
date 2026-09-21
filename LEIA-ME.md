@@ -1,4 +1,4 @@
-# CADMIV — atualização de 20/09/2026
+# CADMIV — atualização de 20/09/2026, revisão 2
 
 ## Primeiro passo para o proprietário
 
@@ -14,7 +14,7 @@ A aplicação ainda precisa da configuração PostgreSQL/Render abaixo antes de 
 - Coluna de chassi normalizado gerada pelo próprio PostgreSQL e restrição UNIQUE. A mesma regra protege gravações diretas no banco. A pré-consulta do formulário é apenas uma orientação; a garantia final é do banco.
 - Campo obrigatório Marca do Veículo. Dados de contato, endereço, saúde, veículo e dependentes do formulário são persistidos. Dados de saúde e endereço ficam no registro privado do cliente.
 - Senhas com hash scrypt e salt; sessões aleatórias armazenadas no banco, com cookie HttpOnly/SameSite e Secure em produção. Limite de tentativas persistido no banco.
-- Login real, consulta dos próprios dados, alteração de telefone, saída da conta e alerta de furto/roubo autenticado para cadastro ativo.
+- Login real, consulta e edição dos próprios dados, exclusão confirmada, saída da conta e alerta de furto/roubo autenticado para cadastro ativo.
 - Consulta pública devolve somente situação, mensagem, marca, modelo, cor e chassi. Não devolve nome, CPF, telefone, endereço ou saúde.
 - Arquivos internos, configurações e código do servidor não são disponibilizados pelo servidor HTTP.
 - Data completa de nascimento, maioridade, CPF, campos obrigatórios e tamanho dos dados são validados no backend.
@@ -25,10 +25,10 @@ A aplicação ainda precisa da configuração PostgreSQL/Render abaixo antes de 
 Esta é a fundação solicitada, não o lançamento comercial completo.
 
 - PIX, confirmação de pagamento e ativação automática não estão integrados. Todo cadastro novo recebe PENDENTE. Nenhum clique confirma pagamento. A tela informa claramente essa limitação.
-- Transferência de titularidade, cancelamento do cadastro, renovação automática e administração ainda precisam de implementação.
+- Transferência direta de titularidade, renovação automática e administração ainda precisam de implementação. A exclusão do próprio cadastro foi incluída na revisão 2.
 - O alerta pode ser registrado por um cliente autenticado cujo cadastro esteja ATIVO. Cadastros PENDENTES não podem simular ativação. Não há endpoint público para ativar um cadastro. O teste ativa apenas registros fictícios diretamente no banco de teste.
 - Nesta rodada há um titular e um veículo por CPF/telefone; um novo veículo para cliente existente exige uma próxima etapa. Não tente cadastrar novamente o mesmo veículo para alterar dados.
-- O telefone é editável na área do cliente; as fotos são escolhidas durante o cadastro. Nome, CPF e identificação do veículo são protegidos contra alteração pelo cliente.
+- O cadastro completo pode ser aberto para edição na área do cliente. Nome do titular, CPF, Chassi, Número da Nota Fiscal, plano, situação e data original ficam protegidos no servidor.
 - O painel.html foi preservado como arquivo, mas sua rota retorna indisponível. Seus números anteriores eram demonstrativos, e não existe autenticação administrativa pronta.
 - node.js foi preservado como arquivo original; contém uma cópia antiga de configuração e NÃO deve ser executado. A aplicação inicia por server.js.
 - Não houve migração de cadastros históricos: os arquivos fornecidos usavam simulação/localStorage. Não se deve considerar esses dados automaticamente importados ou verificados.
@@ -116,3 +116,14 @@ Os avisos de cancelamento e empréstimo foram incluídos no formulário e nos te
 - Botão Salvar Cadastro e Gerar PIX preparado conforme solicitado. PIX real e liberação de impressão mediante pagamento NÃO foram integrados, aguardando a escolha do banco/provedor. A tela seguinte informa que não há cobrança. A impressão continua disponível para testar o cartão; não lançar comercialmente esse fluxo antes da integração.
 - Para atualizar o serviço de testes, envie todo o conteúdo deste pacote para a branch cadmiv-teste e confirme o deploy. Preserve as configurações existentes do Render. Os arquivos ZIP e backups não devem ser enviados ao repositório.
 - Teste um cadastro novo com fotos, confira titular/dependentes e a prévia de impressão. Ainda é necessário conferir a paginação em navegador e o uso de câmera física.
+
+
+## Revisão 2 — editar e excluir cadastro
+
+Na Área do Cliente, clique em Abrir Cadastro para Alterações. O mesmo formulário será preenchido com os dados já salvos. É possível alterar endereço, telefone, e-mail, nascimento (mantendo maioridade), informações de contato/saúde, marca, modelo, cor, ano, estado de conservação, dados dos dependentes do plano e fotos. Confirme a senha atual ao final e clique em Salvar Alterações. Nome do titular, CPF, Chassi e Número da Nota Fiscal não podem ser alterados, nem por solicitação direta à API. Plano, situação, código e data de registro também são preservados. Alterações no telefone mudam o login; alterações de telefone/e-mail invalidam links de recuperação anteriores.
+
+A foto do titular foi movida para uma seção inicialmente escondida, abaixo dos planos e junto dos dependentes. A seção aparece depois de escolher uma opção, inclusive no plano de um cartão. Fotos existentes carregam na edição e permanecem salvas se não forem substituídas ou removidas.
+
+No topo do formulário em edição, Excluir meu cadastro por venda ou doação abre uma confirmação. O cliente deve escolher motivo, informar a senha e digitar EXCLUIR. Voltar sem excluir cancela a ação. A confirmação apaga da base operacional o cliente, o veículo, as fotos, os dependentes, as sessões e os links de recuperação, liberando o chassi para novo cadastro. O QR antigo deixa de localizar o veículo. Não existe transferência automática ou reembolso automático. Backups externos do provedor e cópias guardadas pelo proprietário não são apagados por esse botão; precisam de política própria de retenção. Nenhum cadastro real foi excluído durante o desenvolvimento.
+
+Este pacote possui 36 arquivos, incluindo a pasta test. Envie todo o conteúdo da pasta CADMIV para cadmiv-teste. O arquivo novo cadastro-edicao.js é necessário. O backup original e os quatro HTMLs preservados continuam intactos. PIX permanece pendente de integração.

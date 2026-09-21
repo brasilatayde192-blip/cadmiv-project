@@ -81,7 +81,7 @@
     <div class="cadastro-container">
         <div class="header-title"><h1>CADMIV</h1></div>
         <h2>Área do Cliente</h2><p id="cliente_status" role="status"></p><p><a href="cartao.html">Visualizar cartões / Imprimir Segunda Via</a> · <button type="button" onclick="sair()">Sair</button></p> 
-        <p class="subtitulo">Atualize os seus dados de registro do veículo.</p> 
+        <p class="subtitulo">Abra seu cadastro para alterar endereço, contato, dados do veículo e fotos.</p> 
 
         <!-- FORMULÁRIO PRINCIPAL DE REGISTRO -->
         <form onsubmit="event.preventDefault(); salvarAlteracoes();"> 
@@ -91,7 +91,7 @@
             <input type="text" id="cliente_nome" value="" disabled> 
             
             <label>Telefone de Contato:</label> 
-            <input type="text" id="cliente_telefone" placeholder="Digite seu telefone atualizado" required> 
+            <input type="text" id="cliente_telefone" readonly> 
             
             <label>Modelo do Veículo:</label> 
             <input type="text" id="cliente_modelo" placeholder="Modelo" disabled> 
@@ -122,7 +122,7 @@
                 </div>
             </div>
 
-            <button type="submit" class="btn-salvar">Salvar Alterações</button> 
+            <button type="button" class="btn-salvar" onclick="salvarAlteracoes()">Abrir Cadastro para Alterações</button> 
         </form> 
     </div> 
 

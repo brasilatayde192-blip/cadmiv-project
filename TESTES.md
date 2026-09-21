@@ -73,3 +73,8 @@ O layout de impressão foi revisto, mas o navegador headless encontrou restriç�
 ## Resultado 20/09/2026
 
 38 testes passaram na suíte completa. Após acrescentar a verificação do formulário com fotos, os 6 testes desse arquivo também passaram: total atual de 39 testes, sem falhas pendentes. Verificados cadastro e fotos gravados em transação, recusa de imagem corrompida sem criar cliente, foto de dependente fora do plano, ausência de foto, conflito de chassi sem foto órfã, câmera encerrada quando um dependente é desativado, isolamento de foto por posição e bloqueio de impressão se a foto não carrega. As APIs de câmera e canvas foram simuladas no teste DOM. Não houve teste físico de câmera, nova validação visual da impressão ou transação PIX.
+
+
+## Revisão 2 — 20/09/2026
+
+42 testes aprovados no conjunto atual: 41 na suíte, mais o novo teste de formulário de edição. Após ajustes finais, os 7 testes de formulário/edição e os 25 de integração foram reexecutados e passaram. Cobertura: carregamento/preenchimento do cadastro, identificação bloqueada, confirmação de senha, gravação de contato/endereço/modelo, preservação de data/código/situação/plano, alteração e remoção de foto, rollback em imagem inválida e telefone duplicado, invalidação de links antigos de recuperação, exclusão autenticada com confirmação, cascata de fotos/sessões/recuperações, isolamento entre clientes, invalidação do QR e liberação do chassi. Confirmação cancelada no DOM não envia pedido de exclusão. Testes usam banco isolado; nenhum dado do Render foi alterado. Validação visual em navegador, câmera física e impressão continuam para a etapa no serviço de testes.

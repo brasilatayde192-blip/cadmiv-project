@@ -90,6 +90,7 @@ function createApp(db,{production=false,origin='http://localhost:10000',sendRese
   app.use((req,res,next)=>{res.set({'Cache-Control':'no-store','Referrer-Policy':'no-referrer','X-Content-Type-Options':'nosniff','X-Frame-Options':'DENY'});next();});
   app.use('/api/me/foto',express.json({limit:'1mb'}));
   app.use('/api/cadastros',express.json({limit:'3mb'}));
+  app.use('/api/me',express.json({limit:'3mb'}));
   app.use(express.json({limit:'32kb'}));
   const wrap=fn=>(req,res,next)=>Promise.resolve(fn(req,res,next)).catch(next);
   app.use('/api',(req,res,next)=>{
@@ -97,7 +98,7 @@ function createApp(db,{production=false,origin='http://localhost:10000',sendRese
     next();
   });
   app.use('/api',wrap(async(req,res,next)=>{
-    const sensitive=req.path==='/login'||req.path.startsWith('/senha/');
+    const sensitive=req.path==='/login'||req.path.startsWith('/senha/')||req.path==='/me/excluir'||(req.path==='/me'&&req.method==='PATCH');
     const key=digest(req.ip+':'+(sensitive?'acesso':'api'));
     const {rows}=await db.query(`INSERT INTO cadmiv_limites(chave,quantidade,expira) VALUES($1,1,now()+interval '10 minutes')
       ON CONFLICT(chave) DO UPDATE SET quantidade=CASE WHEN cadmiv_limites.expira<now() THEN 1 ELSE cadmiv_limites.quantidade+1 END,
@@ -140,12 +141,14 @@ function createApp(db,{production=false,origin='http://localhost:10000',sendRese
     if(limit[0].quantidade>3)return;
     // O envio ocorre após a resposta, sem revelar a existência da conta pelo tempo do provedor.
     const task=(async()=>{
-      const {rows}=await db.query('SELECT id,email FROM cadmiv_clientes WHERE telefone=$1 AND lower(email)=$2',[telefone,email]);
-      if(!rows.length)return;
-      const token=crypto.randomBytes(32).toString('hex'),tokenHash=digest(token);
-      await db.query("INSERT INTO cadmiv_recuperacoes(token_hash,cliente_id,expira) VALUES($1,$2,now()+interval '30 minutes')",[tokenHash,rows[0].id]);
+      const token=crypto.randomBytes(32).toString('hex'),tokenHash=digest(token),c=await db.connect();let recipient;
+      try{
+        await c.query('BEGIN');const {rows}=await c.query('SELECT id,email FROM cadmiv_clientes WHERE telefone=$1 AND lower(email)=$2 FOR UPDATE',[telefone,email]);
+        if(!rows.length){await c.query('COMMIT');return;}
+        recipient=rows[0].email;await c.query("INSERT INTO cadmiv_recuperacoes(token_hash,cliente_id,expira) VALUES($1,$2,now()+interval '30 minutes')",[tokenHash,rows[0].id]);await c.query('COMMIT');
+      }catch(e){await c.query('ROLLBACK');throw e;}finally{c.release();}
       const url=new URL('/redefinir-senha.html',origin);url.hash='token='+token;
-      try{await sendResetEmail({to:rows[0].email,url:url.href});}
+      try{await sendResetEmail({to:recipient,url:url.href});}
       catch(e){await db.query('DELETE FROM cadmiv_recuperacoes WHERE token_hash=$1',[tokenHash]);throw e;}
     })().catch(()=>console.error('Falha no envio de recuperação. Verifique o serviço de e-mail.'));
     resetTasks.add(task);task.finally(()=>resetTasks.delete(task));
@@ -205,11 +208,38 @@ function createApp(db,{production=false,origin='http://localhost:10000',sendRese
     res.type('image/svg+xml').send(await QRCode.toString(url.href,{type:'svg',margin:4,errorCorrectionLevel:'M'}));
   }));
   app.get('/api/me',wrap(async(req,res)=>{
-    const id=await current(req);const {rows}=await db.query(`SELECT c.nome,c.cpf,c.telefone,c.email,c.privado,c.dependentes,v.codigo,v.chassi_normalizado AS chassi,v.marca,v.modelo,v.cor,v.status,v.criado_em FROM cadmiv_clientes c JOIN cadmiv_veiculos v ON v.cliente_id=c.id WHERE c.id=$1`,[id]);res.json(rows[0]);
+    const id=await current(req);const {rows}=await db.query(`SELECT c.nome,c.cpf,c.telefone,c.email,c.nascimento,c.responsabilidade,c.privado,c.dependentes,v.nota_fiscal,v.ano,v.estado_conservacao,v.combo,v.codigo,v.chassi_normalizado AS chassi,v.marca,v.modelo,v.cor,v.status,v.criado_em FROM cadmiv_clientes c JOIN cadmiv_veiculos v ON v.cliente_id=c.id WHERE c.id=$1`,[id]);res.json(rows[0]);
   }));
   app.patch('/api/me',wrap(async(req,res)=>{
-    const id=await current(req);if(Object.keys(req.body).some(k=>k!=='telefone'))throw fail(400,'Nesta etapa somente o telefone pode ser atualizado.');
-    await db.query('UPDATE cadmiv_clientes SET telefone=$1 WHERE id=$2',[phone(req.body.telefone),id]);res.json({ok:true});
+    const id=await current(req),body=req.body;
+    const allowed=['telefone','email','nascimento','marca','modelo','cor','ano','estado_conservacao','dep1_nome','dep1_parentesco','dep2_nome','dep2_parentesco','responsabilidade','senha_atual','fotos',...privateKeys];
+    if(!body||typeof body!=='object'||Array.isArray(body)||Object.keys(body).some(k=>!allowed.includes(k)))throw fail(400,'Nome, CPF, Chassi, Nota Fiscal, plano e situação não podem ser alterados.');
+    const c=await db.connect();try{
+      await c.query('BEGIN');const {rows}=await c.query('SELECT c.*,v.chassi,v.marca,v.modelo,v.cor,v.nota_fiscal,v.ano,v.estado_conservacao,v.combo FROM cadmiv_clientes c JOIN cadmiv_veiculos v ON v.cliente_id=c.id WHERE c.id=$1 FOR UPDATE OF c,v',[id]);
+      if(!rows.length)throw fail(401,'Entre novamente na sua conta.');const old=rows[0];
+      if(!await verifyPassword(body.senha_atual,old.senha_hash))throw fail(401,'Confirme sua senha atual para salvar.');
+      const base={...old.privado,nome:old.nome,cpf:old.cpf,telefone:old.telefone,email:old.email,nascimento:String(old.nascimento instanceof Date?old.nascimento.toISOString():old.nascimento).slice(0,10),marca:old.marca,modelo:old.modelo,cor:old.cor,nota_fiscal:old.nota_fiscal,ano:String(old.ano),estado_conservacao:old.estado_conservacao,combo:String(old.combo),responsabilidade:old.responsabilidade};
+      old.dependentes.forEach((d,i)=>{base['dep'+(i+1)+'_nome']=d.nome;base['dep'+(i+1)+'_parentesco']=d.parentesco;});
+      const d=validateRegistration({...base,...body,senha:body.senha_atual,chassi:old.chassi,cadastro_anterior:'Não'});
+      const fotos=body.fotos??{};if(!fotos||typeof fotos!=='object'||Array.isArray(fotos)||Object.keys(fotos).some(k=>!(/^[0-2]$/.test(k))||Number(k)>=old.combo))throw fail(400,'Confira as fotos do seu plano.');
+      const images=[];for(const [pos,value] of Object.entries(fotos)){try{images.push([Number(pos),value===null?null:await prepararFoto(value)]);}catch(e){throw fail(400,e.message);}}
+      await c.query('UPDATE cadmiv_clientes SET telefone=$1,email=$2,nascimento=$3,privado=$4,dependentes=$5,responsabilidade=$6 WHERE id=$7',[d.telefone,d.email,d.nascimento,JSON.stringify(d.privado),JSON.stringify(d.dependentes),d.responsabilidade,id]);
+      await c.query('UPDATE cadmiv_veiculos SET marca=$1,modelo=$2,cor=$3,ano=$4,estado_conservacao=$5 WHERE cliente_id=$6',[d.marca,d.modelo,d.cor,d.ano,d.estado_conservacao,id]);
+      for(const [pos,image] of images){if(image===null)await c.query('DELETE FROM cadmiv_fotos WHERE cliente_id=$1 AND posicao=$2',[id,pos]);else await c.query('INSERT INTO cadmiv_fotos(cliente_id,posicao,imagem) VALUES($1,$2,$3) ON CONFLICT(cliente_id,posicao) DO UPDATE SET imagem=EXCLUDED.imagem',[id,pos,image]);}
+      // Alterar telefone/e-mail invalida links antigos de recuperação.
+      if(d.telefone!==old.telefone||d.email!==old.email)await c.query('DELETE FROM cadmiv_recuperacoes WHERE cliente_id=$1',[id]);
+      await c.query('COMMIT');res.json({ok:true});
+    }catch(e){await c.query('ROLLBACK');throw e;}finally{c.release();}
+  }));
+  app.post('/api/me/excluir',wrap(async(req,res)=>{
+    const id=await current(req);if(req.body.confirmacao!=='EXCLUIR'||!['venda','doacao','outro'].includes(req.body.motivo))throw fail(400,'Escolha o motivo e digite EXCLUIR para confirmar.');
+    const c=await db.connect();try{
+      await c.query('BEGIN');const {rows}=await c.query('SELECT senha_hash FROM cadmiv_clientes WHERE id=$1 FOR UPDATE',[id]);
+      if(!rows.length||!await verifyPassword(req.body.senha,rows[0].senha_hash))throw fail(401,'Senha incorreta.');
+      await c.query('DELETE FROM cadmiv_veiculos WHERE cliente_id=$1',[id]);
+      await c.query('DELETE FROM cadmiv_clientes WHERE id=$1',[id]);
+      await c.query('COMMIT');setCookie(res,'',0);res.json({ok:true});
+    }catch(e){await c.query('ROLLBACK');throw e;}finally{c.release();}
   }));
   app.post('/api/alerta',wrap(async(req,res)=>{
     const id=await current(req);const {rows}=await db.query('SELECT senha_hash FROM cadmiv_clientes WHERE id=$1',[id]);
@@ -225,7 +255,7 @@ function createApp(db,{production=false,origin='http://localhost:10000',sendRese
   }));
   app.get('/',(req,res)=>res.sendFile(path.join(__dirname,'index.html')));
   app.get('/validar',(req,res)=>res.redirect('/validar.html'));
-  for(const page of ['index.html','apresentacao.html','fiscalizacao.html','termos.html','cadastro.html','login.html','alerta.html','cadastro.js','cliente.js','recuperar-senha.html','redefinir-senha.html','senha.js','cartao.js'])app.get('/'+page,(req,res)=>res.sendFile(path.join(__dirname,page)));
+  for(const page of ['index.html','apresentacao.html','fiscalizacao.html','termos.html','cadastro.html','login.html','alerta.html','cadastro.js','cadastro-edicao.js','cliente.js','recuperar-senha.html','redefinir-senha.html','senha.js','cartao.js'])app.get('/'+page,(req,res)=>res.sendFile(path.join(__dirname,page)));
   for(const page of ['botao.html','cartao.html','validar.html'])app.get('/'+page,wrap(async(req,res)=>{try{await current(req);}catch(e){if(e.status===401)return res.redirect('/login.html');throw e;}res.sendFile(path.join(__dirname,page));}));
   app.get('/painel.html',(req,res)=>res.status(403).send('Painel administrativo indisponível nesta etapa. Os indicadores antigos eram demonstrativos.'));
   app.use((req,res)=>res.status(404).json({erro:'Página não encontrada.'}));

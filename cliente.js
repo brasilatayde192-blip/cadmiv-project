@@ -30,7 +30,7 @@ async function confirmarBloqueioTotal(){
 async function dispararAlertaCadmiv(){
  try{await api('/api/alerta',{senha:document.getElementById('senha-confirmacao').value});document.getElementById('senha-confirmacao').value='';alert('Alerta de furto ou roubo salvo no CADMIV.');await carregarCliente();}catch(e){alert(e.message);}
 }
-async function salvarAlteracoes(){try{await api('/api/me',{telefone:document.getElementById('cliente_telefone').value},'PATCH');alert('Telefone atualizado. Use este telefone no próximo login.');}catch(e){alert(e.message);}}
+function salvarAlteracoes(){location.assign('cadastro.html?editar=1');}
 async function sair(){try{await api('/api/logout',{});location.assign('login.html');}catch(e){alert(e.message);}}
 async function carregarCliente(){
  const d=await api('/api/me');

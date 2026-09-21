@@ -1,9 +1,11 @@
 'use strict';
-async function apiCadastro(path,body){
- const r=await fetch(path,{method:'POST',headers:{'Content-Type':'application/json','X-CADMIV':'1'},body:JSON.stringify(body)});
+async function apiCadastro(path,body,method='POST'){
+ const r=await fetch(path,{method,headers:{'Content-Type':'application/json','X-CADMIV':'1'},body:JSON.stringify(body)});
  const data=await r.json();if(!r.ok)throw Error(data.erro||'Não foi possível salvar.');return data;
 }
 function gerenciarCombo(){
+ const titular=document.getElementById('foto-titular'),escolhido=!!document.querySelector('[name="combo"]:checked');
+ if(titular){titular.style.display=escolhido?'block':'none';titular.querySelectorAll('input,button').forEach(el=>el.disabled=!escolhido);if(!escolhido&&typeof fecharFotoCadastro==='function')fecharFotoCadastro(0);}
  const count=Number(document.querySelector('[name="combo"]:checked')?.value||1)-1;
  for(let i=1;i<=2;i++){
   const block=document.getElementById('dep'+i),active=i<=count;
@@ -22,10 +24,12 @@ function mascaraCPF(el){
  el.value=v.replace(/^(\d{3})(\d)/,'$1.$2').replace(/^(\d{3})\.(\d{3})(\d)/,'$1.$2.$3').replace(/(\d{3})\.(\d{3})\.(\d{3})(\d)/,'$1.$2.$3-$4');
 }
 function verificarContestacaoVeiculo(){
+ if(window.cadmivEdicao?.ativo)return;
  const el=document.getElementById('cadastro_anterior');el.setCustomValidity(el.value==='Sim'?'Procure o suporte para transferência do cadastro existente.':'');
 }
 let chassiRequest=0;
 async function verificarChassiCadastrado(){
+ if(window.cadmivEdicao?.ativo)return;
  const input=document.getElementById('chassi_veiculo'),message=document.getElementById('alerta-trava');
  const value=input.value,request=++chassiRequest;input.setCustomValidity('');
  if(!value.trim()){message.style.display='none';return;}
@@ -67,14 +71,16 @@ document.addEventListener('DOMContentLoaded',()=>{
 
  form.addEventListener('submit',async e=>{
   e.preventDefault();if(saving||!form.reportValidity())return;
+  if(window.cadmivEdicao?.ativo&&!window.cadmivEdicao.pronto)return;
   const b=Object.fromEntries(new FormData(form));
   b.nascimento=document.getElementById('cadmiv_ano').value+'-'+document.getElementById('nasc_mes').value.padStart(2,'0')+'-'+document.getElementById('nasc_dia').value.padStart(2,'0');
   b.responsabilidade=document.getElementById('responsabilidade').checked&&!document.getElementById('responsabilidade').disabled;
   const message=document.getElementById('mensagem-cadastro');saving=true;
   form.querySelectorAll('[type="submit"]').forEach(el=>el.disabled=true);message.textContent='Salvando cadastro...';
-  try{b.fotos=obterFotosCadastro(Number(b.combo));fecharTodasCameras();await apiCadastro('/api/cadastros',b);window.location.assign('validar.html');}
+  const controles=[...form.querySelectorAll('input,select,textarea,button')].map(el=>[el,el.disabled]);for(const [el] of controles)el.disabled=true;
+  try{if(window.cadmivEdicao?.ativo){await salvarEdicaoCadastro(b);return;}b.fotos=obterFotosCadastro(Number(b.combo));fecharTodasCameras();await apiCadastro('/api/cadastros',b);window.location.assign('validar.html');}
   catch(err){message.textContent=err.message;message.scrollIntoView({block:'center'});}
-  finally{saving=false;form.querySelectorAll('[type="submit"]').forEach(el=>el.disabled=false);}
+  finally{saving=false;for(const [el,disabled] of controles)el.disabled=disabled;form.querySelectorAll('[type="submit"]').forEach(el=>el.disabled=false);}
  });
 });
 
@@ -86,9 +92,9 @@ function obterFotosCadastro(count){
 }
 function iniciarFotosCadastro(){
  for(const el of document.querySelectorAll('[data-foto]')){
-  const i=Number(el.dataset.foto),f={el,data:null,version:0,fileVersion:0,busy:false,stream:null};fotosCadastro.set(i,f);
+  const i=Number(el.dataset.foto),f={el,data:null,changed:false,version:0,fileVersion:0,busy:false,stream:null};fotosCadastro.set(i,f);
   const q=k=>el.querySelector('[data-'+k+']'),aviso=m=>q('aviso').textContent=m;
-  function preview(source,width,height){const scale=Math.min(1,480/width,640/height),canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(width*scale));canvas.height=Math.max(1,Math.round(height*scale));const ctx=canvas.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.drawImage(source,0,0,canvas.width,canvas.height);f.data=canvas.toDataURL('image/jpeg',.82);q('preview').src=f.data;q('preview').hidden=false;q('vazio').hidden=true;q('remover').hidden=false;aviso('Foto preparada para salvar com o cadastro.');}
+  function preview(source,width,height){const scale=Math.min(1,480/width,640/height),canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(width*scale));canvas.height=Math.max(1,Math.round(height*scale));const ctx=canvas.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.drawImage(source,0,0,canvas.width,canvas.height);f.changed=true;f.data=canvas.toDataURL('image/jpeg',.82);q('preview').src=f.data;q('preview').hidden=false;q('vazio').hidden=true;q('remover').hidden=false;aviso('Foto preparada para salvar com o cadastro.');}
   q('buscar').addEventListener('click',()=>q('arquivo').click());
   q('arquivo').addEventListener('change',async()=>{
    const file=q('arquivo').files[0];if(!file)return;fecharFotoCadastro(i);const version=++f.fileVersion;
@@ -102,7 +108,7 @@ function iniciarFotosCadastro(){
   });
   q('capturar').addEventListener('click',()=>{const v=q('video');if(!v.videoWidth)return;f.fileVersion++;f.busy=false;preview(v,v.videoWidth,v.videoHeight);fecharFotoCadastro(i);});
   q('fechar').addEventListener('click',()=>fecharFotoCadastro(i));
-  q('remover').addEventListener('click',()=>{fecharFotoCadastro(i);f.fileVersion++;f.busy=false;f.data=null;q('preview').hidden=true;q('preview').removeAttribute('src');q('vazio').hidden=false;q('remover').hidden=true;q('arquivo').value='';aviso('Foto removida.');});
+  q('remover').addEventListener('click',()=>{fecharFotoCadastro(i);f.fileVersion++;f.busy=false;f.changed=true;f.data=null;q('preview').hidden=true;q('preview').removeAttribute('src');q('vazio').hidden=false;q('remover').hidden=true;q('arquivo').value='';aviso('Foto removida.');});
  }
  window.addEventListener('pagehide',fecharTodasCameras);
 }

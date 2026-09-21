@@ -107,7 +107,7 @@
 
 </style>
    
-    <script src="cadastro.js" defer></script>
+    <script src="cadastro.js" defer></script><script src="cadastro-edicao.js" defer></script>
  
  
     <style>.cadastro-foto{border:1px solid #cbd5e1;border-radius:6px;padding:14px;margin:14px 0;background:#fff}.cadastro-foto button{background:#936631;color:white;border:0;border-radius:5px;padding:10px 14px;margin:5px 0;cursor:pointer;font:inherit}.cadastro-foto button:disabled{opacity:.5}.foto-preview{width:110px;height:145px;border:1px dashed #aaa;display:flex;align-items:center;justify-content:center;margin:10px 0}.foto-preview img{width:100%;height:100%;object-fit:contain}.cadastro-foto video{width:100%;max-width:320px;max-height:240px}.cadastro-foto [data-aviso]{font-size:14px;line-height:1.4}.cadastro-foto [hidden]{display:none!important}</style></head><body>
@@ -145,7 +145,8 @@
     <input type="text" id="cpf_titular" name="cpf" placeholder="000.000.000-00" maxlength="14" oninput="mascaraCPF(this)" style="width: 100% !important; padding: 10px !important; border: 1px solid #cbd5e1 !important; border-radius: 4px !important; box-sizing: border-box !important;" required>
 </div> 
 
-    <section class="cadastro-foto" data-foto="0" aria-label="Foto do Titular"><strong>Foto do Titular</strong><div class="foto-preview"><img data-preview alt="Prévia da foto do Titular" hidden><span data-vazio>Sem foto</span></div><input data-arquivo type="file" accept="image/jpeg,image/png,image/webp" hidden aria-label="Buscar foto do Titular"><button type="button" data-buscar>Buscar no Arquivo</button> <button type="button" data-camera>Tirar Foto Agora</button><video data-video autoplay playsinline muted hidden></video><button type="button" data-capturar hidden>Capturar Foto</button> <button type="button" data-fechar hidden>Fechar Câmera</button> <button type="button" data-remover hidden>Remover Foto</button><p data-aviso role="status" aria-live="polite"></p></section>
+    
+<section id="acoes-cliente"><a id="acesso-edicao" href="login.html">Já tenho cadastro — alterar ou excluir meus dados</a><button type="button" id="abrir-exclusao" hidden style="background:#a52828;color:white;padding:12px;border:0;border-radius:5px">Excluir meu cadastro por venda ou doação</button></section>
 <!-- 📜 2. DECLARAÇÃO DE RESPONSABILIDADE JURÍDICA NACIONAL -->
     <div style="background-color: #fff !important; border: 1px solid #cbd5e1 !important; padding: 12px !important; border-radius: 4px !important; margin-bottom: 15px !important; font-size: 13px !important; color: #334155 !important; line-height: 1.5 !important; max-height: 100px !important; overflow-y: auto !important;">
         <strong>TERMO DE RESPONSABILIDADE DO TITULAR (CADMIV):</strong><br>
@@ -307,7 +308,7 @@
             </select> 
             
             <div class="info-box-used"> 
-                ⚠️ AVISO IMPORTANTE sobre TRANSFERÊNCIA do VEÍCULO CADASTRADO na CADMIV:<br> Em caso de venda ou doação, o cadastro deve deixar de identificar o antigo titular como proprietário. A transferência e o cancelamento ainda não estão disponíveis nesta etapa de testes. 
+                ⚠️ AVISO IMPORTANTE sobre TRANSFERÊNCIA do VEÍCULO CADASTRADO na CADMIV:<br> Em caso de venda ou doação, o cadastro deve deixar de identificar o antigo titular como proprietário. O titular pode excluir seu cadastro pela área do cliente quando deixar de possuir o veículo. 
             </div> 
             
             <label>Este veículo já foi  CADASTRADO  anteriormente no CADMIV?</label> 
@@ -344,7 +345,8 @@
             <p style="font-size: 13px; font-weight: bold; color: #7f8c8d; text-align: center; margin-top: 15px; line-height: 1.4;"> 📋 INFORMATIVO DE VALIDADE NACIONAL:<br> Esta Cartão Digital possui validade estrita de 1 (um) ano. </p>
 <p role="note" style="text-align: center;">Nesta etapa de testes, não há cobrança nem emissão de cartão ativo. Ao salvar, o cadastro ficará pendente de ativação.</p> 
 
-            <div id="dep1" class="dependent-container" style="display: none;">
+            <div id="foto-titular" class="dependent-container" style="display:none"><div class="family-title">Foto do Titular</div><section class="cadastro-foto" data-foto="0" aria-label="Foto do Titular"><strong>Foto do Titular</strong><div class="foto-preview"><img data-preview alt="Prévia da foto do Titular" hidden><span data-vazio>Sem foto</span></div><input data-arquivo type="file" accept="image/jpeg,image/png,image/webp" hidden aria-label="Buscar foto do Titular"><button type="button" data-buscar>Buscar no Arquivo</button> <button type="button" data-camera>Tirar Foto Agora</button><video data-video autoplay playsinline muted hidden></video><button type="button" data-capturar hidden>Capturar Foto</button> <button type="button" data-fechar hidden>Fechar Câmera</button> <button type="button" data-remover hidden>Remover Foto</button><p data-aviso role="status" aria-live="polite"></p></section></div>
+<div id="dep1" class="dependent-container" style="display: none;">
 <div class="family-title">👤 Cadastro Completo do Dependente 1</div> 
                 <label>Nome Completo do Dependente 1:</label> 
                 <input name="dep1_nome" type="text" placeholder="Nome do dependente 1">
@@ -404,7 +406,8 @@
                 </div> 
             </div>
 
-            <!-- Início da Tarja Verde do Final do Formulário -->
+            <div id="senha-edicao" hidden><label for="senha-atual-edicao">Confirme sua senha atual para salvar as alterações:</label><input type="password" id="senha-atual-edicao" autocomplete="current-password" maxlength="128"><p>Nome, CPF, Chassi, Número da Nota Fiscal e data de registro permanecem os mesmos.</p></div>
+<!-- Início da Tarja Verde do Final do Formulário -->
         <div class="tarja-botoes">
             <button type="submit" id="btn-enviar" class="btn-next">
                 Salvar Cadastro e Gerar PIX
@@ -414,7 +417,7 @@
         
     </form>
 </div>
-</body>
+<dialog id="confirmar-exclusao" aria-labelledby="titulo-exclusao"><h2 id="titulo-exclusao">Excluir definitivamente meu cadastro</h2><p>Serão apagados deste sistema seus dados, veículo, fotos e dependentes. O acesso à conta será encerrado e o QR-code antigo deixará de localizar o cadastro. Esta ação não pode ser desfeita.</p><label for="motivo-exclusao">Motivo:</label><select id="motivo-exclusao"><option value="">Selecione</option><option value="venda">Venda</option><option value="doacao">Doação</option><option value="outro">Outro motivo</option></select><label for="senha-exclusao">Senha atual:</label><input id="senha-exclusao" type="password" autocomplete="current-password" maxlength="128"><label for="texto-exclusao">Digite EXCLUIR para confirmar:</label><input id="texto-exclusao" autocomplete="off"><p id="mensagem-exclusao" role="status"></p><button type="button" id="cancelar-exclusao">Voltar sem excluir</button> <button type="button" id="executar-exclusao">Excluir definitivamente</button></dialog><style>[hidden]{display:none!important}dialog{max-width:500px;width:90%;box-sizing:border-box;border:1px solid #aaa;border-radius:8px;text-align:left}dialog::backdrop{background:#0008}dialog button{padding:12px;margin-top:15px;cursor:pointer}#executar-exclusao{background:#a52828;color:white;border:0}#acoes-cliente{margin:15px 0}input[readonly]{background:#eee}.cadastro-foto video:not([hidden]){display:block}</style></body>
 </html>
 
 
