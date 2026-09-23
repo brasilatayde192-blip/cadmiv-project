@@ -260,7 +260,7 @@ function createApp(db,{production=false,origin='http://localhost:10000',sendRese
   app.get('/painel.html',(req,res)=>res.status(403).send('Painel administrativo indisponível nesta etapa. Os indicadores antigos eram demonstrativos.'));
   app.use((req,res)=>res.status(404).json({erro:'Página não encontrada.'}));
   app.use((err,req,res,next)=>{
-    if(err.code==='23505')return res.status(409).json({erro:err.constraint==='cadmiv_veiculos_chassi_unique'?'Este chassi já está cadastrado.':'Já existe cadastro com estes dados. Use o acesso de cliente cadastrado.'});
+    if(err.code==='23505')return res.status(409).json({erro:err.constraint==='cadmiv_veiculos_chassi_unique'?'Este chassi ou número de série já está cadastrado no CADMIV. Não é permitido criar outro cadastro para este veículo.':'Já existe cadastro com estes dados. Use o acesso de cliente cadastrado.'});
     const status=err.status||503;if(status>=500)console.error('Falha na operação CADMIV:',err.code||'INTERNAL');
     res.status(status).json({erro:status>=500?'Serviço temporariamente indisponível. Tente novamente.':status===413?'Formulário muito grande.':err.type==='entity.parse.failed'?'JSON inválido.':err.message});
   });return app;

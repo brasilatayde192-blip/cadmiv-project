@@ -1,4 +1,15 @@
 'use strict';
+function alternarSenhaCadastro(id,botao){
+ const campo=document.getElementById(id),mostrar=campo.type==='password';
+ campo.type=mostrar?'text':'password';botao.textContent=mostrar?'🐵':'🙈';
+ botao.setAttribute('aria-label',mostrar?'Ocultar senha':'Mostrar senha');botao.setAttribute('aria-pressed',String(mostrar));
+}
+function mostrarMensagemCadastro(texto,erro=false,destacar=false){
+ const el=document.getElementById('mensagem-cadastro');
+ el.classList.toggle('alerta-cadastro',erro);el.setAttribute('role',erro?'alert':'status');el.setAttribute('aria-live',erro?'assertive':'polite');
+ el.textContent=texto;
+ if(destacar){el.focus({preventScroll:true});el.scrollIntoView({block:'center',behavior:'instant'});}
+}
 async function apiCadastro(path,body,method='POST'){
  const r=await fetch(path,{method,headers:{'Content-Type':'application/json','X-CADMIV':'1'},body:JSON.stringify(body)});
  const data=await r.json();if(!r.ok)throw Error(data.erro||'Não foi possível salvar.');return data;
@@ -37,8 +48,8 @@ async function verificarChassiCadastrado(){
   const d=await apiCadastro('/api/chassi/verificar',{chassi:value});
   if(request!==chassiRequest||input.value!==value)return;
   message.style.display=d.cadastrado?'block':'none';
-  message.textContent='Este chassi já está cadastrado. Use o acesso de cliente cadastrado ou procure o suporte.';
-  input.setCustomValidity(d.cadastrado?'Chassi já cadastrado.':'');
+  message.textContent='Este chassi ou número de série já está cadastrado no CADMIV. Não é permitido criar outro cadastro para este veículo.';
+  input.setCustomValidity(d.cadastrado?message.textContent:'');
  }catch(e){if(request===chassiRequest){message.style.display='block';message.textContent='Não foi possível verificar agora. A conferência será repetida ao salvar.';}}
 }
 document.addEventListener('DOMContentLoaded',()=>{
@@ -49,14 +60,23 @@ document.addEventListener('DOMContentLoaded',()=>{
  gerenciarCombo();
  const form=document.getElementById('form-cadastro');let saving=false;
  const avisosTraduzidos=new Set();
+ let primeiroInvalido=null;
  function limparAvisosTraduzidos(){
   for(const campo of avisosTraduzidos)campo.setCustomValidity('');
   avisosTraduzidos.clear();
+  if(document.getElementById('mensagem-cadastro').classList.contains('alerta-cadastro'))mostrarMensagemCadastro('');
  }
  form.addEventListener('input',limparAvisosTraduzidos);
  form.addEventListener('change',limparAvisosTraduzidos);
  form.addEventListener('invalid',e=>{
   const campo=e.target,v=campo.validity;
+  e.preventDefault();
+  if(!primeiroInvalido){primeiroInvalido=campo;queueMicrotask(()=>{
+   const alvo=primeiroInvalido;primeiroInvalido=null;
+   const label=[...form.querySelectorAll('label[for]')].find(l=>l.htmlFor===alvo.id);
+   const texto=alvo.validationMessage;
+   mostrarMensagemCadastro(label?label.textContent.trim()+' '+texto:texto,true,true);
+  });}
   if(v.customError)return;
   let aviso='Confira o valor preenchido neste campo.';
   if(v.valueMissing)aviso=campo.type==='checkbox'?'Marque esta opção para continuar.':campo.type==='radio'?'Selecione uma das opções.':campo.tagName==='SELECT'?'Selecione uma opção.':'Preencha este campo.';
@@ -76,10 +96,10 @@ document.addEventListener('DOMContentLoaded',()=>{
   b.nascimento=document.getElementById('cadmiv_ano').value+'-'+document.getElementById('nasc_mes').value.padStart(2,'0')+'-'+document.getElementById('nasc_dia').value.padStart(2,'0');
   b.responsabilidade=document.getElementById('responsabilidade').checked&&!document.getElementById('responsabilidade').disabled;
   const message=document.getElementById('mensagem-cadastro');saving=true;
-  form.querySelectorAll('[type="submit"]').forEach(el=>el.disabled=true);message.textContent='Salvando cadastro...';
+  form.querySelectorAll('[type="submit"]').forEach(el=>el.disabled=true);mostrarMensagemCadastro('Salvando cadastro...');
   const controles=[...form.querySelectorAll('input,select,textarea,button')].map(el=>[el,el.disabled]);for(const [el] of controles)el.disabled=true;
   try{if(window.cadmivEdicao?.ativo){await salvarEdicaoCadastro(b);return;}b.fotos=obterFotosCadastro(Number(b.combo));fecharTodasCameras();await apiCadastro('/api/cadastros',b);window.location.assign('validar.html');}
-  catch(err){message.textContent=err.message;message.scrollIntoView({block:'center'});}
+  catch(err){mostrarMensagemCadastro(err.message,true,true);}
   finally{saving=false;for(const [el,disabled] of controles)el.disabled=disabled;form.querySelectorAll('[type="submit"]').forEach(el=>el.disabled=false);}
  });
 });

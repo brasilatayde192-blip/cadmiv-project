@@ -15,6 +15,25 @@ test('Formulário e telas no DOM do navegador',{skip:!enabled},async t=>{
   let resolveCamera,stopped=0;Object.defineProperty(w.navigator,'mediaDevices',{value:{getUserMedia:()=>new Promise(r=>resolveCamera=r)}});box.querySelector('[data-camera]').click();d.getElementById('combo1').checked=true;w.gerenciarCombo();resolveCamera({getTracks:()=>[{stop:()=>stopped++}]});await new Promise(r=>setTimeout(r,15));assert.equal(stopped,1);assert.equal(box.querySelector('[data-video]').hidden,true);assert.equal(file.disabled,true);
  });
  await t.test('Envio inclui marca e campos certos, e mantém formulário após erro',async()=>{const fixture=require('./fixture')();for(const [key,value] of Object.entries(fixture)){const el=d.querySelector('[name="'+key+'"]');if(el && el.type!=='radio')el.value=value;}d.getElementById('nasc_dia').value='1';d.getElementById('nasc_mes').value='1';d.getElementById('cadmiv_ano').value='1990';d.getElementById('combo1').checked=true;assert.equal(d.getElementById('form-cadastro').checkValidity(),true);d.getElementById('form-cadastro').dispatchEvent(new w.Event('submit',{cancelable:true}));await new Promise(r=>setTimeout(r,30));assert.equal(calls.at(-1).url,'/api/cadastros');assert.equal(calls.at(-1).body.marca,'Marca Teste');assert.equal(calls.at(-1).body.nome,fixture.nome);assert.equal(calls.at(-1).body.nascimento,'1990-01-01');assert.equal(d.getElementById('mensagem-cadastro').textContent,'Erro controlado para teste');assert.equal(d.getElementById('btn-enviar').disabled,false);});
+ await t.test('Alerta vermelho mostra CPF inválido, recebe foco e desaparece ao corrigir',async()=>{
+  const form=d.getElementById('form-cadastro'),message=d.getElementById('mensagem-cadastro'),cpf=d.querySelector('[name="cpf"]');
+  let posts=0;w.fetch=async()=>{posts++;return {ok:false,json:async()=>({erro:'CPF inválido.'})};};
+  cpf.value='111.111.111-11';form.dispatchEvent(new w.Event('submit',{cancelable:true}));await new Promise(r=>setTimeout(r,25));
+  assert.equal(posts,1);assert.equal(message.textContent,'CPF inválido.');assert.equal(message.classList.contains('alerta-cadastro'),true);assert.equal(message.getAttribute('role'),'alert');assert.equal(d.activeElement,message);assert.equal(d.getElementById('btn-enviar').disabled,false);
+  cpf.value=require('./fixture')().cpf;cpf.dispatchEvent(new w.Event('input',{bubbles:true}));assert.equal(message.textContent,'');assert.equal(message.classList.contains('alerta-cadastro'),false);
+  w.mostrarMensagemCadastro('Salvando cadastro...');assert.equal(message.classList.contains('alerta-cadastro'),false);
+ });
+ await t.test('Campo obrigatório bloqueia envio e destaca o primeiro erro no topo',async()=>{
+  const form=d.getElementById('form-cadastro'),nome=d.querySelector('[name="nome"]'),message=d.getElementById('mensagem-cadastro');
+  nome.value='';assert.equal(form.reportValidity(),false);await new Promise(r=>setTimeout(r,0));assert.match(message.textContent,/Preencha este campo/);assert.equal(message.classList.contains('alerta-cadastro'),true);assert.equal(d.activeElement,message);
+  nome.value='Cliente Teste';nome.dispatchEvent(new w.Event('input',{bubbles:true}));
+ });
+ await t.test('Chassi cadastrado bloqueia formulário com aviso visível, sem depender do envio',async()=>{
+  const input=d.getElementById('chassi_veiculo'),message=d.getElementById('mensagem-cadastro');
+  w.fetch=async()=>({ok:true,json:async()=>({cadastrado:true})});await w.verificarChassiCadastrado();assert.equal(input.validity.customError,true);
+  input.reportValidity();await new Promise(r=>setTimeout(r,0));assert.match(message.textContent,/Não é permitido criar outro cadastro/);assert.equal(message.classList.contains('alerta-cadastro'),true);
+  input.value='NOVO-CHASSI';input.dispatchEvent(new w.Event('input',{bubbles:true}));assert.equal(input.validity.customError,false);assert.equal(message.textContent,'');
+ });
  await t.test('Páginas não usam sucesso simulado ou armazenamento pessoal',()=>{for(const name of ['cadastro.html','validar.html','login.html','cartao.html','botao.html','alerta.html','fiscalizacao.html']){const content=fs.readFileSync(path.join(root,name),'utf8');assert.ok(!content.includes('localStorage.setItem'));assert.ok(!content.includes('Pagamento PIX confirmado'));assert.ok(!content.includes('shadowSenha'));const page=new JSDOM(content);for(const el of page.window.document.querySelectorAll('script[src]'))assert.ok(fs.existsSync(path.join(root,el.getAttribute('src'))));page.window.close();}});
  w.close();
 });

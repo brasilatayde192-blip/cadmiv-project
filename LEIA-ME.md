@@ -1,4 +1,12 @@
-# CADMIV — atualização de 20/09/2026, revisão 2
+# CADMIV — atualização de 22/09/2026, alertas do cadastro
+
+## Aviso vermelho e trava de veículo duplicado
+
+Erros no cadastro aparecem no topo com uma luz vermelha à esquerda e o texto à direita. O brilho pulsa suavemente; a preferência do dispositivo por movimento reduzido desativa a animação. O aviso recebe foco ao tentar salvar com erro. Ao editar um campo, o aviso anterior é limpo e a próxima tentativa confere os dados novamente. Mensagens de carregamento e sucesso não usam a luz vermelha.
+
+A trava existente no banco impede repetir um chassi/número de série normalizado, em qualquer situação do registro, inclusive ATIVO e ROUBO. Espaços, pontuação e diferenças entre maiúsculas/minúsculas não criam um chassi distinto. A consulta antecipada ajuda no formulário, mas a restrição no banco também protege o envio direto e concorrente.
+
+Esta conferência usa somente os registros existentes no CADMIV. Não consulta bases policiais, não identifica fisicamente um veículo com número informado diferente e não conserva uma restrição depois da exclusão definitiva do registro. O aviso de duplicidade não revela dados pessoais do titular nem altera o alerta existente.
 
 ## Primeiro passo para o proprietário
 
@@ -127,3 +135,7 @@ A foto do titular foi movida para uma seção inicialmente escondida, abaixo dos
 No topo do formulário em edição, Excluir meu cadastro por venda ou doação abre uma confirmação. O cliente deve escolher motivo, informar a senha e digitar EXCLUIR. Voltar sem excluir cancela a ação. A confirmação apaga da base operacional o cliente, o veículo, as fotos, os dependentes, as sessões e os links de recuperação, liberando o chassi para novo cadastro. O QR antigo deixa de localizar o veículo. Não existe transferência automática ou reembolso automático. Backups externos do provedor e cópias guardadas pelo proprietário não são apagados por esse botão; precisam de política própria de retenção. Nenhum cadastro real foi excluído durante o desenvolvimento.
 
 Este pacote possui 36 arquivos, incluindo a pasta test. Envie todo o conteúdo da pasta CADMIV para cadmiv-teste. O arquivo novo cadastro-edicao.js é necessário. O backup original e os quatro HTMLs preservados continuam intactos. PIX permanece pendente de integração.
+
+### Mostrar ou ocultar a senha
+
+Os campos de senha para ativar alerta de furto/roubo na área do cliente e para salvar alterações agora têm o botão de macaquinho: olhos fechados com a senha oculta e olhos abertos com a senha visível. O botão apenas alterna a visualização; não envia o formulário nem altera o valor digitado.

@@ -113,7 +113,14 @@
     <style>.cadastro-foto{border:1px solid #cbd5e1;border-radius:6px;padding:14px;margin:14px 0;background:#fff}.cadastro-foto button{background:#936631;color:white;border:0;border-radius:5px;padding:10px 14px;margin:5px 0;cursor:pointer;font:inherit}.cadastro-foto button:disabled{opacity:.5}.foto-preview{width:110px;height:145px;border:1px dashed #aaa;display:flex;align-items:center;justify-content:center;margin:10px 0}.foto-preview img{width:100%;height:100%;object-fit:contain}.cadastro-foto video{width:100%;max-width:320px;max-height:240px}.cadastro-foto [data-aviso]{font-size:14px;line-height:1.4}.cadastro-foto [hidden]{display:none!important}</style></head><body>
 <div class="container">
         <h1>CADMIV</h1>
-        <h2>Formulário de CADASTRO</h2><p id="mensagem-cadastro" role="status" aria-live="polite"></p>
+        <h2>Formulário de CADASTRO</h2><p id="mensagem-cadastro" role="status" aria-live="polite" aria-atomic="true" tabindex="-1"></p>
+        <style>
+        #mensagem-cadastro:empty{display:none}
+        #mensagem-cadastro.alerta-cadastro{display:flex;align-items:center;gap:14px;background:#fff1f1;color:#8b1515;border:2px solid #b91c1c;border-radius:8px;padding:16px;font-size:18px;font-weight:700;text-align:left;line-height:1.5;scroll-margin-top:24px}
+        #mensagem-cadastro.alerta-cadastro::before{content:"";flex:0 0 22px;width:22px;height:22px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff2f2 0%,#ff6868 20%,#db1717 55%,#8b0000 100%);border:2px solid #8b0000;box-shadow:0 0 9px 3px #ef444477;animation:lanterna-cadastro 2s ease-in-out infinite}
+        @keyframes lanterna-cadastro{50%{box-shadow:0 0 15px 6px #ef444499}}
+        @media(prefers-reduced-motion:reduce){#mensagem-cadastro.alerta-cadastro::before{animation:none}}
+        </style>
 <!-- INÍCIO DA SEÇÃO DE DATA DE NASCIMENTO COMPLETA -->
 <form id="form-cadastro" method="post" action="/api/cadastros"><div class="form-group">
 <!-- 🚨 AVISO RELUZENTE DE SEGURANÇA NACIONAL SUGERIDO PELO DIRETOR -->
@@ -406,7 +413,7 @@
                 </div> 
             </div>
 
-            <div id="senha-edicao" hidden><label for="senha-atual-edicao">Confirme sua senha atual para salvar as alterações:</label><input type="password" id="senha-atual-edicao" autocomplete="current-password" maxlength="128"><p>Nome, CPF, Chassi, Número da Nota Fiscal e data de registro permanecem os mesmos.</p></div>
+            <div id="senha-edicao" hidden><label for="senha-atual-edicao">Confirme sua senha atual para salvar as alterações:</label><div style="position:relative"><input type="password" id="senha-atual-edicao" autocomplete="current-password" maxlength="128" style="padding-right:52px;box-sizing:border-box"><button type="button" id="olho-senha-edicao" aria-label="Mostrar senha" aria-controls="senha-atual-edicao" aria-pressed="false" onclick="alternarSenhaCadastro('senha-atual-edicao',this)" style="position:absolute;right:4px;top:50%;transform:translateY(-50%);width:44px;min-height:44px;margin:0;padding:5px;background:none;border:0;font-size:20px;cursor:pointer">🙈</button></div><p>Nome, CPF, Chassi, Número da Nota Fiscal e data de registro permanecem os mesmos.</p></div>
 <!-- Início da Tarja Verde do Final do Formulário -->
         <div class="tarja-botoes">
             <button type="submit" id="btn-enviar" class="btn-next">

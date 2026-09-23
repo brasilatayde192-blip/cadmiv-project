@@ -4,7 +4,7 @@ async function api(path,body,method){
  const options=body===undefined?{}:{method:method||'POST',headers:{'Content-Type':'application/json','X-CADMIV':'1'},body:JSON.stringify(body)};
  const r=await fetch(path,options),data=await r.json();if(!r.ok)throw Error(data.erro||'Não foi possível concluir.');return data;
 }
-function alternar(id,icone){const el=document.getElementById(id);el.type=el.type==='password'?'text':'password';document.getElementById(icone).textContent=el.type==='password'?'🙈':'👁️';}
+function alternar(id,icone){const el=document.getElementById(id),botao=document.getElementById(icone),mostrar=el.type==='password';el.type=mostrar?'text':'password';botao.textContent=mostrar?'🐵':'🙈';botao.setAttribute('aria-label',mostrar?'Ocultar senha':'Mostrar senha');botao.setAttribute('aria-pressed',String(mostrar));}
 function alternarVisibilidadeSenha(){alternar('login_senha','icone_olho');}
 function alternarOlhoAlerta(){alternar('alerta_senha','icone_olho_alerta');}
 async function realizarLogin(){

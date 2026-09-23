@@ -32,11 +32,25 @@ test('Integração HTTP e PostgreSQL (banco isolado)',{skip:!configured},async t
   await t.test('UNIQUE impede gravação direta com variante do chassi',async()=>{await db.query(`INSERT INTO cadmiv_clientes(id,nome,cpf,telefone,email,nascimento,senha_hash) SELECT '00000000-0000-4000-8000-000000000098',nome,'12345678999','11911112222',email,nascimento,senha_hash FROM cadmiv_clientes LIMIT 1`);await assert.rejects(db.query(`INSERT INTO cadmiv_veiculos(id,cliente_id,codigo,chassi,marca,modelo,cor,nota_fiscal,ano,estado_conservacao,combo) SELECT '00000000-0000-4000-8000-000000000099','00000000-0000-4000-8000-000000000098','outro','t.e-s t/e1',marca,modelo,cor,nota_fiscal,ano,estado_conservacao,combo FROM cadmiv_veiculos LIMIT 1`),e=>e.code==='23505' && e.constraint==='cadmiv_veiculos_chassi_unique');await db.query("DELETE FROM cadmiv_clientes WHERE id='00000000-0000-4000-8000-000000000098'");});
   await t.test('Consulta pública não expõe dados pessoais',async()=>{for(const b of [{chassi:'teste-1'},{codigo}]){const r=await request('/api/consultar',b),d=JSON.parse(r.body);assert.deepEqual(Object.keys(d).sort(),['chassi','cor','marca','mensagem','modelo','status']);assert.equal(d.status,'PENDENTE');assert.equal(d.marca,'Marca Teste');assert.ok(!r.body.includes(fixture().cpf));}assert.equal(JSON.parse((await request('/api/consultar',{chassi:'inexistente'})).body).status,'INVALIDO');});
   await t.test('Pré-consulta retorna somente existência',async()=>assert.deepEqual(JSON.parse((await request('/api/chassi/verificar',{chassi:'teste1'})).body),{cadastrado:true}));
+  await t.test('Veículo existente bloqueia novo titular em todos os estados, inclusive furto ou roubo',async()=>{
+   const before=(await db.query('SELECT count(*)::integer AS n FROM cadmiv_clientes')).rows[0].n;
+   for(const status of ['ATIVO','ROUBO','PENDENTE','DESATIVADO','ADORMECIDO']){
+    await db.query('UPDATE cadmiv_veiculos SET status=$1 WHERE codigo=$2',[status,codigo]);
+    assert.deepEqual(JSON.parse((await request('/api/chassi/verificar',{chassi:' te.st/e-1 '})).body),{cadastrado:true});
+    // Outra pessoa, com CPF e telefone diferentes, declara primeiro cadastro e tenta enviar direto.
+    const r=await request('/api/cadastros',{...fixture(2),chassi:' te.st/e-1 ',cadastro_anterior:'Não'});
+    assert.equal(r.status,409,r.body);assert.match(JSON.parse(r.body).erro,/Não é permitido criar outro cadastro/);
+    const original=JSON.parse((await request('/api/consultar',{codigo})).body);assert.equal(original.status,status);
+    assert.equal((await db.query('SELECT count(*)::integer AS n FROM cadmiv_clientes')).rows[0].n,before);
+    assert.equal((await db.query('SELECT count(*)::integer AS n FROM cadmiv_veiculos')).rows[0].n,1);
+   }
+   await db.query("UPDATE cadmiv_veiculos SET status='PENDENTE' WHERE codigo=$1",[codigo]);
+  });
   await t.test('Reinício do servidor mantém cadastro e sessão',async()=>{await new Promise(r=>server.close(r));await launch();const r=await request('/api/me',undefined,cookie);assert.equal(r.status,200,r.body);assert.equal(JSON.parse(r.body).cpf,fixture().cpf);});
   await t.test('Senha errada não permite login nem alerta',async()=>{assert.equal((await request('/api/login',{telefone:fixture().telefone,senha:'admin'})).status,401);assert.equal((await request('/api/alerta',{senha:'admin'},cookie)).status,401);assert.equal((await request('/api/alerta',{senha:fixture().senha})).status,401);});
   await t.test('Cadastro pendente não ativa alerta nem aceita status pelo cliente',async()=>{assert.equal((await request('/api/alerta',{senha:fixture().senha},cookie)).status,409);assert.equal((await request('/api/me',{status:'ATIVO'},cookie,'PATCH')).status,400);});
   await t.test('Login verdadeiro e isolamento entre clientes',async()=>{const b=fixture(3),r=await request('/api/cadastros',b);assert.equal(r.status,201,r.body);const me=JSON.parse((await request('/api/me',undefined,r.cookie)).body);assert.equal(me.nome,b.nome);assert.notEqual(me.cpf,fixture().cpf);const login=await request('/api/login',{telefone:b.telefone,senha:b.senha});assert.equal(login.status,200);});
-  await t.test('Nome e CPF imutáveis; atualização de telefone real',async()=>{assert.equal((await request('/api/me',{nome:'Troca'},cookie,'PATCH')).status,400);assert.equal((await request('/api/me',{cpf:fixture(4).cpf},cookie,'PATCH')).status,400);assert.equal((await request('/api/me',{telefone:'11988887777'},cookie,'PATCH')).status,200);assert.equal(JSON.parse((await request('/api/me',undefined,cookie)).body).telefone,'11988887777');});
+  await t.test('Nome e CPF imutáveis; atualização de telefone real',async()=>{assert.equal((await request('/api/me',{nome:'Troca'},cookie,'PATCH')).status,400);assert.equal((await request('/api/me',{cpf:fixture(4).cpf},cookie,'PATCH')).status,400);assert.equal((await request('/api/me',{telefone:'11988887777',senha_atual:fixture().senha},cookie,'PATCH')).status,200);assert.equal(JSON.parse((await request('/api/me',undefined,cookie)).body).telefone,'11988887777');});
   await t.test('Alerta de cliente ativo persiste e consulta reflete status',async()=>{await db.query("UPDATE cadmiv_veiculos SET status='ATIVO' WHERE codigo=$1",[codigo]);assert.equal((await request('/api/alerta',{senha:fixture().senha},cookie)).status,200);assert.equal(JSON.parse((await request('/api/consultar',{codigo})).body).status,'ROUBO');});
   await t.test('Origem externa e postagem sem proteção rejeitadas',async()=>{for(const headers of [{'Content-Type':'application/json'},{'Content-Type':'application/json','X-CADMIV':'1',Origin:'https://outro.example'}]){const r=await fetch(base+'/api/login',{method:'POST',headers,body:'{}'});assert.equal(r.status,403);}});
   await t.test('Duas tentativas concorrentes resultam em um cadastro',async()=>{const results=await Promise.all([request('/api/cadastros',{...fixture(5),chassi:'CONCORRENTE'}),request('/api/cadastros',{...fixture(6),chassi:'con-cor rente'})]);assert.deepEqual(results.map(r=>r.status).sort(),[201,409]);});
@@ -101,6 +115,33 @@ test('Integração HTTP e PostgreSQL (banco isolado)',{skip:!configured},async t
    await db.query('DELETE FROM cadmiv_limites');await db.query('DELETE FROM cadmiv_recuperacoes');mailFails=true;
    assert.equal((await request('/api/senha/solicitar',body)).status,202);await Promise.all([...app.locals.resetTasks]);mailFails=false;
    assert.equal((await db.query('SELECT * FROM cadmiv_recuperacoes')).rows.length,0);
+  });
+  await t.test('Edição completa preserva identidade, data, situação e exige senha',async()=>{
+   await db.query('DELETE FROM cadmiv_limites');const person=fixture(20),r=await request('/api/cadastros',person),auth=r.cookie;assert.equal(r.status,201,r.body);
+   const before=JSON.parse((await request('/api/me',undefined,auth)).body);
+   for(const key of ['nome','cpf','chassi','nota_fiscal','combo','status','criado_em'])assert.equal((await request('/api/me',{[key]:'alterado',senha_atual:person.senha},auth,'PATCH')).status,400);
+   assert.equal((await request('/api/me',{email:'novo@example.invalid'},auth,'PATCH')).status,401);
+   const id=(await db.query('SELECT id FROM cadmiv_clientes WHERE telefone=$1',[person.telefone])).rows[0].id;
+   await db.query("INSERT INTO cadmiv_recuperacoes VALUES($1,$2,now()+interval '30 minutes')",['f'.repeat(64),id]);
+   const changed=await request('/api/me',{telefone:'11988886666',email:'novo@example.invalid',logradouro:'Rua Nova',numero:'42',marca:'Marca Nova',modelo:'bike_comum',cor:'Verde',senha_atual:person.senha},auth,'PATCH');assert.equal(changed.status,200,changed.body);
+   const after=JSON.parse((await request('/api/me',undefined,auth)).body);for(const key of ['nome','cpf','chassi','nota_fiscal','criado_em','status','codigo','combo'])assert.equal(after[key],before[key]);assert.equal(after.privado.logradouro,'Rua Nova');assert.equal(after.privado.numero,'42');assert.equal(after.email,'novo@example.invalid');assert.equal(after.marca,'Marca Nova');assert.equal(after.modelo,'bike_comum');assert.equal((await db.query('SELECT * FROM cadmiv_recuperacoes WHERE cliente_id=$1',[id])).rows.length,0);
+   assert.equal((await request('/api/login',{telefone:person.telefone,senha:person.senha})).status,401);assert.equal((await request('/api/login',{telefone:after.telefone,senha:person.senha})).status,200);
+   assert.equal((await request('/api/me',{logradouro:'Não gravar',fotos:{0:'data:image/png;base64,AAAA'},senha_atual:person.senha},auth,'PATCH')).status,400);assert.equal(JSON.parse((await request('/api/me',undefined,auth)).body).privado.logradouro,'Rua Nova');
+   const bytes=await require('sharp')({create:{width:40,height:50,channels:3,background:'#508070'}}).png().toBuffer(),foto='data:image/png;base64,'+bytes.toString('base64');
+   assert.equal((await request('/api/me',{fotos:{0:foto},senha_atual:person.senha},auth,'PATCH')).status,200);assert.equal((await request('/api/me/foto/0',undefined,auth)).status,200);
+   assert.equal((await request('/api/me',{fotos:{0:null},senha_atual:person.senha},auth,'PATCH')).status,200);assert.equal((await request('/api/me/foto/0',undefined,auth)).status,404);
+   const other=await request('/api/cadastros',fixture(21));assert.equal(other.status,201);assert.equal((await request('/api/me',{telefone:fixture(21).telefone,senha_atual:person.senha},auth,'PATCH')).status,409);
+  });
+  await t.test('Exclusão exige confirmação e senha; remove somente o próprio cadastro e libera chassi',async()=>{
+   await db.query('DELETE FROM cadmiv_limites');const p=fixture(22),registered=await request('/api/cadastros',p),auth=registered.cookie;assert.equal(registered.status,201);
+   const id=(await db.query('SELECT id FROM cadmiv_clientes WHERE telefone=$1',[p.telefone])).rows[0].id,codigo=JSON.parse(registered.body).codigo;
+   await db.query('INSERT INTO cadmiv_fotos VALUES($1,0,$2)',[id,Buffer.from('foto ficticia')]);await db.query("INSERT INTO cadmiv_recuperacoes VALUES($1,$2,now()+interval '30 minutes')",['e'.repeat(64),id]);
+   const body={motivo:'venda',senha:p.senha,confirmacao:'EXCLUIR'};assert.equal((await request('/api/me/excluir',body)).status,401);assert.equal((await request('/api/me/excluir',{...body,confirmacao:''},auth)).status,400);assert.equal((await request('/api/me/excluir',{...body,senha:'errada'},auth)).status,401);assert.equal((await request('/api/me',undefined,auth)).status,200);
+   const count=(await db.query('SELECT count(*)::int AS n FROM cadmiv_clientes')).rows[0].n;
+   const deleted=await request('/api/me/excluir',{...body,cliente_id:'outro'},auth);assert.equal(deleted.status,200,deleted.body);assert.match(deleted.headers.get('set-cookie'),/Max-Age=0/);
+   for(const table of ['cadmiv_fotos','cadmiv_sessoes','cadmiv_recuperacoes','cadmiv_veiculos'])assert.equal((await db.query('SELECT * FROM '+table+' WHERE cliente_id=$1',[id])).rows.length,0);assert.equal((await db.query('SELECT count(*)::int AS n FROM cadmiv_clientes')).rows[0].n,count-1);
+   assert.equal((await request('/api/me',undefined,auth)).status,401);assert.equal((await request('/api/login',{telefone:p.telefone,senha:p.senha})).status,401);assert.equal(JSON.parse((await request('/api/consultar',{codigo})).body).status,'INVALIDO');assert.equal(JSON.parse((await request('/api/chassi/verificar',{chassi:p.chassi})).body).cadastrado,false);
+   assert.equal((await request('/api/cadastros',p)).status,201);
   });
   await t.test('Limitação de tentativas funciona',async()=>{let r;for(let i=0;i<22;i++)r=await request('/api/login',{telefone:'11999999999',senha:'errada'});assert.equal(r.status,429);});
  }finally{if(server)await new Promise(r=>server.close(r));await close();}
