@@ -141,7 +141,7 @@
         <input type="text" value="" id="data_emissao" style="background-color: #e2e8f0 !important; color: #1e293b !important; font-weight: bold !important; text-align: center !important; padding: 10px !important; border-radius: 4px !important; border: 1px solid #cbd5e1 !important; width: 100% !important; box-sizing: border-box !important;" readonly>
     </div>
 <!-- INICIO DA TARJA DE SEGUNDA VIA PAGA -->
-<a href="login.html" class="btn-next" style="display:block;text-align:center">Já sou cliente — acessar meu cadastro</a>
+<a href="login.html" class="btn-next" style="display:block;text-align:center">Já sou Cliente — Acessar meu Cadastro</a>
 <!-- FIM DA TARJA DE SEGUNDA VIA PAGA -->                                                                                                                 
         <p style="text-align: center; color: #7f8c8d;">Plataforma CADMIV para Cadastro de Patrimônio Privado.</p> 
         
@@ -155,7 +155,7 @@
 </div> 
 
     
-<section id="acoes-cliente"><a id="acesso-edicao" href="login.html">Já tenho cadastro — alterar ou excluir meus dados</a><button type="button" id="abrir-exclusao" hidden style="background:#a52828;color:white;padding:12px;border:0;border-radius:5px">Excluir meu cadastro por venda ou doação</button></section>
+<section id="acoes-cliente"><a id="acesso-edicao" href="login.html">Já tenho Cadastro — Alterar ou Excluir meus dados</a><button type="button" id="abrir-exclusao" hidden style="background:#a52828;color:white;padding:12px;border:0;border-radius:5px">Excluir meu Cadastro por Venda ou Doação</button></section>
 <!-- 📜 2. DECLARAÇÃO DE RESPONSABILIDADE JURÍDICA NACIONAL -->
     <div style="background-color: #fff !important; border: 1px solid #cbd5e1 !important; padding: 12px !important; border-radius: 4px !important; margin-bottom: 15px !important; font-size: 13px !important; color: #334155 !important; line-height: 1.5 !important; max-height: 100px !important; overflow-y: auto !important;">
         <strong>TERMO DE RESPONSABILIDADE DO TITULAR (CADMIV):</strong><br>
@@ -288,13 +288,16 @@
 <select name="modelo" required> 
                 <option value="">Selecione o modelo do veículo...</option> 
                 <option value="bike_comum">Bicicleta Comum (Sem ser Elétrica)</option> 
-                <option value="bike_sem_acelerador">Bicicleta Elétrica sem Acelerador</option> 
-                <option value="bike_com_acelerador">Bicicleta Elétrica com Acelerador</option> 
+                <option value="bike_sem_acelerador">Bicicleta Elétrica (Sem Acelerador)</option> 
+                <option value="bike_com_acelerador">Bicicleta Elétrica (Com Acelerador)</option> 
                 <option value="bike_esportiva_alto_custo">Bicicleta Esportiva de Alto Custo</option>
                 <option value="bike_triciclo_comum">Triciclo Comum (Sem ser Elétrico)</option>
-                <option value="bike_triciclo_especial">Triciclo Especial Elétrico com Acelerador</option>
-                <option value="patinete">Patinete</option> 
-                <option value="monociclo">Monociclo</option> 
+                <option value="bike_triciclo_especial">Triciclo Especial Elétrico (Com Acelerador)</option>
+                <option value="patinete">Patinete Comum</option>
+                <option value="patinete eletrica">Patinete Elétrica (Sem Acelerador)</option>
+                <option value="patinete eletrica">Patinete Elétrica (Com Acelerador)</option>  
+                <option value="monociclo">Monociclo Comum</option>
+                <option value="monociclo eletrico">Monociclo Elétrico</option> 
             </select> 
             
             <label>Número de Identificação do Veículo (Chassi / Série):</label> 
@@ -302,7 +305,7 @@
 
             <label>Número da Nota Fiscal de Compra do Veículo:</label> 
             <input id="nota-fiscal" name="nota_fiscal" type="text" maxlength="100" placeholder="Número da nota fiscal (aceita números e letras)" required>
-            <details id="sem-nota"><summary style="cursor:pointer;margin:10px 0">Caso não tenha nota fiscal, clique aqui 👆</summary><div style="text-align:left"><label style="display:block"><input style="width:auto" type="checkbox" name="origem_sem_nota" value="doacao"> Veículo foi recebido como: Doação</label><label style="display:block"><input style="width:auto" type="checkbox" name="origem_sem_nota" value="presente"> Veículo foi recebido como: Presente</label></div></details>
+            <details id="sem-nota"><summary style="cursor:pointer;margin:10px 0">Caso não tenha Nota Fiscal, Clique Aqui 👆</summary><div style="text-align:left"><label style="display:block"><input style="width:auto" type="checkbox" name="origem_sem_nota" value="doacao"> Veículo foi recebido como: Doação</label><label style="display:block"><input style="width:auto" type="checkbox" name="origem_sem_nota" value="presente"> Veículo foi recebido como: Presente</label></div></details>
 
             <label>Ano de Fabricação do Veículo:</label> 
             <input name="ano" type="text" placeholder="Ex: 2026" required>
@@ -333,7 +336,7 @@
             <section class="info-box-used"><h3>Cancelamento e valores pagos</h3><p>O cancelamento por desistência, após o prazo legal de arrependimento e a prestação regular do serviço, não gera devolução automática dos valores pagos. Permanecem assegurados os reembolsos previstos em lei, inclusive por arrependimento no prazo aplicável, cobrança indevida ou falha na prestação do serviço. Nesta etapa de testes, não há cobrança.</p><h3>Empréstimo do veículo a terceiros</h3><p>Ao emprestar o veículo, o CADMIV recomenda que o titular forneça ao condutor uma autorização escrita, com identificação das partes, identificação do veículo, período de uso e assinatura do titular. Ela pode auxiliar na conferência durante uma abordagem, mas não substitui os documentos legalmente exigidos nem garante a liberação do veículo.</p></section><div class="section-title">3. Concretização do Cadastro Corporativo</div> 
             
             <div class="offer-box"> 
-                <strong>Concretização do seu Cartão Digital</strong><br><br> 
+                <strong>Concretização do Cartão Digital</strong><br><br> 
                 <em>Escolha abaixo o combo ideal para a proteção do seu patrimônio e ative as fichas de dependentes se necessário:</em> 
             </div> 
             
