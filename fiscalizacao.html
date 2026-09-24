@@ -49,55 +49,9 @@
         
         .web-footer { font-size: 15px; font-weight: bold; color: #2c3e50; text-align: center; margin-top: 15px; }
     </style>
-    <script>
-        function consultarChassi() {
-            var valor = document.getElementById("input_agente").value.trim();
-            var resultado = document.getElementById("resultado_consulta");
-            
-            if (valor === "") {
-                alert("Agente, por favor insira o número do Chassi para fiscalização.");
-                return;
-            }
+    
 
-            resultado.style.display = "block";
-
-            if (valor === "1234" || valor.toLowerCase() === "furto") {
-                resultado.className = "status-result status-alert-furto";
-                resultado.style.backgroundColor = ""; 
-                resultado.style.color = ""; 
-                resultado.style.border = ""; 
-                resultado.innerHTML = "🚨 🚨 ALERTA DE EMERGÊNCIA POLICIAL 🚨 🚨<br><br>" +
-                                      "STATUS: VEÍCULO FURTADO / ROUBADO!<br>" +
-                                      "MOTIVO: Cadastro bloqueado pelo proprietário titular.<br>" +
-                                      "⚠️ ABORDE O CONDUTOR E ACIONE A POLÍCIA MILITAR IMEDIATAMENTE!";
-            } else if (valor === "5555") {
-                resultado.className = "status-result";
-                resultado.style.backgroundColor = "#fadbd8";
-                resultado.style.color = "#78281f";
-                resultado.style.border = "2px solid #e74c3c";
-                resultado.innerHTML = "🔴 STATUS: DESATIVADO<br>Motivo: Veículo Repassado via Venda / Doação / Fora de Uso.";
-            } else if (valor === "7777") {
-                resultado.className = "status-result";
-                resultado.style.backgroundColor = "#fdebd0";
-                resultado.style.color = "#7e5109";
-                resultado.style.border = "2px solid #f39c12";
-                resultado.innerHTML = "💛 STATUS: ADORMECIDO<br>Motivo: Falta fazer a Renovação Anual do Cadastro CADMIV.";
-            } else {
-                resultado.className = "status-result";
-                resultado.style.backgroundColor = "#d4efdf";
-                resultado.style.color = "#196f3d";
-                resultado.style.border = "2px solid #27ae60";
-                resultado.innerHTML = "🟢 STATUS: ATIVO (OK)<br>Veículo Homologado sob Proteção Nacional. Proprietário Regularizado.";
-            }
-        }
-
-        // 🟢 DIRECIONAMENTO PERFEITO: ABRE DIRETAMENTE OS TERMOS DE USO DO SITE
-        function avancarFluxo() {
-            window.location.href = "termos.html";
-        }
-    </script>
-<script src="https:www.cloudflare.com"></script>
-</head>
+<script src="cliente.js" defer></script></head>
 <body>
 
     <div class="container">
@@ -110,33 +64,18 @@
             
             <div id="resultado_consulta" class="status-result"></div>
 
-            <div class="qr-section">
-                <div class="qr-title">📷 QR-CODE OFICIAL DE FISCALIZAÇÃO</div>
-                <div class="qr-text"><p>Agente, aponte a câmera do seu celular para este QR-Code para acessar o portal de checagem instantânea de qualquer lugar do Brasil.</p> 
- 
-
-<!-- COLOQUE APENAS ESTE BLOCO ABAIXO (ELE É O QR CODE PERFEITO COM FUNDO BRANCO) -->
-<div style="background-color: #FFFFFF !important; padding: 20px !important; border-redius: 12px !important; display: inline-block !important; margin: 15px auto !important; box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important; border: 2px dashed #bdc3c7 !important; text-align: center !important;">
-   <img < src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACgCAAAAABHA98vAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAAmJLR0QA/4ePzL8AAAAHdElNRQfmCAkJExYxIovTAAAB9UlEQVR42u2Y0YrDIAxFT9///+WeZRiUorGptS3shX0YpInHq6lghGv8u8bSgSgI6YDoAOkA6QDpAOkA6QDpAH8VwNf7bYOf9vN7bQAOf8e6oR9+Xo9lQztvG9p529DO24Z23ja087ahnbcN7bxt+N0Arscv3ZfL6YAnAKeDywGPAKZDywHPAM6HzwOfAFwOfwLwNMAH6gNPAzwb4At1ga8Bngb4V9X8H/wM6gRVAO9bH6gSVAHMAlUFs0B1wSxQVfD0Z1AVwOfqAs8CPAvwE9oHzwI8C/Cz6gNPAnxWfWAOUN9vDFAmUAdIB9gM8Pr4O/m7E4CT/0O7E4An/7B2JwA3f9gGfA0w+e+w9f8C8G9+oE6wGeAn9ID7DPAX9IB7AfDbeX9f9/vV+40B7u83Bnif9vO6f5rX7bFsaN9jWfA8ftnQZgE6wGaAFwN0gM0ALwXoAJsBXgswC9ABNgP8Bv7OBGQDvI6A9xHwMQLuI+CpA94XwHsM3AnANODbX/iA9wXwbgCmAe8L4N0AnAAcC3+9fB/wTADvI+AdA08dMDXAe8fAnQBsO+Brf+ED3hfAdwPwf379K379KwbwjwD8Y4D/wM9/xQD+EYAOkA6wGeDFAB1gM8BLATrAZoDXAswCdIDNAPsH6vveX8H8H7wfNf9D9F80f68B9g8D9E+Apx/W97m/grkO/gC/bYBnAmgA6QDpAOkA6QDpAOkA/wAYP8+gshIuQwAAAABJRU5ErkJggg==" 
-         alt="QR Code Oficial CADMIV" 
-         style="width: 160px !important; height: 160px !important; display: block !important; margin: 0 auto !important; shape-rendering: crispEdges !important;">
-</div>
-
-<div style="color: #2c3e50 !important; font-family: Arial, sans-serif !important; font-size: 13px !important; font-weight: bold !important; margin-top: 12px !important; text-align: center !important; letter-spacing: 0.5px !important;">
-    QR-CODE OFICIAL DE FISCALIZAÇÃO
-</div>
-</div>
+            <p>A consulta informa a situação registrada no CADMIV. Compare marca, modelo, cor e chassi com o veículo apresentado. Esta consulta não confirma, por si só, a identidade do portador nem a regularidade de trânsito.</p>
         </div>
 
         <div class="info-section">
             <div class="info-header">📄 Painel Informativo de Utilidade Pública</div>
-            <div class="info-intro">Para que você compreenda a relevância deste registro corporativo, detalhamos abaixo o escopo de atuação e as finalidades da plataforma CADMIV:</div>
+            <div class="info-intro">Para que você compreenda a relevância deste registro privado, detalhamos abaixo o escopo de atuação e as finalidades da plataforma CADMIV:</div>
             
             <ul>
-                <li><strong>O que é a CADMIV?</strong> É uma plataforma de registro e homologação patrimonial  de segurança  voltada exclusivamente para veículos  de pequeno  porte de mobilidade individual.</li>
+                <li><strong>O que é a CADMIV?</strong> É uma plataforma de registro para proteção patrimonial  de segurança  voltada exclusivamente para veículos  de pequeno  porte de mobilidade individual.</li>
                 <li><strong>Qual é a nossa Finalidade Primordial?</strong> Estabelecer um vínculo firme, forte, real e definitivo entre o legítimo proprietário do Veículo Autopropelido ( Bicicletas: Comuns, Elétricas, Esportivas, Patinetes e Monociclos ) através de um banco de dados unificado.</li>
                 <li><strong>Apoio à Fiscalização de Trânsito:</strong> Em abordagens rotineiras nas vias públicas, os agentes de segurança pública utilizam este Portal acima para checar instantaneamente o status do veículo abordado, agindo de forma implacável contra o comércio de receptação ilícita.</li>
-                <li><strong>Protocolo de Emergência e Saúde:</strong> É um compromisso mútuo. Além da proteção ao patrimônio, a sua credencial digital carrega informações vitais de saúde (como tipo sanguíneo e contatos de emergência), garantindo socorro humanizado e rápido em caso de acidentes nas ruas.</li>
+                <li><strong>Protocolo de Emergência e Saúde:</strong> CPF, endereço, telefone e informações de saúde não são exibidos nesta consulta pública.</li>
             </ul>
             
             <div class="motto-text">Cidadão Consciente, Protege Patrimônio.</div>

@@ -1,0 +1,98 @@
+# Resultado dos testes — CADMIV
+
+A suíte local terminou com **30 testes aprovados, zero falhas e zero testes ignorados**. Essa contagem do Node inclui dois agrupamentos: são 28 cenários mais dois testes agrupadores.
+
+## Ambiente e alcance
+
+- Node.js 24; Express e driver pg instalados a partir do package-lock.json.
+- SQL executado com PGlite, uma distribuição embarcada do PostgreSQL, em ambiente isolado com dados fictícios.
+- Requisições HTTP reais ao servidor Express local.
+- Estrutura e comportamento do formulário verificados com jsdom. Isso não equivale a teste visual em navegadores reais ou em celulares.
+- Teste adicional de persistência em disco: o banco embarcado foi fechado e reaberto; chassi normalizado, marca e situação permaneceram gravados.
+- Auditoria das dependências de produção: nenhuma vulnerabilidade conhecida reportada pelo npm no momento da execução. Isso não substitui uma auditoria completa de segurança.
+
+## Cenários aprovados
+
+- Normalização de chassi, recusa de caracteres inválidos e limites de tamanho.
+- Chassi duplicado recusado pela API e pela restrição UNIQUE, inclusive por SQL direto com outro cliente.
+- Requisições concorrentes: um cadastro aceito e outro recusado; ausência de cliente órfão após erro.
+- Maioridade usando data completa, datas impossíveis, CPF, telefone, e-mail e senha.
+- Marca obrigatória no servidor, além do formulário.
+- Dependentes e aceite de responsabilidade conforme o plano.
+- Hash de senha com salt e recusa de senha incorreta.
+- Sessão HttpOnly/SameSite, login, logout e isolamento dos dados entre clientes.
+- Dados e sessão mantidos após reinício do servidor HTTP.
+- Alteração persistente de telefone; recusa de alteração de nome, CPF e situação pelo cliente.
+- Alerta autenticado de cadastro ativo; recusa para cadastro pendente ou senha errada.
+- Consulta pública sem dados pessoais ou médicos.
+- Bloqueio de arquivos internos, painel administrativo e cartão sem autenticação.
+- Recusa de origem externa e requisições sem proteção contra envio cruzado.
+- Limitação de tentativas de login.
+- IDs únicos, todos os campos pertencendo ao formulário, troca de plano e envio correto de marca/nascimento.
+- Mensagem de erro sem apagar o formulário; ausência das confirmações fictícias antigas.
+
+## Limitações da verificação
+
+Não foram testados o PostgreSQL gerenciado no Render, a conexão TLS ao seu banco, as credenciais da sua conta, o domínio, a infraestrutura de produção nem concorrência entre processos de um servidor PostgreSQL remoto. PGlite serializa acesso ao banco; o teste concorrente valida o comportamento HTTP/UNIQUE local, não a infraestrutura distribuída.
+
+Nenhum dado de cliente real foi usado nos testes. Não houve publicação, alteração de GitHub ou implantação no Render.
+
+## Reproduzir
+
+`npm ci` instala as dependências de produção. `npm test` executa os testes unitários e pula explicitamente os conjuntos sem configuração.
+
+Para integração em PostgreSQL de servidor, configure CADMIV_TEST_DATABASE_URL com um banco vazio EXCLUSIVO para testes. A suíte cria suas tabelas e deixa registros fictícios. Nunca use a URL do banco de produção.
+
+Para repetir a verificação embarcada/DOM sem adicionar bibliotecas ao package.json de produção:
+
+1. Em uma pasta separada, instale `@electric-sql/pglite` e `jsdom` com npm.
+2. Defina CADMIV_TEST_PGLITE como o caminho absoluto do módulo instalado `@electric-sql/pglite`.
+3. Defina CADMIV_TEST_JSDOM como o caminho absoluto do módulo instalado `jsdom`.
+4. Execute `node --test --test-isolation=none test/*.test.js` na pasta CADMIV. A opção sem isolamento contorna uma restrição de criação de processos observada neste ambiente Windows.
+
+## Preservação
+
+A base de trabalho foi uma cópia dos 14 arquivos da pasta GPT-CADMIV, compatível com os anexos recuperados da conversa. Os originais não foram escritos. O backup CADMIV-BACKUP-ANTES-DAS-ALTERACOES não foi modificado nem sobrescrito.
+
+## Atualização de 18/09/2026 — cartão e consulta
+
+31 testes passaram, sem falhas ou testes ignorados, em ambiente local com PostgreSQL embarcado e DOM. Inclui QR individual protegido por sessão, SVG correspondente ao link com código aleatório, cartão sem campo CPF e lista restrita de campos públicos (situação, mensagem, marca, modelo, cor e chassi). npm audit: zero vulnerabilidades conhecidas nesta execução. Leitura com câmera de celular e nova publicação no Render ainda pendentes.
+
+## Recuperação de senha — 18/09/2026
+
+35 testes aprovados: 33 na suíte existente ampliada e 2 testes adicionais do provedor de e-mail e da tela de redefinição. Verificados: resposta genérica para conta ausente ou e-mail divergente, token armazenado como hash, senha mínima, uso único inclusive em pedidos concorrentes no adaptador embarcado, expiração, invalidação de sessões, recusa da senha antiga, login com senha nova, limite por telefone, descarte do token em falha de envio, remoção do token do endereço e confirmação de senha. Serviço de e-mail simulado; nenhum e-mail real enviado. Entrega real, configuração do remetente e validação no Render continuam pendentes.
+
+
+## Resultado 19/09/2026
+
+37 testes aprovados (suíte de 36 mais o novo teste de cartões, corrigido e reexecutado), sem falhas pendentes. Fotos do titular e dois dependentes: persistência após reinício, isolamento entre contas, recusa sem sessão, posição inválida e imagem corrompida, reprocessamento JPEG, dimensões e remoção. Consulta pública mantém apenas os campos permitidos. DOM: seleção de dependente, remoção na posição correta, bloqueio de impressão quando a foto não carrega e encerramento de câmera cuja abertura termina depois de trocar o cartão. npm audit após instalação de sharp: zero vulnerabilidades conhecidas.
+
+O layout de impressão foi revisto, mas o navegador headless encontrou restrições de acesso neste ambiente. Não foi possível confirmar visualmente a paginação A4/Carta ou a captura por câmera real. Conferir a prévia de uma página e testar câmera/upload no Render antes de uso definitivo. Os testes de DOM simulam as APIs de imagem/câmera; não equivalem a esses testes visuais.
+
+
+## Resultado 20/09/2026
+
+38 testes passaram na suíte completa. Após acrescentar a verificação do formulário com fotos, os 6 testes desse arquivo também passaram: total atual de 39 testes, sem falhas pendentes. Verificados cadastro e fotos gravados em transação, recusa de imagem corrompida sem criar cliente, foto de dependente fora do plano, ausência de foto, conflito de chassi sem foto órfã, câmera encerrada quando um dependente é desativado, isolamento de foto por posição e bloqueio de impressão se a foto não carrega. As APIs de câmera e canvas foram simuladas no teste DOM. Não houve teste físico de câmera, nova validação visual da impressão ou transação PIX.
+
+
+## Revisão 2 — 20/09/2026
+
+42 testes aprovados no conjunto atual: 41 na suíte, mais o novo teste de formulário de edição. Após ajustes finais, os 7 testes de formulário/edição e os 25 de integração foram reexecutados e passaram. Cobertura: carregamento/preenchimento do cadastro, identificação bloqueada, confirmação de senha, gravação de contato/endereço/modelo, preservação de data/código/situação/plano, alteração e remoção de foto, rollback em imagem inválida e telefone duplicado, invalidação de links antigos de recuperação, exclusão autenticada com confirmação, cascata de fotos/sessões/recuperações, isolamento entre clientes, invalidação do QR e liberação do chassi. Confirmação cancelada no DOM não envia pedido de exclusão. Testes usam banco isolado; nenhum dado do Render foi alterado. Validação visual em navegador, câmera física e impressão continuam para a etapa no serviço de testes.
+
+## Alertas — 22/09/2026
+
+Executados os testes de frontend, edição e integração: 36 passaram, zero falhas e zero ignorados. Novos casos verificam erro de CPF com alerta vermelho e foco, limpeza ao corrigir, bloqueio por campo obrigatório e por chassi já cadastrado. No banco isolado, outro CPF/telefone tentou cadastrar uma variante do mesmo chassi em cada situação: ATIVO, ROUBO, PENDENTE, DESATIVADO e ADORMECIDO. Todos receberam HTTP 409; quantidade de clientes/veículos e situação original foram preservadas. Os testes anteriores de concorrência e restrição direta no banco continuam passando. Nenhum registro real nem serviço Render foi modificado. A luz foi verificada por DOM/CSS, sem nova inspeção visual em navegador nesta rodada. O proprietário relatou sucesso no teste físico de câmera da revisão anterior.
+
+Verificação adicional no DOM: cliques reais nos dois novos botões de senha alternam password/text e os ícones, mantêm o valor digitado, atualizam o rótulo acessível e não enviam o formulário. Sintaxe de cadastro.js e cliente.js validada.
+
+## Renovação e nota fiscal — 24/09/2026
+
+49 testes passaram na suíte completa, zero falhas e ignorados. O novo teste adicional de telas passou também em execução isolada: total de 50 testes no conjunto atual. Uma execução intermediária combinada atingiu falta de memória após passar os testes de telas; o teste de telas foi repetido separadamente com sucesso. O ambiente requer --test-isolation=none por restringir criação de subprocessos.
+
+Verificados: aniversário de um ano e 29/02, vencimento na hora exata, datas baseadas em renovação, ausência de data não interpretada como pagamento, alerta ROUBO preservado, login de vencido, redirecionamento ao acessar páginas privadas diretamente, QR bloqueado, consulta pública como ADORMECIDO, confirmação de pagamento forjada rejeitada, PIX indisponível, data do cadastro original preservada e migração idempotente. Confirmação de pagamento foi simulada somente por preenchimento direto do banco efêmero do teste; não há integração ou rota de pagamento habilitada.
+
+Nota fiscal: letras, números e comprimentos pequenos/grandes; doação/presente exclusivos; recusa de origem inválida e combinação de número com origem sem nota; persistência e preservação da origem em edição autenticada. DOM: lembrete oculto antes de autenticar, botão PIX desativado, agradecimento condicionado à resposta do servidor, seleção exclusiva de origem e restauração do campo NF. Nenhum dado do Render foi alterado. Não foi realizada nova validação visual de impressão ou navegador real nesta rodada.
+
+## Setas de preenchimento — 24/09/2026
+
+11 testes de formulário e edição passaram, sem falhas ou testes ignorados. Setas vermelhas aparecem após tentativa com campos inválidos; desaparecem individualmente ao corrigir. Bordas e aria-invalid identificam os campos, inclusive dia/mês/ano que compartilham uma pergunta. Campos opcionais, desativados e dependentes de planos não escolhidos não recebem indicação. Doação/presente retiram a indicação da nota fiscal. Aviso no topo e bloqueio de envio preservados. Verificação automatizada de DOM; sem nova inspeção visual em navegador real. Render não foi alterado.

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CADMIV - Pagamento e Identificação Nacional</title>
+    <title>CADMIV - Pagamento e Identificação Pessoal</title>
     <style>
         body { font-family: Arial, sans-serif; background-color: #f4f4f9; padding: 20px; text-align: center; color: #2c3e50; }
         .container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); display: inline-block; width: 100%; max-width: 550px; box-sizing: border-box; text-align: left; }
@@ -20,51 +20,20 @@
         .camera-btn { background-color: #d35400; color: white; padding: 10px 15px; border: none; border-radius: 3px; cursor: pointer; font-weight: bold; font-size: 13px; display: inline-block; margin-top: 10px; }
         video { width: 100%; max-width: 200px; display: none; margin-top: 10px; border-radius: 5px; background: black; }
     </style>
-    <script>
-        function finalizarProcesso() {
-            alert("Pagamento PIX confirmado com sucesso! Emitindo suas credenciais corporativas CADMIV.");
-            window.location.href = "cartao.html";
-        }
-
-        function ligarCamera(idVideo) {
-            var video = document.getElementById(idVideo);
-            video.style.display = "block";
-            navigator.mediaDevices.getUserMedia({ video: true })
-                .then(function (stream) { video.srcObject = stream; video.play(); })
-                .catch(function () { alert("Câmera não encontrada ou permissão negada."); });
-        }
-    </script>
-</head>
+    
+<script src="cliente.js" defer></script></head>
 <body>
 
     <div class="container">
-        <h2>Portal de Pagamento e Identificação</h2>
-        <p>Sua transação está protegida pela Plataforma de Conformidade Nacional.</p>
+        <div class="head-title"><h1>CADMIV</h1></div>
+        <h2>Portal de Pagamento <br>e<br> Identificação</h2>
+        <p>Confira os dados salvos na sua conta.</p>
 
         <!-- SEÇÃO DE FOTOS E RECONHECIMENTO VISUAL -->
-        <div class="photo-section">
-            <strong>📸 RECONHECIMENTO VISUAL DA CREDENCIAL DIGITAL</strong>
-            <p style="margin: 5px 0; font-size: 13px; color: #7f8c8d;">Personalize a sua credencial agora enviando de um arquivo ou tirando uma foto atual na hora.</p>
-            
-            <div class="dependent-box">
-                <span style="font-weight: bold; color: #d35400;">• Foto do Titular da CADMIV:</span>
-                <br>
-                <input type="file" id="foto-titular" accept="image/*" style="display: none;">
-                <button type="button" class="upload-btn" onclick="document.getElementById('foto-titular').click()">📁 Escolher Arquivo</button>
-                <button type="button" class="camera-btn" onclick="ligarCamera('video-titular')">📷 Tirar Foto na Hora</button>
-                <video id="video-titular"></video>
-            </div>
-        </div>
-
         <!-- ÁREA DO PIX PREPARADA -->
-        <div class="pix-box">
-            <strong>GERANDO PIX AUTOMÁTICO...</strong>
-            <p style="font-size: 14px; color: #7f8c8d; margin-top: 5px;">Sistema integrado via API com a nova companhia de recebimentos seguros.</p>
-            <div class="qr-placeholder">[QR CODE DO PIX]</div>
-            <p style="font-size: 13px; font-weight: bold; color: #c0392b;">⚠️ Copie o código PIX no seu banco ou escaneie o QR Code acima para pagar.</p>
-        </div>
+        <div class="pix-box"><strong>Cadastro salvo — ativação pendente</strong><p>O pagamento PIX ainda não está integrado. Nenhuma cobrança ou ativação é realizada nesta etapa.</p></div>
 
-        <button type="button" onclick="finalizarProcesso()" class="btn-confirm">Confirmar Pagamento e Gerar Cartões Digitais</button>
+        <button type="button" onclick="finalizarProcesso()" class="btn-confirm">Consultar meus dados</button>
     </div>
 
 </body>

@@ -17,44 +17,11 @@
         .footer-text { text-align: center; margin-top: 20px; font-size: 12px; color: #bdc3c7; } 
         .alert-box { background-color: #fadbd8; border-left: 5px solid #e74c3c; color: #78281f; padding: 15px; border-radius: 5px; margin-top: 15px; display: none; font-weight: bold; font-size: 13px; text-align: center; }
     </style> 
-    <script> 
-        function alternarVisibilidadeSenha() { 
-            var campoSenha = document.getElementById('login_senha'); 
-            var iconeOlho = document.getElementById('icone_olho'); 
-            if (campoSenha.type === 'password') { 
-                campoSenha.type = 'text'; 
-                iconeOlho.innerText = '👁️'; 
-            } else { 
-                campoSenha.type = 'password'; 
-                iconeOlho.innerText = '🙈'; 
-            } 
-        }
-
-        function realizarLogin() { 
-            var telefone = document.getElementById("login_telefone").value; 
-            var shadowSenha = document.getElementById("login_senha").value; 
-            var alertaBox = document.getElementById("alerta-login");
-
-            if (telefone === "" || shadowSenha === "") { 
-                alert("Por favor, preencha todos os campos obrigatórios."); 
-                return; 
-            } 
-
-            // CIRCUITO DE VALIDAÇÃO: Simula teste de segurança corporativa
-            if (shadowSenha === "123456" || shadowSenha === "admin" || shadowSenha.length >= 4) {
-                alertaBox.style.display = "none";
-                alert("Acesso autorizado! Entrando no formulário CADMIV."); 
-                window.location.href = "alerta.html"; // Redirecionamento corrigido!
-            } else {
-                // Ativa a recusa na tela caso a senha seja considerada inválida/falsa
-                alertaBox.style.display = "block";
-            }
-        } 
-    </script> 
-</head> 
+     
+<script src="cliente.js" defer></script><script src="renovacao.js" defer></script><style>body{height:auto;min-height:100vh;flex-direction:column;padding:24px;box-sizing:border-box}.marca-cadmiv{font:700 32px Arial,sans-serif;color:#111;text-align:left;margin:0 0 24px}#renovacao{box-sizing:border-box;width:100%;max-width:550px;margin:24px auto;padding:24px;border:2px solid #e3b735;border-radius:10px;background:#fff3bd;text-align:left}#renovacao p{color:#3c3422;font-size:17px;line-height:1.5}#renovacao .tarja{display:block;box-sizing:border-box;width:100%;background:#27823c;color:white;font:bold 16px Arial;padding:16px;border:0;border-radius:5px;text-align:center;margin:16px 0;text-decoration:none;cursor:pointer}#renovacao button:disabled{opacity:.65;cursor:not-allowed}[hidden]{display:none!important}</style></head> 
 <body> 
     <div class="login-container"> 
-        <h2>Acesso ao seu Cadastro na CADMIV</h2> 
+        <h1 class="marca-cadmiv">CADMIV</h1><h2>Acesso ao seu Cadastro na CADMIV</h2> 
         <p>Insira seu Telefone e sua Senha de Acesso.</p> 
         
         <!-- Alerta de recusa profissional -->
@@ -71,8 +38,8 @@
             </div>
 
             <button type="submit" class="btn-login">Entrar no Sistema de Cadastro</button> 
-        </form> 
+        </form><p><a href="recuperar-senha.html">Esqueci minha senha</a></p> 
         <div class="footer-text">Plataforma sob Conformidade de Proteção Privado.</div> 
     </div> 
-</body> 
+<section id="renovacao" hidden aria-labelledby="titulo-renovacao" tabindex="-1"><h2 id="titulo-renovacao">Renovação do Cartão Digital</h2><p id="mensagem-renovacao" role="status" aria-live="polite"></p><div id="renovacao-pendente" hidden><p>Caro cliente, agradecemos por lembrar de renovar seu Cartão Digital. Seu patrimônio merece.</p><p>Seu cartão está vencido. A renovação por PIX ainda não está disponível. Nenhuma cobrança será gerada nesta etapa.</p><button class="tarja" type="button" disabled>Salvar Cadastro e Gerar PIX</button></div><div id="renovacao-concluida" hidden><p>Prezado cliente, a CADMIV agradece a renovação do seu CARTÃO DIGITAL.</p><a class="tarja" href="cartao.html">Imprimir Cartão Digital com a data da Renovação</a></div><a id="renovacao-acesso" class="tarja" href="botao.html" hidden>Acessar Área do Cliente</a><button type="button" onclick="carregarRenovacao()">Conferir situação</button> <button type="button" onclick="sair()">Sair da conta</button></section></body> 
 </html>
