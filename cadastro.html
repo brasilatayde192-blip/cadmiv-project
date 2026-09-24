@@ -51,7 +51,9 @@
         .section-title { background-color: #34495e; color: white; padding: 10px; border-radius: 5px; margin-top: 20px; font-size: 16px; font-weight: bold; } 
         .health-title { background-color: #c0392b; color: white; padding: 10px; border-radius: 5px; margin-top: 20px; font-size: 16px; font-weight: bold; } 
         .family-title { background-color: #2980b9; color: white; padding: 10px; border-radius: 5px; margin-top: 20px; font-size: 16px; font-weight: bold; } 
-        label { font-weight: bold; display: block; margin-top: 15px; color: #34495e; } 
+        label { font-weight: bold; display: block; margin-top: 15px; color: #34495e; }
+        .seta-cadastro { display:inline-block; color:#c01818; font-size:28px; font-weight:900; line-height:1; margin-right:8px; vertical-align:middle; flex-shrink:0; }
+        #form-cadastro .campo-pendente { border:2px solid #c01818; outline-offset:3px; }
         input, select, textarea { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #bdc3c7; border-radius: 5px; box-sizing: border-box; font-size: 14px; } 
         .alert-box { background-color: #fadbd8; border-left: 5px solid #e74c3c; color: #78281f; padding: 15px; border-radius: 5px; margin-top: 15px; display: none; font-weight: bold; } 
         .info-box-used { background-color: #fef9e7; border-left: 5px solid #f39c12; color: #7e5109; padding: 15px; border-radius: 5px; margin-top: 10px; font-size: 13px; font-weight: bold; line-height: 1.4; } 
@@ -59,7 +61,7 @@
         .price-option { background: white; border: 1px solid #bdc3c7; padding: 15px; margin-top: 10px; border-radius: 5px; display: flex; align-items: center; cursor: pointer; } 
         .price-option input { width: auto; margin-top: 0; margin-right: 15px; transform: scale(1.3); } 
         .price-label { font-size: 16px; font-weight: bold; color: #27ae60; } 
-        .btn-next { background-color: #27ae60; color: white; border: none; padding: 15px; width: 100%; border-radius: 5px; font-weight: bold; font-size: 16px; margin-top: 25px; cursor: pointer; } 
+        .btn-next { box-sizing: border-box; max-width: 100%; overflow-wrap: anywhere; background-color: #27ae60; color: white; border: none; padding: 15px; width: 100%; border-radius: 5px; font-weight: bold; font-size: 16px; margin-top: 25px; cursor: pointer; } 
         .btn-next:hover { background-color: #219150; } 
         .blood-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 5px; } 
         .blood-option { display: flex; align-items: center; background: #f8f9f9; padding: 10px; border: 1px solid #d5dbdb; border-radius: 5px; cursor: pointer; } 
@@ -107,198 +109,58 @@
 
 </style>
    
-    <script>
-// 🗓️ MOTOR 1: INJETOR ATÔMICO UNIVERSAL (DATA ATUAL: 23/08/2026)
-window.onload = function() {
-    var hoje = new Date();
-    var dia = String(hoje.getDate()).padStart(2, '0');
-    var mes = String(hoje.getMonth() + 1).padStart(2, '0');
-    var ano = hoje.getFullYear();
-    var dataFormatada = dia + '/' + mes + '/' + ano;
-
-    // Procura cirurgicamente por qualquer campo de texto travado (cinza) no topo
-    var todosInputs = document.getElementsByTagName('input');
-    for (var i = 0; i < todosInputs.length; i++) {
-        var input = todosInputs[i];
-        if (input.id.includes('registro') || input.id.includes('data') || input.name.includes('data') || input.hasAttribute('readonly')) {
-            input.value = dataFormatada; // Carimba a data de hoje na marra!
-        }
-    }
-    
-    // Roda a checagem dos combos logo no início
-    gerenciarCombo();
-};
-
-// 📇 MOTOR 2: ENGENHARIA DE VISIBILIDADE IMPLACÁVEL DOS DEPENDENTES
-function gerenciarCombo() {
-    var plano2 = document.getElementById("combo2") ? document.getElementById("combo2").checked : false;
-    var plano3 = document.getElementById("combo3") ? document.getElementById("combo3").checked : false;
-    
-    var blocoDep1 = document.getElementById("dep1") || document.getElementById("dependente1") || document.getElementById("dep_1") || document.querySelector(".dependent-container");
-    var blocoDep2 = document.getElementById("dep2") || document.getElementById("dependente2") || document.getElementById("dep_2");
-    var secaoResponsabilidade = document.getElementById("secao-responsabilidade") || document.getElementById("secao_responsabilidade");
-
-    if (blocoDep1) {
-        blocoDep1.style.setProperty("display", (plano2 || plano3) ? "block" : "none", "important");
-    }
-    if (blocoDep2) {
-        blocoDep2.style.setProperty("display", plano3 ? "block" : "none", "important");
-    }
-    if (secaoResponsabilidade) {
-        secaoResponsabilidade.style.setProperty("display", (plano2 || plano3) ? "block" : "none", "important");
-    }
-}
-
-// 🎛️ ESCUTA ATIVA DIRETAMENTE NOS CLIQUES DA TELA
-document.addEventListener("DOMContentLoaded", function() {
-    var botoesRadio = document.querySelectorAll('input[type="radio"]');
-    botoesRadio.forEach(function(radio) {
-        radio.addEventListener("click", gerenciarCombo);
-        radio.addEventListener("change", gerenciarCombo);
-    });
-});
-
-// 🔐 MOTOR 3: TRAVA CRONOLÓGICA CONTRA MENORES DE 18 ANOS (CADMIV)
-function validarMaioridadeCadmiv() {
-    var campoAno = document.getElementById("cadmiv_ano") || document.getElementById("nasc_ano");
-    if (!campoAno || !campoAno.value) return true;
-
-    if (campoAno.value.length === 4) {
-        var anoNasc = parseInt(campoAno.value, 10);
-        var idade = 2026 - anoNasc;
-
-        if (idade < 18 || anoNasc <= 1900 || isNaN(idade)) {
-            alert("🚨 CADASTRO RECUSADO:\nA plataforma CADMIV exige maioridade penal e jurídica (mínimo de 18 anos) para a homologação de veículos.");
-            campoAno.value = ""; 
-            return false;
-        }
-        return true;
-    }
-    return true;
-}
-
-function verificarIdadeCompleta(event) {
-    return validarMaioridadeCadmiv();
-}
-// 🚨 MOTOR DE FISCALIZAÇÃO SUPREMA - BARRA ENVIOS COM CAMPOS EM BRANCO
-function validarFormularioCompleto(event) {
-    // 1. Roda a trava cronológica da maioridade penal/jurídica que já criamos
-    if (typeof validarMaioridadeCadmiv === "function" && !validarMaioridadeCadmiv()) {
-        if (event && event.preventDefault) event.preventDefault();
-        return false;
-    }
-
-    // 2. Passa um pente fino em todas as caixas visíveis que possuem preenchimento obrigatório
-    var camposObrigatorios = document.querySelectorAll('input[required], select[required]');
-    var formularioValido = true;
-    var primeiroCampoVazio = null;
-
-    camposObrigatorios.forEach(function(campo) {
-        // Verifica se o campo está visível na tela e se o cliente deixou em branco
-        if (campo.offsetParent !== null && (!campo.value || campo.value.trim() === "")) {
-            formularioValido = false;
-            campo.style.border = "2px solid #ef4444"; // Sinaliza a caixa vazia de vermelho
-            if (!primeiroCampoVazio) primeiroCampoVazio = campo;
-        } else {
-            campo.style.border = "1px solid #ccc"; // Devolve o visual padrão se preenchido
-        }
-    });
-
-    // 3. Se houver falha, interrompe o trânsito da página para o PIX na hora!
-    if (!formularioValido) {
-        if (event && event.preventDefault) {
-            event.preventDefault();
-        }
-        
-        alert("🚨 ALERTA CADMIV:\nO cadastro não pôde ser enviado! Por favor, preencha todos os campos obrigatórios sinalizados antes de gerar o PIX.");
-        
-        if (primeiroCampoVazio) {
-            primeiroCampoVazio.focus(); // Coloca o cursor do monitor direto em cima do erro
-        }
-        return false;
-    }
-
-    // 4. Se tudo estiver preenchido com perfeição de elite, libera o avanço para o pagamento
-    if (typeof avancarPagamento === "function") {
-        avancarPagamento(event);
-    }
-    return true;
-}
-// 📷 MOTOR DE MÍDIA AVANÇADO: LIGA A CÂMERA DO TITULAR E DOS DEPENDENTES NA HORA
-function ligarCamera(idVideo) {
-    var elementoVideo = document.getElementById(idVideo);
-    if (!elementoVideo) return;
-
-    // Desliga a câmera se já estiver ativa para não travar o monitor
-    if (elementoVideo.srcObject) {
-        var stream = elementoVideo.srcObject;
-        var tracks = stream.getTracks();
-        tracks.forEach(function(track) { track.stop(); });
-        elementoVideo.srcObject = null;
-        elementoVideo.style.display = "none";
-        return;
-    }
-
-    // Liga a câmera nativa com suporte total para arquivos locais (file://)
-    var configuracaoMidia = { video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: "user" } };
-    
-    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        navigator.mediaDevices.getUserMedia(configuracaoMidia)
-        .then(function(stream) {
-            elementoVideo.srcObject = stream;
-            elementoVideo.style.setProperty("display", "block", "important"); // Faz o quadro do vídeo brotar na tela
-            elementoVideo.style.marginTop = "10px";
-            elementoVideo.style.borderRadius = "4px";
-            elementoVideo.play();
-        })
-        .catch(function(erro) {
-            console.log("Erro na câmera: ", erro);
-            alert("🚨 SEGURANÇA CADMIV:\nA câmera não abriu porque o navegador exige uma conexão segura (HTTPS). Para testar localmente, use o botão marrom 'Buscar no Arquivo' para anexar a foto do cartão!");
-        });
-    } else {
-        alert("🚨 BLOQUEIO DO NAVEGADOR:\nEste navegador bloqueia o uso de câmeras em arquivos locais abertos direto do Bloco de Notas.");
-    }
-}
-
-    </script>
+    <script src="cadastro.js" defer></script><script src="cadastro-edicao.js" defer></script>
  
  
-    <div class="container"> 
-        <h2>Formulário de Cadastro -- CADMIV --</h2>
-<!-- INICIO DA TARJA DE SEGUNDA VIA PAGA -->
-<div id="tarja-cortesia" onclick="if(typeof avancarPagamento === 'function') { avancarPagamento(event); } else { window.location.href = 'validar.html'; }" style="background-color: #27ae60; color: white; padding: 12px; border-radius: 6px; text-align: center; font-weight: bold; font-size: 16px; cursor: pointer; margin-bottom: 15px;">
-    💳 CLIQUE AQUI PARA EMITIR SUA 2ª VIA DO CARTÃO DIGITAL POR APENAS R$ 29,99
-</div>
-<!-- FIM DA TARJA DE SEGUNDA VIA PAGA -->                                                                                                                 
-        <p style="text-align: center; color: #7f8c8d;">Plataforma Homologada para Cadastro de Patrimônio Privado.</p> 
-        <form onsubmit="event.preventDefault();" id="form-cadastro"> 
-            <div class="section-title">1. Dados do Proprietário  (Titular)</div> 
-            <label>Nome Completo:</label> 
-            <input type="text" id="nome_completo" placeholder="Digite seu nome completo" required> 
-            
-            <!-- INÍCIO DA SEÇÃO DE DATA DE NASCIMENTO COMPLETA -->
-<div class="form-group">
+    <style>.cadastro-foto{border:1px solid #cbd5e1;border-radius:6px;padding:14px;margin:14px 0;background:#fff}.cadastro-foto button{background:#936631;color:white;border:0;border-radius:5px;padding:10px 14px;margin:5px 0;cursor:pointer;font:inherit}.cadastro-foto button:disabled{opacity:.5}.foto-preview{width:110px;height:145px;border:1px dashed #aaa;display:flex;align-items:center;justify-content:center;margin:10px 0}.foto-preview img{width:100%;height:100%;object-fit:contain}.cadastro-foto video{width:100%;max-width:320px;max-height:240px}.cadastro-foto [data-aviso]{font-size:14px;line-height:1.4}.cadastro-foto [hidden]{display:none!important}</style></head><body>
+<div class="container">
+        <h1>CADMIV</h1>
+        <h2>Formulário de CADASTRO</h2><p id="mensagem-cadastro" role="status" aria-live="polite" aria-atomic="true" tabindex="-1"></p>
+        <style>
+        #mensagem-cadastro:empty{display:none}
+        #mensagem-cadastro.alerta-cadastro{display:flex;align-items:center;gap:14px;background:#fff1f1;color:#8b1515;border:2px solid #b91c1c;border-radius:8px;padding:16px;font-size:18px;font-weight:700;text-align:left;line-height:1.5;scroll-margin-top:24px}
+        #mensagem-cadastro.alerta-cadastro::before{content:"";flex:0 0 22px;width:22px;height:22px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff2f2 0%,#ff6868 20%,#db1717 55%,#8b0000 100%);border:2px solid #8b0000;box-shadow:0 0 9px 3px #ef444477;animation:lanterna-cadastro 2s ease-in-out infinite}
+        @keyframes lanterna-cadastro{50%{box-shadow:0 0 15px 6px #ef444499}}
+        @media(prefers-reduced-motion:reduce){#mensagem-cadastro.alerta-cadastro::before{animation:none}}
+        </style>
+<!-- INÍCIO DA SEÇÃO DE DATA DE NASCIMENTO COMPLETA -->
+<form id="form-cadastro" method="post" action="/api/cadastros"><div class="form-group">
 <!-- 🚨 AVISO RELUZENTE DE SEGURANÇA NACIONAL SUGERIDO PELO DIRETOR -->
-<div style="background-color: #fdf2f2 !important; border: 2px solid #ec7063 !important; padding: 12px !important; border-radius: 6px !important; margin-bottom: 12px !important; text-align: center !important; animation: reluzirAlerta 1.5s infinite alternate !important;">
+<div style="background-color: #fdf2f2 !important; border: 2px solid #ec7063 !important; padding: 12px !important; border-radius: 6px !important; margin-bottom: 12px !important; text-align: center !important; animation: reluzirAlerta 1.0s infinite alternate !important;">
     <strong style="color: #c0392b !important; font-family: Arial, sans-serif !important; font-size: 13.5px !important; letter-spacing: 0.5px !important; text-transform: uppercase !important;">
-        ⚠ É expressamente proibido cadastrar nesta plataforma pessoas com menos de 18 anos de idade!
+        ▲ É expressamente proibido cadastrar nesta plataforma pessoas com menos de 18 anos de idade!
     </strong>
 </div>
-<!-- 🎴 BLOCO ISOLADO FLUTUANTE DA CADMIV - INDESTRUTÍVEL -->
-<div style="background-color: #f8fafc !important; border: 2px solid #3b82f6 !important; padding: 15px !important; border-radius: 8px !important; margin-top: 15px !important; margin-bottom: 20px !important; font-family: Arial, sans-serif !important;">
-    
-    <!-- 🗓️ 1. DATA  ATUAL CARIMBADA E TRAVADA -->
-    <div style="margin-bottom: 15px !important;">
-        <label style="font-weight: bold !important; color: #1e293b !important; display: block !important; margin-bottom: 5px !important;">Data Oficial de Homologação:</label>
-        <input type="text" value="21/08/2026" id="data_emissao" style="background-color: #e2e8f0 !important; color: #1e293b !important; font-weight: bold !important; text-align: center !important; padding: 10px !important; border-radius: 4px !important; border: 1px solid #cbd5e1 !important; width: 100% !important; box-sizing: border-box !important;" readonly>
-    </div>
 
-    <!-- 📜 2. DECLARAÇÃO DE RESPONSABILIDADE JURÍDICA NACIONAL -->
+<!-- 📜 BLOCO ISOLADO FLUTUANTE DA CADMIV - INDESTRUTÍVEL -->
+<div style="background-color: #f8fafc !important; border: 2px solid #3b82f6 !important; padding: 15px !important; border-radius: 8px !important; margin-top: 15px !important; margin-bottom: 20px !important; font-family: Arial, sans-serif !important;">
+
+    <!-- 1. DATA ATUAL CARIMBADA E TRAVADA -->
+    <div style="margin-bottom: 15px !important;">
+        <label style="font-weight: bold !important; color: #1e293b !important; display: block !important; margin-bottom: 5px !important;">Data de Cadastro:</label>
+        <input type="text" value="" id="data_emissao" style="background-color: #e2e8f0 !important; color: #1e293b !important; font-weight: bold !important; text-align: center !important; padding: 10px !important; border-radius: 4px !important; border: 1px solid #cbd5e1 !important; width: 100% !important; box-sizing: border-box !important;" readonly>
+    </div>
+<!-- INICIO DA TARJA DE SEGUNDA VIA PAGA -->
+<a href="login.html" class="btn-next" style="display:block;text-align:center">Já sou cliente — acessar meu cadastro</a>
+<!-- FIM DA TARJA DE SEGUNDA VIA PAGA -->                                                                                                                 
+        <p style="text-align: center; color: #7f8c8d;">Plataforma CADMIV para Cadastro de Patrimônio Privado.</p> 
+        
+            <div class="section-title">1. Dados do Proprietário  (Titular)</div>
+            <label>Nome Completo:</label> 
+            <input name="nome" type="text" id="nome_completo" placeholder="Digite seu nome completo" required>
+<!-- 🪪 CAMPO DO CPF DO TITULAR - OBRIGATÓRIO E BLINDADO -->
+<div style="margin-bottom: 15px !important; font-family: Arial, sans-serif !important;">
+    <label style="font-weight: bold !important; color: #1e293b !important; display: block !important; margin-bottom: 5px !important;">CPF do Titular:</label>
+    <input type="text" id="cpf_titular" name="cpf" placeholder="000.000.000-00" maxlength="14" oninput="mascaraCPF(this)" style="width: 100% !important; padding: 10px !important; border: 1px solid #cbd5e1 !important; border-radius: 4px !important; box-sizing: border-box !important;" required>
+</div> 
+
+    
+<section id="acoes-cliente"><a id="acesso-edicao" href="login.html">Já tenho cadastro — alterar ou excluir meus dados</a><button type="button" id="abrir-exclusao" hidden style="background:#a52828;color:white;padding:12px;border:0;border-radius:5px">Excluir meu cadastro por venda ou doação</button></section>
+<!-- 📜 2. DECLARAÇÃO DE RESPONSABILIDADE JURÍDICA NACIONAL -->
     <div style="background-color: #fff !important; border: 1px solid #cbd5e1 !important; padding: 12px !important; border-radius: 4px !important; margin-bottom: 15px !important; font-size: 13px !important; color: #334155 !important; line-height: 1.5 !important; max-height: 100px !important; overflow-y: auto !important;">
         <strong>TERMO DE RESPONSABILIDADE DO TITULAR (CADMIV):</strong><br>
-        Ao clicar em prosseguir, o requerente declara sob as penas da lei penal e civil que todas as informações prestadas neste formulário de homologação veicular, incluindo os dados de chassis, motorização e credenciais de dependentes, são verídicas, assumindo total responsabilidade jurídica sobre o ato.
+        Ao clicar em prosseguir, o requerente declara sob as penas da lei penal e civil que todas as informações prestadas neste formulário de CADASTRO veicular, incluindo os dados de chassis, motorização e dados de dependentes, são verídicas, assumindo total responsabilidade jurídica sobre o ato.
     <!-- FIM DO TEXTO DO TERMO DE RESPONSABILIDADE -->
-    responsabilidade jurídica sobre o ato.
     </div>
 
     <!-- 🔐 ESSA É A TAG QUE VOCÊ VAI ADICIONAR PARA FECHAR A MOLDURA AZUL E CONSERTAR A TELA -->
@@ -313,9 +175,9 @@ function ligarCamera(idVideo) {
     <label>Data de Nascimento (Obrigatório - Maiores de 18 anos):</label>
     <div style="display: flex; gap: 10px; width: 100%;">
         <!-- Dia -->
-        <input type="number" id="nasc_dia" placeholder="Dia" min="1" max="31" oninput="verificarIdadeCompleta()" style="width: 25%; padding: 10px; border-radius: 4px; border: 1px solid #ccc; box-sizing: border-box;">
+        <input type="number" id="nasc_dia" required placeholder="Dia" min="1" max="31" oninput="verificarIdadeCompleta()" style="width: 25%; padding: 10px; border-radius: 4px; border: 1px solid #ccc; box-sizing: border-box;">
         <!-- Mês -->
-        <select id="nasc_mes" onchange="verificarIdadeCompleta()" style="width: 40%; padding: 10px; border-radius: 4px; border: 1px solid #ccc; box-sizing: border-box;">
+        <select id="nasc_mes" required onchange="verificarIdadeCompleta()" style="width: 40%; padding: 10px; border-radius: 4px; border: 1px solid #ccc; box-sizing: border-box;">
             <option value="">Mês</option>
             <option value="1">Janeiro</option><option value="2">Fevereiro</option><option value="3">Março</option>
             <option value="4">Abril</option><option value="5">Maio</option><option value="6">Junho</option>
@@ -323,7 +185,7 @@ function ligarCamera(idVideo) {
             <option value="10">Outubro</option><option value="11">Novembro</option><option value="12">Dezembro</option>
         </select>
         <!-- Ano -->
-        <input type="number" id="cadmiv_ano" placeholder="Ano" min="1900" max="2026" oninput="verificarIdadeCompleta()" style="width: 35%; padding: 10px; border-radius: 4px; border: 1px solid #ccc; box-sizing: border-box;" required>
+        <input type="number" id="cadmiv_ano" placeholder="Ano" min="1900" max="2100" oninput="verificarIdadeCompleta()" style="width: 35%; padding: 10px; border-radius: 4px; border: 1px solid #ccc; box-sizing: border-box;" required>
     </div>
     <!-- Tarja de Alerta Informativo de Idade -->
     <div id="alerta-idade" style="display: none; color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; padding: 10px; margin-top: 10px; border-radius: 4px; font-weight: bold;">
@@ -333,10 +195,10 @@ function ligarCamera(idVideo) {
 <!-- FIM DA SEÇÃO DE DATA DE NASCIMENTO --> 
             
             <label>E-mail:</label> 
-            <input type="email" placeholder="Digite seu e-mail Preferencial" required> 
+            <input name="email" type="email" placeholder="Digite seu e-mail Preferencial" required> 
             
             <label>Telefone Celular (Será usado como seu Login de Acesso):</label> 
-            <input type="text" placeholder="Ex: 11999998888" required> 
+            <input name="telefone" type="text" placeholder="Ex: 11999998888" required> 
             
             <div class="form-group">
     <label for="senha-confirmacao">Crie uma Senha de Acesso:</label>
@@ -344,7 +206,7 @@ function ligarCamera(idVideo) {
     <!-- MOLDURA DE POSICIONAMENTO: Garante que o botão fique preso dentro da caixa -->
     <div style="position: relative; width: 100%;">
         
-        <input type="password" id="senha-confirmacao" placeholder="Digite sua senha para bloquear" style="padding-right: 45px; width: 100%; box-sizing: border-box; height: 40px; border: 1px solid #ccc; border-radius: 4px;">
+        <input type="password" id="senha-confirmacao" name="senha" minlength="12" maxlength="128" required autocomplete="new-password" placeholder="Digite aqui sua senha" style="padding-right: 45px; width: 100%; box-sizing: border-box; height: 40px; border: 1px solid #ccc; border-radius: 4px;">
         
         <!-- O MACAQUINHO AGORA TRAVADO NO CANTO DIREITO INTERNO -->
         <button type="button" id="icone_olho_cadastro" class="btn-secondary" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 20px; padding: 5px; z-index: 10;" onclick="(function(){ var campo = document.getElementById('senha-confirmacao'); if(campo.type === 'password'){ campo.type = 'text'; document.getElementById('icone_olho_cadastro').innerHTML = '🐵'; } else { campo.type = 'password'; document.getElementById('icone_olho_cadastro').innerHTML = '🙈'; } })()">🙈</button>
@@ -353,27 +215,27 @@ function ligarCamera(idVideo) {
 </div> 
             
             <label>CEP:</label> 
-            <input type="text" placeholder="00000-000" required> 
+            <input name="cep" type="text" placeholder="00000-000" required> 
             
             <label>Logradouro (Rua / Avenida):</label> 
-            <input type="text" placeholder="Nome da rua ou avenida" required> 
+            <input name="logradouro" type="text" placeholder="Nome da rua ou avenida" required> 
             
             <label>Número:</label> 
-            <input type="text" placeholder="Nº" required> 
+            <input name="numero" type="text" placeholder="Nº" required> 
             
             <label>Bairro:</label> 
-            <input type="text" placeholder="Nome do bairro" required> 
+            <input name="bairro" type="text" placeholder="Nome do bairro" required> 
             
             <label>Cidade:</label> 
-            <input type="text" placeholder="Nome da cidade" required> 
+            <input name="cidade" type="text" placeholder="Nome da cidade" required> 
             
             <label>Estado:</label>
-<input type="text" placeholder="UF" required> 
+<input name="uf" type="text" placeholder="UF" required> 
             
             <div class="health-title">🚨 Protocolo de  SAÚDE  e  EMERGÊNCIA</div> 
             
             <label>Em caso de Emergência, ligar para:</label> 
-            <select required> 
+            <select name="contato_emergencia" required> 
                 <option value="">Selecione o contato...</option> 
                 <option value="pai">Pai</option> 
                 <option value="mae">Mãe</option> 
@@ -383,11 +245,12 @@ function ligarCamera(idVideo) {
                 <option value="primo">Primo(a)</option> 
                 <option value="cunhado">Cunhado(a)</option>
                 <option value="enteado">Enteado(a)</option> 
-                <option value="amigo">Amigo(a)</option> 
+                <option value="amigo">Amigo(a)</option>
+                <option value="vizinho">Vizinho(a)</option> 
             </select> 
             
             <label>Telefone Fixo ou Celular do Contato:</label> 
-            <input type="text" placeholder="(00) 00000-0000" required>
+            <input type="text" name="telefone_emergencia" placeholder="(00) 00000-0000" required>
 
             <label>Fator Sanguíneo:</label> 
             <div class="blood-grid"> 
@@ -402,25 +265,27 @@ function ligarCamera(idVideo) {
             </div> 
             
             <label>Possui Alergia a Látex?</label> 
-            <select required> 
+            <select name="latex" required> 
                 <option value="">Selecione...</option> 
-                <option value="nao">Não possuo alergia</option> 
-                <option value="sim">Sim, sou alérgico(a)</option> 
+                <option value="nao">Não possuo Alergia</option> 
+                <option value="sim">Sim, sou Alérgico(a)</option> 
             </select> 
             
             <label>Possui Alergia a algum Medicamento?</label> 
-            <input type="text" placeholder="Digite os medicamentos ou escreva 'Nenhuma" required>
+            <input type="text" name="medicamentos" placeholder="Digite os medicamentos ou escreva 'Nenhuma" required>
 
             <label>Médico de sua preferência (Nome Completo):</label> 
-            <input type="text" placeholder="Nome do Doutor(a)">
+            <input name="medico" type="text" placeholder="Nome do Doutor(a)">
 
             <label>Telefone de contato do Médico:</label> 
-            <input type="text" placeholder="(00) 00000-0000">
+            <input type="text" name="telefone_medico" placeholder="(00) 00000-0000">
 
             <div class="section-title">2. Dados do Veículo Autopropelido Cadastrado</div> 
             
-            <label>Modelo do Veículo:</label>
-<select required> 
+            <label for="marca">Marca do Veículo:</label>
+<input type="text" id="marca" name="marca" maxlength="100" placeholder="Ex.: Segway, Xiaomi, Specialized" required>
+<label>Modelo do Veículo:</label>
+<select name="modelo" required> 
                 <option value="">Selecione o modelo do veículo...</option> 
                 <option value="bike_comum">Bicicleta Comum (Sem ser Elétrica)</option> 
                 <option value="bike_sem_acelerador">Bicicleta Elétrica sem Acelerador</option> 
@@ -433,16 +298,17 @@ function ligarCamera(idVideo) {
             </select> 
             
             <label>Número de Identificação do Veículo (Chassi / Série):</label> 
-            <input type="text" id="chassi_veiculo" onblur="verificarChassiCadastrado()" placeholder="Digite o número do chassi" required>
+            <input type="text" id="chassi_veiculo" name="chassi" maxlength="128" onblur="verificarChassiCadastrado()" placeholder="Digite o número do chassi" required>
 
             <label>Número da Nota Fiscal de Compra do Veículo:</label> 
-            <input type="text" placeholder="Número da NF" required>
+            <input id="nota-fiscal" name="nota_fiscal" type="text" maxlength="100" placeholder="Número da nota fiscal (aceita números e letras)" required>
+            <details id="sem-nota"><summary style="cursor:pointer;margin:10px 0">Caso não tenha nota fiscal, clique aqui 👆</summary><div style="text-align:left"><label style="display:block"><input style="width:auto" type="checkbox" name="origem_sem_nota" value="doacao"> Veículo foi recebido como: Doação</label><label style="display:block"><input style="width:auto" type="checkbox" name="origem_sem_nota" value="presente"> Veículo foi recebido como: Presente</label></div></details>
 
             <label>Ano de Fabricação do Veículo:</label> 
-            <input type="text" placeholder="Ex: 2026" required>
+            <input name="ano" type="text" placeholder="Ex: 2026" required>
 
             <label>Cor do Veículo:</label> 
-            <input type="text" placeholder="Cor predominante" required>
+            <input name="cor" type="text" placeholder="Cor predominante" required>
 
             <label>Estado de Conservação do Veículo:</label> 
             <select name="estado_conservacao" id="estado_conservacao" class="form-control" required>
@@ -452,62 +318,59 @@ function ligarCamera(idVideo) {
             </select> 
             
             <div class="info-box-used"> 
-                ⚠️ AVISO IMPORTANTE sobre TRANSFERÊNCIA do VEÍCULO CADASTRADO na CADMIV:<br> Caso você venda, doe ou passe este veículo a terceiros de forma que ele não pertença mais a você, é sua obrigação legal entrar no Formulário de Cadastro da CADMIV e CANCELAR o veículo  IMEDIATAMENTE. 
+                ⚠️ AVISO IMPORTANTE sobre TRANSFERÊNCIA do VEÍCULO CADASTRADO na CADMIV:<br> Em caso de venda ou doação, o cadastro deve deixar de identificar o antigo titular como proprietário. O titular pode excluir seu cadastro pela área do cliente quando deixar de possuir o veículo. 
             </div> 
             
             <label>Este veículo já foi  CADASTRADO  anteriormente no CADMIV?</label> 
             <select name="cadastro_anterior" id="cadastro_anterior" class="form-control" onchange="verificarContestacaoVeiculo()" required>
     <option value="">Selecione uma opção...</option>
-    <option value="Não">Não, este é o primeiro cadastro</option>
-    <option value="Sim">Sim, já possui cadastro anterior</option>
+    <option value="Não">Não, este é o primeiro Cadastro</option>
+    <option value="Sim">Sim, já possui Cadastro Anterior</option>
 </select> 
             
             <div id="alerta-trava" class="alert-box">⚠️ BLOQUEIO DE SEGURANÇA JURÍDICA NACIONAL:<br>Este veículo já possui um Cadastro ativo no sistema.</div> 
 
-            <div class="section-title">3. Concretização do Cadastro Corporativo</div> 
+            <section class="info-box-used"><h3>Cancelamento e valores pagos</h3><p>O cancelamento por desistência, após o prazo legal de arrependimento e a prestação regular do serviço, não gera devolução automática dos valores pagos. Permanecem assegurados os reembolsos previstos em lei, inclusive por arrependimento no prazo aplicável, cobrança indevida ou falha na prestação do serviço. Nesta etapa de testes, não há cobrança.</p><h3>Empréstimo do veículo a terceiros</h3><p>Ao emprestar o veículo, o CADMIV recomenda que o titular forneça ao condutor uma autorização escrita, com identificação das partes, identificação do veículo, período de uso e assinatura do titular. Ela pode auxiliar na conferência durante uma abordagem, mas não substitui os documentos legalmente exigidos nem garante a liberação do veículo.</p></section><div class="section-title">3. Concretização do Cadastro Corporativo</div> 
             
             <div class="offer-box"> 
-                <strong>CONCRETIZAÇÃO E PROTEÇÃO OFICIAL DA SUA CREDENCIAL</strong><br><br> 
+                <strong>Concretização do seu Cartão Digital</strong><br><br> 
                 <em>Escolha abaixo o combo ideal para a proteção do seu patrimônio e ative as fichas de dependentes se necessário:</em> 
             </div> 
             
             <div class="price-option"> 
-                <input type="radio" name="combo" id="combo1" onchange="forcarAberturaDependentes()"> 1 Cartão Digital  (Apenas Titular)<br>
+                <input type="radio" name="combo" id="combo1" value="1" required onchange="forcarAberturaDependentes()"> 1 Cartão Digital  (Apenas Titular)<br>
                 <div><strong>Emitir 1 Cartão Digital (Apenas Titular)</strong><br><span class="price-label">Taxa Única: $24.99 (Via PIX Seguro)</span></div> 
             </div> 
             
             <div class="price-option"> 
-               <input type="radio" name="combo" id="combo2" onchange="forcarAberturaDependentes()">2 Cartões Digitais (Titular + 1 Dependente)<br>
+               <input type="radio" name="combo" id="combo2" value="2" required onchange="forcarAberturaDependentes()">2 Cartões Digitais (Titular + 1 Dependente)<br>
                 <div><strong>Emitir 2 Cartões Digitais (Titular + 1 Dependente)</strong><br><span class="price-label">Taxa Única: $39.99 (Via PIX Seguro)</span></div> 
             </div> 
             
             <div class="price-option"> 
-                <input type="radio" name="combo" id="combo3" onchange="forcarAberturaDependentes()">3 Cartões Digitais (Titular + 2 Dependentes)
+                <input type="radio" name="combo" id="combo3" value="3" required onchange="forcarAberturaDependentes()">3 Cartões Digitais (Titular + 2 Dependentes)
                 <div><strong>Emitir 3 Cartões Digitais (Combo-Familiar)</strong><br><span class="price-label">Taxa Única: $49.99 (Via PIX Seguro)</span></div> 
             </div> 
             
-            <p style="font-size: 13px; font-weight: bold; color: #7f8c8d; text-align: center; margin-top: 15px; line-height: 1.4;"> 📋 INFORMATIVO DE VALIDADE NACIONAL:<br> Esta credencial corporativa possui validade estrita de 1 (um) ano. </p>
-<div class="tarja-botoes" style="background-color: #27ae60; padding: 20px; border-radius: 5px; margin-top: 25px; margin-bottom: 25px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
- <button type="submit" id="btn-viajar" onclick="return validarFormularioCompleto(event);" class="btn-next" style="background-color: #ffffff !important; color: #27ae60 !important; font-weight: bold; border: 2px solid #ffffff; max-width: 400px; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 16px;">Salvar Cadastro Completo e Gerar PIX</button>   
-</div> 
+            <p style="font-size: 13px; font-weight: bold; color: #7f8c8d; text-align: center; margin-top: 15px; line-height: 1.4;"> 📋 INFORMATIVO DE VALIDADE NACIONAL:<br> Esta Cartão Digital possui validade estrita de 1 (um) ano. </p>
+<p role="note" style="text-align: center;">Nesta etapa de testes, não há cobrança nem emissão de cartão ativo. Ao salvar, o cadastro ficará pendente de ativação.</p> 
 
-            <div id="dep1" class="dependent-container" style="display: none;">
+            <div id="foto-titular" class="dependent-container" style="display:none"><div class="family-title">Foto do Titular</div><section class="cadastro-foto" data-foto="0" aria-label="Foto do Titular"><strong>Foto do Titular</strong><div class="foto-preview"><img data-preview alt="Prévia da foto do Titular" hidden><span data-vazio>Sem foto</span></div><input data-arquivo type="file" accept="image/jpeg,image/png,image/webp" hidden aria-label="Buscar foto do Titular"><button type="button" data-buscar>Buscar no Arquivo</button> <button type="button" data-camera>Tirar Foto Agora</button><video data-video autoplay playsinline muted hidden></video><button type="button" data-capturar hidden>Capturar Foto</button> <button type="button" data-fechar hidden>Fechar Câmera</button> <button type="button" data-remover hidden>Remover Foto</button><p data-aviso role="status" aria-live="polite"></p></section></div>
+<div id="dep1" class="dependent-container" style="display: none;">
 <div class="family-title">👤 Cadastro Completo do Dependente 1</div> 
                 <label>Nome Completo do Dependente 1:</label> 
-                <input type="text" placeholder="Nome do dependente 1">
+                <input name="dep1_nome" type="text" placeholder="Nome do dependente 1">
                 <label>Grau de Parentesco:</label> 
 <br><br>
 <!-- 📁 BOTÕES DE MÍDIA EXCLUSIVOS DO DEPENDENTE 1 -->
-<input type="file" id="f-dep1" style="display:none;">
-<button type="button" class="photo-btn" onclick="document.getElementById('f-dep1').click()" style="background-color: #b87333 !important; color: white !important; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; margin-right: 10px;">
-    🗂️ Buscar no Arquivo
-</button>
-<button type="button" class="photo-btn" onclick="ligarCamera('v-dep1')" style="background-color: #b87333 !important; color: white !important; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">
-    📷 Tirar Foto Agora
-</button>
-<video id="v-dep1" autoplay style="width: 100%; max-width: 300px; display: none; margin-top: 10px; border-radius: 4px;"></video>
-                <select>
+
+
+
+
+                <select name="dep1_parentesco">
   <option value="" disabled selected>Selecione um dependente...</option>
+                    <option value="pai">Pai</option>
+                    <option value="mae">Mãe</option>
                     <option value="filho">Filho(a)</option> 
                     <option value="primo">Primo(a)</option> 
                     <option value="irmao">Irmão(a)</option> 
@@ -515,21 +378,20 @@ function ligarCamera(idVideo) {
                     <option value="amigo">Amigo(a)</option>
                     <option value="cunhado">Cunhado(a)</option>
                     <option value="enteado">Enteado(a)</option>
-                </select> 
+                    <option value="amigo">Amigo(a)</option>
+                </select><section class="cadastro-foto" data-foto="1" aria-label="Foto do Dependente 1"><strong>Foto do Dependente 1</strong><div class="foto-preview"><img data-preview alt="Prévia da foto do Dependente 1" hidden><span data-vazio>Sem foto</span></div><input data-arquivo type="file" accept="image/jpeg,image/png,image/webp" hidden aria-label="Buscar foto do Dependente 1"><button type="button" data-buscar>Buscar no Arquivo</button> <button type="button" data-camera>Tirar Foto Agora</button><video data-video autoplay playsinline muted hidden></video><button type="button" data-capturar hidden>Capturar Foto</button> <button type="button" data-fechar hidden>Fechar Câmera</button> <button type="button" data-remover hidden>Remover Foto</button><p data-aviso role="status" aria-live="polite"></p></section> 
                 <br><br>
-                <div id="dep1" class="dependent-container" style="display:none;"> 
-                <button type="button" class="photo-btn" onclick="document.getElementById('f-dep1').click()">📁 Buscar no Arquivo</button> 
-                <button type="button" class="photo-btn" onclick="ligarCamera('v-dep1')">📷 Tirar Foto Agora</button> 
-                <video id="v-dep1"></video> 
-            </div>
+                </div>
 
             <div id="dep2" class="dependent-container" style="display: none;"> 
                 <div class="family-title">👤 Cadastro Completo do Dependente 2 (Combo Familiar)</div> 
                 <label>Nome Completo do Dependente 2:</label> 
-                <input type="text" placeholder="Nome do dependente 2">
+                <input name="dep2_nome" type="text" placeholder="Nome do dependente 2">
                 <label>Grau de Parentesco:</label> 
-                <select>
+                <select name="dep2_parentesco">
   <option value="" disabled selected>Selecione um dependente...</option>
+                    <option value="pai">Pai</option>
+                    <option value="mae">Mãe</option>
                     <option value="filho">Filho(a)</option> 
                     <option value="primo">Primo(a)</option> 
                     <option value="irmao">Irmão(a)</option> 
@@ -537,33 +399,35 @@ function ligarCamera(idVideo) {
                     <option value="amigo">Amigo(a)</option>
                     <option value="cunhado">Cunhado(a)</option>
                     <option value="enteado">Enteado(a)</option>
-                <br><br> 
-                <input type="file" id="f-dep2" style="display:none;"> 
-                <button type="button" class="photo-btn" onclick="document.getElementById('f-dep2').click()">📁 Buscar no Arquivo</button> 
-                <button type="button" class="photo-btn" onclick="ligarCamera('v-dep2')">📷 Tirar Foto Agora</button> 
-                <video id="v-dep2"></video> 
+                    <option value="amigo">Amigo(a)</option>
+                </select><section class="cadastro-foto" data-foto="2" aria-label="Foto do Dependente 2"><strong>Foto do Dependente 2</strong><div class="foto-preview"><img data-preview alt="Prévia da foto do Dependente 2" hidden><span data-vazio>Sem foto</span></div><input data-arquivo type="file" accept="image/jpeg,image/png,image/webp" hidden aria-label="Buscar foto do Dependente 2"><button type="button" data-buscar>Buscar no Arquivo</button> <button type="button" data-camera>Tirar Foto Agora</button><video data-video autoplay playsinline muted hidden></video><button type="button" data-capturar hidden>Capturar Foto</button> <button type="button" data-fechar hidden>Fechar Câmera</button> <button type="button" data-remover hidden>Remover Foto</button><p data-aviso role="status" aria-live="polite"></p></section><br><br> 
+                 
+                 
+                 
+                 
             </div>
 
             <div id="secao-responsabilidade" class="dependent-container" style="background-color: #fcf3cf; border-color: #f39c12;"> 
                 <span style="font-weight: bold; color: #b7950b;">📋 DECLARAÇÃO DE RESPONSABILIDADE JURÍDICA:</span> 
                 <textarea rows="3" readonly style="margin-top:5px; background:#fff; resize:none;">Eu, na qualidade de proprietário titular cadastrado na plataforma CADMIV, vencionando para todos os fins de direito, a vinculação do meu Endereço Residencial e Contatos Telefônicos ao cadastro do dependente refirido acima, declaro ser responsável pelas informações prestadas.</textarea>
 <div style="margin-top: 10px; display: flex; align-items: center;"> 
-                    <input type="checkbox" style="width: auto; margin-top: 0; margin-right: 10px; transform: scale(1.2);"> 
+                    <input type="checkbox" name="responsabilidade" id="responsabilidade" style="width: auto; margin-top: 0; margin-right: 10px; transform: scale(1.2);"> 
                     <strong>Confirmo e aceito os Termos de Responsabilidade Acima.</strong> 
                 </div> 
             </div>
 
-            <!-- Início da Tarja Verde do Final do Formulário -->
+            <div id="senha-edicao" hidden><label for="senha-atual-edicao">Confirme sua senha atual para salvar as alterações:</label><div style="position:relative"><input type="password" id="senha-atual-edicao" autocomplete="current-password" maxlength="128" style="padding-right:52px;box-sizing:border-box"><button type="button" id="olho-senha-edicao" aria-label="Mostrar senha" aria-controls="senha-atual-edicao" aria-pressed="false" onclick="alternarSenhaCadastro('senha-atual-edicao',this)" style="position:absolute;right:4px;top:50%;transform:translateY(-50%);width:44px;min-height:44px;margin:0;padding:5px;background:none;border:0;font-size:20px;cursor:pointer">🙈</button></div><p>Nome, CPF, Chassi, Número da Nota Fiscal e data de registro permanecem os mesmos.</p></div>
+<!-- Início da Tarja Verde do Final do Formulário -->
         <div class="tarja-botoes">
-            <button type="button" id="btn-enviar" onclick="avancarPagamento(event)" class="btn-next">
-                Salvar Cadastro Completo e Gerar PIX
+            <button type="submit" id="btn-enviar" class="btn-next">
+                Salvar Cadastro e Gerar PIX
             </button>
         </div>
         <!-- Fim da Tarja Verde -->
         
     </form>
 </div>
-</body>
+<dialog id="confirmar-exclusao" aria-labelledby="titulo-exclusao"><h2 id="titulo-exclusao">Excluir definitivamente meu cadastro</h2><p>Serão apagados deste sistema seus dados, veículo, fotos e dependentes. O acesso à conta será encerrado e o QR-code antigo deixará de localizar o cadastro. Esta ação não pode ser desfeita.</p><label for="motivo-exclusao">Motivo:</label><select id="motivo-exclusao"><option value="">Selecione</option><option value="venda">Venda</option><option value="doacao">Doação</option><option value="outro">Outro motivo</option></select><label for="senha-exclusao">Senha atual:</label><input id="senha-exclusao" type="password" autocomplete="current-password" maxlength="128"><label for="texto-exclusao">Digite EXCLUIR para confirmar:</label><input id="texto-exclusao" autocomplete="off"><p id="mensagem-exclusao" role="status"></p><button type="button" id="cancelar-exclusao">Voltar sem excluir</button> <button type="button" id="executar-exclusao">Excluir definitivamente</button></dialog><style>[hidden]{display:none!important}dialog{max-width:500px;width:90%;box-sizing:border-box;border:1px solid #aaa;border-radius:8px;text-align:left}dialog::backdrop{background:#0008}dialog button{padding:12px;margin-top:15px;cursor:pointer}#executar-exclusao{background:#a52828;color:white;border:0}#acoes-cliente{margin:15px 0}input[readonly]{background:#eee}.cadastro-foto video:not([hidden]){display:block}</style></body>
 </html>
 
 
