@@ -65,22 +65,50 @@ document.addEventListener('DOMContentLoaded',()=>{
  gerenciarCombo();
  const form=document.getElementById('form-cadastro');let saving=false;
  const avisosTraduzidos=new Set();
+ let mostrarSetas=false;
+ const setas=new Map();
+ function atualizarSetas(){
+  if(!mostrarSetas)return;
+  const destinos=new Set();
+  for(const campo of form.querySelectorAll('input,select,textarea')){
+   const invalido=campo.willValidate&&!campo.validity.valid;
+   campo.classList.toggle('campo-pendente',invalido);
+   if(invalido)campo.setAttribute('aria-invalid','true');else campo.removeAttribute('aria-invalid');
+   if(!invalido)continue;
+   let destino=campo.labels?.[0];
+   // Os três campos da data compartilham a pergunta; cada campo mantém sua borda.
+   for(let bloco=campo;!destino&&bloco&&bloco!==form;bloco=bloco.parentElement){
+    if(bloco.previousElementSibling?.tagName==='LABEL')destino=bloco.previousElementSibling;
+    if(campo.type==='radio'||campo.type==='checkbox'){destino=campo.parentElement;break;}
+   }
+   destino=destino||campo.parentElement;destinos.add(destino);
+   if(!setas.has(destino)){
+    const seta=document.createElement('span');seta.className='seta-cadastro';seta.textContent='➜';
+    seta.setAttribute('aria-hidden','true');seta.title='Preencha ou confira este campo';
+    destino.prepend(seta);setas.set(destino,seta);
+   }
+  }
+  for(const [destino,seta] of setas)if(!destinos.has(destino)){seta.remove();setas.delete(destino);}
+ }
  let primeiroInvalido=null;
  function limparAvisosTraduzidos(){
   for(const campo of avisosTraduzidos)campo.setCustomValidity('');
   avisosTraduzidos.clear();
   if(document.getElementById('mensagem-cadastro').classList.contains('alerta-cadastro'))mostrarMensagemCadastro('');
+  atualizarSetas();
  }
  form.addEventListener('input',limparAvisosTraduzidos);
  form.addEventListener('change',limparAvisosTraduzidos);
  form.addEventListener('invalid',e=>{
   const campo=e.target,v=campo.validity;
   e.preventDefault();
+  mostrarSetas=true;
   if(!primeiroInvalido){primeiroInvalido=campo;queueMicrotask(()=>{
    const alvo=primeiroInvalido;primeiroInvalido=null;
    const label=[...form.querySelectorAll('label[for]')].find(l=>l.htmlFor===alvo.id);
    const texto=alvo.validationMessage;
    mostrarMensagemCadastro(label?label.textContent.trim()+' '+texto:texto,true,true);
+   atualizarSetas();
   });}
   if(v.customError)return;
   let aviso='Confira o valor preenchido neste campo.';
