@@ -1,4 +1,15 @@
-# CADMIV — atualização de 22/09/2026, alertas do cadastro
+# CADMIV — atualização de 24/09/2026, preparação da renovação
+
+## Renovação e nota fiscal
+
+- CADMIV no topo do acesso e da recuperação de senha usa Arial, negrito, 32px, como no portal de pagamento.
+- Após login autenticado, cartões com validade vencida mostram o lembrete amarelo. Acesso direto às páginas privadas do cartão também retorna ao lembrete; emissão de QR e impressão pelo botão conferem o vencimento.
+- Um novo ano é calculado a partir de cada data de renovação confirmada, com aniversário em 28/02 quando a renovação foi em 29/02. A primeira ativação usa a mesma duração. A data do primeiro cadastro permanece intacta; no cartão renovado aparece a data da renovação e a validade.
+- Esta entrega PREPARA as telas. PIX ainda não está integrado: o botão de cobrança fica desativado e não há rota que aceite do navegador uma confirmação de pagamento. A tela de agradecimento só aparece quando o servidor encontra uma renovação registrada e vigente, com situação ATIVO. A futura integração deverá validar a confirmação do provedor, atualizar as datas com segurança e evitar confirmações duplicadas. Não há ativação automática disponível nesta entrega.
+- A migração adiciona campos sem apagar registros. Cadastros existentes sem data confirmada de ativação/renovação não ganham datas inventadas nem passam a ser considerados pagos. Cadastros PENDENTE continuam na etapa de testes. Registros legados ATIVO sem data exigem conferência antes do lançamento. O alerta ROUBO permanece visível na consulta mesmo se o cartão vencer.
+- Nota fiscal admite até 100 caracteres, números e letras, sem mínimo de nove dígitos. Para novos cadastros sem nota, abrir a opção abaixo do campo e escolher somente Doação ou Presente. Com uma opção marcada, o número não é enviado nem exigido; ao desmarcar, o número volta a ser exigido. A opção fica preservada e bloqueada na edição, assim como o número da nota fiscal.
+
+Teste no serviço cadmiv-teste antes de publicar para uso real. Os cenários de pagamento nos testes automatizados usam somente um banco isolado; não representam cobrança real. Não altere datas do banco real para simular pagamento.
 
 ## Aviso vermelho e trava de veículo duplicado
 

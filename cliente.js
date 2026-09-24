@@ -9,7 +9,7 @@ function alternarVisibilidadeSenha(){alternar('login_senha','icone_olho');}
 function alternarOlhoAlerta(){alternar('alerta_senha','icone_olho_alerta');}
 async function realizarLogin(){
  const box=document.getElementById('alerta-login');
- try{await api('/api/login',{telefone:document.getElementById('login_telefone').value,senha:document.getElementById('login_senha').value});location.assign('botao.html');}
+ try{const d=await api('/api/login',{telefone:document.getElementById('login_telefone').value,senha:document.getElementById('login_senha').value});if(d.renovar){await carregarRenovacao();return;}location.assign('botao.html');}
  catch(e){box.textContent=e.message;box.style.display='block';}
 }
 async function consultarChassi(){
@@ -33,7 +33,7 @@ async function dispararAlertaCadmiv(){
 function salvarAlteracoes(){location.assign('cadastro.html?editar=1');}
 async function sair(){try{await api('/api/logout',{});location.assign('login.html');}catch(e){alert(e.message);}}
 async function carregarCliente(){
- const d=await api('/api/me');
+ const d=await api('/api/me');if(d.vencido){location.replace('login.html?renovar=1');return;}
  const set=(id,value)=>{const el=document.getElementById(id);if(el){if(el.tagName==='INPUT')el.value=value;else el.textContent=value;}};
  set('cliente_nome',d.nome);set('cliente_telefone',d.telefone);set('cliente_modelo',d.marca+' — '+nomeModelo(d.modelo));
  set('cartao_status','Situação: '+d.status+(d.status==='PENDENTE'?' — NÃO ATIVO':''));
@@ -42,7 +42,7 @@ async function carregarCliente(){
  set('caixa_nome_real',d.nome);set('caixa_chassi_real',d.marca+' — '+nomeModelo(d.modelo)+' — CHASSI: '+d.chassi);
  const qr=document.getElementById('qr-veiculo'),link=document.getElementById('link-consulta');
  if(qr&&link){qr.src='/api/me/qr';qr.hidden=false;link.href='fiscalizacao.html#codigo='+encodeURIComponent(d.codigo);link.hidden=false;}
- set('caixa_codigo_real','Referência: '+d.codigo.slice(0,8).toUpperCase()+'…'+d.codigo.slice(-4).toUpperCase());set('caixa_data_real','CADASTRADO EM: '+new Date(d.criado_em).toLocaleDateString('pt-BR'));
+ set('caixa_codigo_real','Referência: '+d.codigo.slice(0,8).toUpperCase()+'…'+d.codigo.slice(-4).toUpperCase());set('caixa_data_real',(d.renovado_em?'RENOVADO EM: ':'CADASTRADO EM: ')+new Date(d.renovado_em||d.criado_em).toLocaleDateString('pt-BR'));const validade=document.getElementById('validade-cartao');if(validade)validade.textContent=d.valido_ate?'VÁLIDO ATÉ: '+new Date(d.valido_ate).toLocaleDateString('pt-BR'):'';
 }
 document.addEventListener('DOMContentLoaded',()=>{
  if(document.getElementById('resultado_consulta')){

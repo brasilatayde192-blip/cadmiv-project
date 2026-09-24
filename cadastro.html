@@ -299,7 +299,8 @@
             <input type="text" id="chassi_veiculo" name="chassi" maxlength="128" onblur="verificarChassiCadastrado()" placeholder="Digite o número do chassi" required>
 
             <label>Número da Nota Fiscal de Compra do Veículo:</label> 
-            <input name="nota_fiscal" type="text" placeholder="Número da NF" required>
+            <input id="nota-fiscal" name="nota_fiscal" type="text" maxlength="100" placeholder="Número da nota fiscal (aceita números e letras)" required>
+            <details id="sem-nota"><summary style="cursor:pointer;margin:10px 0">Caso não tenha nota fiscal, clique aqui 👆</summary><div style="text-align:left"><label style="display:block"><input style="width:auto" type="checkbox" name="origem_sem_nota" value="doacao"> Veículo foi recebido como: Doação</label><label style="display:block"><input style="width:auto" type="checkbox" name="origem_sem_nota" value="presente"> Veículo foi recebido como: Presente</label></div></details>
 
             <label>Ano de Fabricação do Veículo:</label> 
             <input name="ano" type="text" placeholder="Ex: 2026" required>

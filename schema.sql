@@ -39,3 +39,8 @@ CREATE TABLE IF NOT EXISTS cadmiv_fotos (
  imagem bytea NOT NULL CHECK(octet_length(imagem)<=200000),
  PRIMARY KEY(cliente_id,posicao)
 );
+
+-- Migração aditiva: preserva a data original e não presume pagamentos antigos.
+ALTER TABLE cadmiv_veiculos ADD COLUMN IF NOT EXISTS ativado_em timestamptz;
+ALTER TABLE cadmiv_veiculos ADD COLUMN IF NOT EXISTS renovado_em timestamptz;
+ALTER TABLE cadmiv_veiculos ADD COLUMN IF NOT EXISTS origem_sem_nota text CHECK(origem_sem_nota IN ('doacao','presente'));

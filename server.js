@@ -1,5 +1,6 @@
 'use strict';
 const express = require('express');
+const {vigencia}=require('./vigencia');
 const QRCode = require('qrcode');
 const { createResetMailer } = require('./email');
 const { prepararFoto } = require('./fotos');
@@ -55,7 +56,10 @@ function validateRegistration(b) {
   if (typeof b.senha !== 'string' || b.senha.length < 12 || b.senha.length > 128) throw fail(400,'Use uma senha de 12 a 128 caracteres.');
   d.senha=b.senha; d.marca=text(b.marca,'Marca do Veículo',100); d.modelo=text(b.modelo,'modelo',100);
   if (!['bike_comum','bike_sem_acelerador','bike_com_acelerador','bike_esportiva_alto_custo','bike_triciclo_comum','bike_triciclo_especial','patinete','monociclo'].includes(d.modelo)) throw fail(400,'Modelo inválido.');
-  d.chassi=normalizeChassi(b.chassi); d.cor=text(b.cor,'cor',80); d.nota_fiscal=text(b.nota_fiscal,'nota fiscal',100); d.ano=text(b.ano,'ano',4);
+  d.chassi=normalizeChassi(b.chassi); d.cor=text(b.cor,'cor',80); d.origem_sem_nota=b.origem_sem_nota||null;
+  if(d.origem_sem_nota!==null&&!['doacao','presente'].includes(d.origem_sem_nota))throw fail(400,'Selecione doação ou presente.');
+  d.nota_fiscal=text(b.nota_fiscal,'nota fiscal',100,!d.origem_sem_nota);
+  if(d.origem_sem_nota&&d.nota_fiscal)throw fail(400,'Informe a nota fiscal ou escolha doação/presente, não ambos.'); d.ano=text(b.ano,'ano',4);
   if (!/^\d{4}$/.test(d.ano) || +d.ano < 1900 || +d.ano > new Date().getUTCFullYear()+1) throw fail(400,'Ano de fabricação inválido.');
   if (!['novo','usado'].includes(b.estado_conservacao)) throw fail(400,'Selecione o estado de conservação.');
   d.estado_conservacao=b.estado_conservacao;
@@ -112,6 +116,9 @@ function createApp(db,{production=false,origin='http://localhost:10000',sendRese
     if(!rows.length)throw fail(401,'Sessão expirada. Entre novamente.');return rows[0].cliente_id;
   }
   async function session(c,id){const token=crypto.randomBytes(32).toString('hex');await c.query("INSERT INTO cadmiv_sessoes(token_hash,cliente_id,expira) VALUES($1,$2,now()+interval '8 hours')",[digest(token),id]);return token;}
+  async function situacao(id){const {rows}=await db.query('SELECT status,ativado_em,renovado_em FROM cadmiv_veiculos WHERE cliente_id=$1',[id]);if(!rows.length)throw fail(404,'Cadastro não localizado.');return {...rows[0],...vigencia(rows[0])};}
+  app.get('/api/me/renovacao',wrap(async(req,res)=>{const d=await situacao(await current(req));res.json({...d,pagamento_disponivel:false});}));
+  app.post('/api/me/renovacao',wrap(async(req,res)=>{await current(req);throw fail(409,'A renovação por PIX ainda não está disponível. Nenhuma cobrança foi gerada.');}));
   function setCookie(res,token,maxAge=28800000){res.cookie('cadmiv_session',token,{httpOnly:true,secure:production,sameSite:'strict',maxAge,path:'/'});}
   app.get('/healthz',wrap(async(req,res)=>{await db.query('SELECT 1');res.json({status:'ok'});}));
   app.post('/api/chassi/verificar',wrap(async(req,res)=>{const {rows}=await db.query('SELECT 1 FROM cadmiv_veiculos WHERE chassi_normalizado=$1',[normalizeChassi(req.body.chassi)]);res.json({cadastrado:rows.length>0});}));
@@ -125,6 +132,7 @@ function createApp(db,{production=false,origin='http://localhost:10000',sendRese
       const id=crypto.randomUUID(),vehicleId=crypto.randomUUID(),codigo=crypto.randomBytes(24).toString('hex');
       await c.query(`INSERT INTO cadmiv_clientes(id,nome,cpf,telefone,email,nascimento,senha_hash,privado,dependentes,responsabilidade) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`,[id,b.nome,b.cpf,b.telefone,b.email,b.nascimento,passwordHash,JSON.stringify(b.privado),JSON.stringify(b.dependentes),b.responsabilidade]);
       await c.query(`INSERT INTO cadmiv_veiculos(id,cliente_id,codigo,chassi,marca,modelo,cor,nota_fiscal,ano,estado_conservacao,combo) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`,[vehicleId,id,codigo,b.chassi,b.marca,b.modelo,b.cor,b.nota_fiscal,b.ano,b.estado_conservacao,b.combo]);
+      await c.query('UPDATE cadmiv_veiculos SET origem_sem_nota=$1 WHERE id=$2',[b.origem_sem_nota,vehicleId]);
       for(let i=0;i<imagens.length;i++)if(imagens[i])await c.query('INSERT INTO cadmiv_fotos(cliente_id,posicao,imagem) VALUES($1,$2,$3)',[id,i,imagens[i]]);
       const token=await session(c,id);await c.query('COMMIT');setCookie(res,token);res.status(201).json({codigo,status:'PENDENTE'});
     }catch(e){await c.query('ROLLBACK');throw e;}finally{c.release();}
@@ -180,7 +188,8 @@ function createApp(db,{production=false,origin='http://localhost:10000',sendRese
       const valid=await verifyPassword(req.body.senha,rows[0]?.senha_hash||'0'.repeat(32)+':'+'0'.repeat(128));
       if(!rows.length||!valid)throw fail(401,'Telefone ou senha incorretos.');
       if(cookie(req))await c.query('DELETE FROM cadmiv_sessoes WHERE token_hash=$1',[digest(cookie(req))]);
-      const token=await session(c,rows[0].id);await c.query('COMMIT');setCookie(res,token);res.json({ok:true});
+      const v=await c.query('SELECT status,ativado_em,renovado_em FROM cadmiv_veiculos WHERE cliente_id=$1',[rows[0].id]);
+      const token=await session(c,rows[0].id);await c.query('COMMIT');setCookie(res,token);res.json({ok:true,renovar:vigencia(v.rows[0]).vencido});
     }catch(e){await c.query('ROLLBACK');throw e;}finally{c.release();}
   }));
   app.post('/api/logout',wrap(async(req,res)=>{await db.query('DELETE FROM cadmiv_sessoes WHERE token_hash=$1',[digest(cookie(req))]);setCookie(res,'',0);res.json({ok:true});}));
@@ -201,24 +210,24 @@ function createApp(db,{production=false,origin='http://localhost:10000',sendRese
     res.json({ok:true});
   }));
   app.get('/api/me/qr',wrap(async(req,res)=>{
-    const id=await current(req);
+    const id=await current(req);if((await situacao(id)).vencido)throw fail(403,'Cartão vencido. Renove antes de imprimir.');
     const {rows}=await db.query('SELECT codigo FROM cadmiv_veiculos WHERE cliente_id=$1',[id]);
     if(!rows.length)throw fail(404,'Veículo não localizado.');
     const url=new URL('/fiscalizacao.html',origin);url.hash='codigo='+rows[0].codigo;
     res.type('image/svg+xml').send(await QRCode.toString(url.href,{type:'svg',margin:4,errorCorrectionLevel:'M'}));
   }));
   app.get('/api/me',wrap(async(req,res)=>{
-    const id=await current(req);const {rows}=await db.query(`SELECT c.nome,c.cpf,c.telefone,c.email,c.nascimento,c.responsabilidade,c.privado,c.dependentes,v.nota_fiscal,v.ano,v.estado_conservacao,v.combo,v.codigo,v.chassi_normalizado AS chassi,v.marca,v.modelo,v.cor,v.status,v.criado_em FROM cadmiv_clientes c JOIN cadmiv_veiculos v ON v.cliente_id=c.id WHERE c.id=$1`,[id]);res.json(rows[0]);
+    const id=await current(req);const {rows}=await db.query(`SELECT c.nome,c.cpf,c.telefone,c.email,c.nascimento,c.responsabilidade,c.privado,c.dependentes,v.nota_fiscal,v.origem_sem_nota,v.ativado_em,v.renovado_em,v.ano,v.estado_conservacao,v.combo,v.codigo,v.chassi_normalizado AS chassi,v.marca,v.modelo,v.cor,v.status,v.criado_em FROM cadmiv_clientes c JOIN cadmiv_veiculos v ON v.cliente_id=c.id WHERE c.id=$1`,[id]);res.json({...rows[0],...vigencia(rows[0])});
   }));
   app.patch('/api/me',wrap(async(req,res)=>{
     const id=await current(req),body=req.body;
     const allowed=['telefone','email','nascimento','marca','modelo','cor','ano','estado_conservacao','dep1_nome','dep1_parentesco','dep2_nome','dep2_parentesco','responsabilidade','senha_atual','fotos',...privateKeys];
     if(!body||typeof body!=='object'||Array.isArray(body)||Object.keys(body).some(k=>!allowed.includes(k)))throw fail(400,'Nome, CPF, Chassi, Nota Fiscal, plano e situação não podem ser alterados.');
     const c=await db.connect();try{
-      await c.query('BEGIN');const {rows}=await c.query('SELECT c.*,v.chassi,v.marca,v.modelo,v.cor,v.nota_fiscal,v.ano,v.estado_conservacao,v.combo FROM cadmiv_clientes c JOIN cadmiv_veiculos v ON v.cliente_id=c.id WHERE c.id=$1 FOR UPDATE OF c,v',[id]);
+      await c.query('BEGIN');const {rows}=await c.query('SELECT c.*,v.chassi,v.marca,v.modelo,v.cor,v.nota_fiscal,v.origem_sem_nota,v.ano,v.estado_conservacao,v.combo FROM cadmiv_clientes c JOIN cadmiv_veiculos v ON v.cliente_id=c.id WHERE c.id=$1 FOR UPDATE OF c,v',[id]);
       if(!rows.length)throw fail(401,'Entre novamente na sua conta.');const old=rows[0];
       if(!await verifyPassword(body.senha_atual,old.senha_hash))throw fail(401,'Confirme sua senha atual para salvar.');
-      const base={...old.privado,nome:old.nome,cpf:old.cpf,telefone:old.telefone,email:old.email,nascimento:String(old.nascimento instanceof Date?old.nascimento.toISOString():old.nascimento).slice(0,10),marca:old.marca,modelo:old.modelo,cor:old.cor,nota_fiscal:old.nota_fiscal,ano:String(old.ano),estado_conservacao:old.estado_conservacao,combo:String(old.combo),responsabilidade:old.responsabilidade};
+      const base={...old.privado,nome:old.nome,cpf:old.cpf,telefone:old.telefone,email:old.email,nascimento:String(old.nascimento instanceof Date?old.nascimento.toISOString():old.nascimento).slice(0,10),marca:old.marca,modelo:old.modelo,cor:old.cor,nota_fiscal:old.nota_fiscal,origem_sem_nota:old.origem_sem_nota,ano:String(old.ano),estado_conservacao:old.estado_conservacao,combo:String(old.combo),responsabilidade:old.responsabilidade};
       old.dependentes.forEach((d,i)=>{base['dep'+(i+1)+'_nome']=d.nome;base['dep'+(i+1)+'_parentesco']=d.parentesco;});
       const d=validateRegistration({...base,...body,senha:body.senha_atual,chassi:old.chassi,cadastro_anterior:'Não'});
       const fotos=body.fotos??{};if(!fotos||typeof fotos!=='object'||Array.isArray(fotos)||Object.keys(fotos).some(k=>!(/^[0-2]$/.test(k))||Number(k)>=old.combo))throw fail(400,'Confira as fotos do seu plano.');
@@ -248,15 +257,15 @@ function createApp(db,{production=false,origin='http://localhost:10000',sendRese
     if(!result.rows.length)throw fail(409,'O cadastro ainda não está ativo. Entre em contato com o suporte.');res.json({status:'ROUBO'});
   }));
   app.post('/api/consultar',wrap(async(req,res)=>{
-    const result=req.body.chassi!==undefined ? await db.query('SELECT status,marca,modelo,cor,chassi_normalizado AS chassi FROM cadmiv_veiculos WHERE chassi_normalizado=$1',[normalizeChassi(req.body.chassi)]) : await db.query('SELECT status,marca,modelo,cor,chassi_normalizado AS chassi FROM cadmiv_veiculos WHERE codigo=$1',[text(req.body.codigo,'código',64)]);
+    const result=req.body.chassi!==undefined ? await db.query('SELECT status,ativado_em,renovado_em,marca,modelo,cor,chassi_normalizado AS chassi FROM cadmiv_veiculos WHERE chassi_normalizado=$1',[normalizeChassi(req.body.chassi)]) : await db.query('SELECT status,ativado_em,renovado_em,marca,modelo,cor,chassi_normalizado AS chassi FROM cadmiv_veiculos WHERE codigo=$1',[text(req.body.codigo,'código',64)]);
     if(!result.rows.length)return res.json({status:'INVALIDO',mensagem:'Veículo não localizado na base CADMIV.'});
     const messages={PENDENTE:'Cadastro em andamento — ainda não ativo.',ATIVO:'Cadastro ativo.',ROUBO:'Alerta de furto ou roubo registrado pelo titular.',DESATIVADO:'Cadastro desativado.',ADORMECIDO:'Cadastro aguardando renovação.'};
-    const r=result.rows[0];res.json({status:r.status,mensagem:messages[r.status],marca:r.marca,modelo:r.modelo,cor:r.cor,chassi:r.chassi});
+    const r={...result.rows[0],...vigencia(result.rows[0])};res.json({status:r.status,mensagem:messages[r.status],marca:r.marca,modelo:r.modelo,cor:r.cor,chassi:r.chassi});
   }));
   app.get('/',(req,res)=>res.sendFile(path.join(__dirname,'index.html')));
   app.get('/validar',(req,res)=>res.redirect('/validar.html'));
-  for(const page of ['index.html','apresentacao.html','fiscalizacao.html','termos.html','cadastro.html','login.html','alerta.html','cadastro.js','cadastro-edicao.js','cliente.js','recuperar-senha.html','redefinir-senha.html','senha.js','cartao.js'])app.get('/'+page,(req,res)=>res.sendFile(path.join(__dirname,page)));
-  for(const page of ['botao.html','cartao.html','validar.html'])app.get('/'+page,wrap(async(req,res)=>{try{await current(req);}catch(e){if(e.status===401)return res.redirect('/login.html');throw e;}res.sendFile(path.join(__dirname,page));}));
+  for(const page of ['index.html','apresentacao.html','fiscalizacao.html','termos.html','cadastro.html','login.html','alerta.html','cadastro.js','cadastro-edicao.js','cliente.js','recuperar-senha.html','redefinir-senha.html','senha.js','cartao.js','renovacao.js'])app.get('/'+page,(req,res)=>res.sendFile(path.join(__dirname,page)));
+  for(const page of ['botao.html','cartao.html','validar.html'])app.get('/'+page,wrap(async(req,res)=>{try{const id=await current(req);if((await situacao(id)).vencido)return res.redirect('/login.html?renovar=1');}catch(e){if(e.status===401)return res.redirect('/login.html');throw e;}res.sendFile(path.join(__dirname,page));}));
   app.get('/painel.html',(req,res)=>res.status(403).send('Painel administrativo indisponível nesta etapa. Os indicadores antigos eram demonstrativos.'));
   app.use((req,res)=>res.status(404).json({erro:'Página não encontrada.'}));
   app.use((err,req,res,next)=>{

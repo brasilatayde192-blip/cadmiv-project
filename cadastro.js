@@ -54,6 +54,11 @@ async function verificarChassiCadastrado(){
 }
 document.addEventListener('DOMContentLoaded',()=>{
  iniciarFotosCadastro();
+ const nota=document.getElementById('nota-fiscal'),origens=[...document.querySelectorAll('[name="origem_sem_nota"]')];
+ for(const opcao of origens)opcao.addEventListener('change',()=>{
+  if(opcao.checked)for(const outra of origens)if(outra!==opcao)outra.checked=false;
+  const semNota=origens.some(el=>el.checked);nota.disabled=semNota;nota.required=!semNota;
+ });
  document.getElementById('data_emissao').value=new Date().toLocaleDateString('pt-BR');
  document.getElementById('cadmiv_ano').max=new Date().getFullYear();
  document.getElementById('chassi_veiculo').addEventListener('input',e=>{chassiRequest++;e.target.setCustomValidity('');document.getElementById('alerta-trava').style.display='none';});

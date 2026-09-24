@@ -21,6 +21,9 @@ async function abrirCadastroExistente(){
   for(const key of ['nome','cpf','chassi','nota_fiscal']){const el=form.querySelector('[name="'+key+'"]');el.readOnly=true;el.setAttribute('aria-readonly','true');}
   for(const el of form.querySelectorAll('[name="combo"]')){el.checked=el.value===String(d.combo);el.disabled=true;}
   gerenciarCombo();window.cadmivEdicao.combo=Number(d.combo);
+  for(const el of form.querySelectorAll('[name="origem_sem_nota"]')){el.checked=el.value===d.origem_sem_nota;el.disabled=true;}
+  document.getElementById('sem-nota').open=!!d.origem_sem_nota;
+  const nota=form.querySelector('[name="nota_fiscal"]');nota.required=!d.origem_sem_nota;
   const senha=form.querySelector('[name="senha"]');senha.disabled=true;senha.required=false;senha.parentElement.hidden=true;form.querySelector('label[for="senha-confirmacao"]').hidden=true;
   const anterior=document.getElementById('cadastro_anterior');anterior.value='Não';anterior.disabled=true;anterior.setCustomValidity('');
   document.getElementById('data_emissao').value=new Date(d.criado_em).toLocaleDateString('pt-BR');

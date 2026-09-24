@@ -26,7 +26,7 @@ function iniciarCartoes(d){
   cartaoInicializado=true;select.addEventListener('change',selecionarCartao);
   ce('imprimir-cartao').addEventListener('click',async()=>{
    if(fotoCarregando||fotoErro)return;
-   try{const qr=ce('qr-veiculo');if(qr.hidden||!qr.src)throw Error();await qr.decode();if(!ce('foto-pessoa').hidden)await ce('foto-pessoa').decode();await document.fonts.ready;window.print();}catch{ce('mensagem-foto').textContent='Aguarde o carregamento do cartão e do QR-code antes de imprimir.';}
+   try{const atual=await api('/api/me/renovacao');if(atual.vencido){ce('mensagem-foto').textContent='Cartão vencido. Acesse sua conta para renovar.';ce('imprimir-cartao').disabled=true;return;}const qr=ce('qr-veiculo');if(qr.hidden||!qr.src)throw Error();await qr.decode();if(!ce('foto-pessoa').hidden)await ce('foto-pessoa').decode();await document.fonts.ready;window.print();}catch{ce('mensagem-foto').textContent='Não foi possível confirmar a validade ou carregar o cartão. Confira sua conexão e tente novamente.';}
   });
  }
  selecionarCartao();
