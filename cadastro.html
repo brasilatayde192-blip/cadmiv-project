@@ -128,7 +128,7 @@
 <!-- 🚨 AVISO RELUZENTE DE SEGURANÇA NACIONAL SUGERIDO PELO DIRETOR -->
 <div style="background-color: #fdf2f2 !important; border: 2px solid #ec7063 !important; padding: 12px !important; border-radius: 6px !important; margin-bottom: 12px !important; text-align: center !important; animation: reluzirAlerta 1.0s infinite alternate !important;">
     <strong style="color: #c0392b !important; font-family: Arial, sans-serif !important; font-size: 13.5px !important; letter-spacing: 0.5px !important; text-transform: uppercase !important;">
-        ▲ É expressamente proibido cadastrar nesta plataforma pessoas com menos de 18 anos de idade!
+        ▲ É expressamente proibido CADASTRAR nesta plataforma pessoas com menos de 18 anos de idade!
     </strong>
 </div>
 
@@ -189,7 +189,7 @@
     </div>
     <!-- Tarja de Alerta Informativo de Idade -->
     <div id="alerta-idade" style="display: none; color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; padding: 10px; margin-top: 10px; border-radius: 4px; font-weight: bold;">
-        ❌ RESTRIÇÃO DE IDADE CRONOLÓGICA: O cadastro é permitido apenas para maiores de 18 anos de idade.
+        ❌ RESTRIÇÃO DE IDADE CRONOLÓGICA: O Cadastro é permitido apenas para maiores de 18 anos de idade.
     </div>
 </div>
 <!-- FIM DA SEÇÃO DE DATA DE NASCIMENTO --> 
@@ -277,7 +277,7 @@
             <label>Médico de sua preferência (Nome Completo):</label> 
             <input name="medico" type="text" placeholder="Nome do Doutor(a)">
 
-            <label>Telefone de contato do Médico de sua Preferência:</label> 
+            <label>Telefone de contato do Médico:</label> 
             <input type="text" name="telefone_medico" placeholder="(00) 00000-0000">
 
             <div class="section-title">2. Dados do Veículo Autopropelido Cadastrado</div> 
@@ -288,16 +288,16 @@
 <select name="modelo" required> 
                 <option value="">Selecione o modelo do veículo...</option> 
                 <option value="bike_comum">Bicicleta Comum (Sem ser Elétrica)</option> 
-                <option value="bike_sem_acelerador">Bicicleta Elétrica (Sem Acelerador)</option> 
-                <option value="bike_com_acelerador">Bicicleta Elétrica (Com Acelerador)</option> 
+                <option value="bike_sem_acelerador">Bicicleta Elétrica sem Acelerador</option> 
+                <option value="bike_com_acelerador">Bicicleta Elétrica com Acelerador</option> 
                 <option value="bike_esportiva_alto_custo">Bicicleta Esportiva de Alto Custo</option>
                 <option value="bike_triciclo_comum">Triciclo Comum (Sem ser Elétrico)</option>
-                <option value="bike_triciclo_especial">Triciclo Especial Elétrico (Com Acelerador)</option>
+                <option value="bike_triciclo_especial">Triciclo Especial Elétrico com Acelerador</option>
                 <option value="patinete">Patinete Comum</option>
-                <option value="patinete eletrica">Patinete Elétrica (Sem Acelerador)</option>
-                <option value="patinete eletrica">Patinete Elétrica (Com Acelerador)</option>  
-                <option value="monociclo">Monociclo Comum</option>
-                <option value="monociclo eletrico">Monociclo Elétrico</option> 
+                <option value="patinete_eletrica">Patinete Elétrica (Sem Acelerador)</option>
+                <option value="patinete_eletrica">Patinete Elétrica (Com Acelerador)</option> 
+                <option value="monociclo_comum">Monociclo Comum</option>
+                <option value="monociclo_eletrico">Monociclo Elétrico</option> 
             </select> 
             
             <label>Número de Identificação do Veículo (Chassi / Série):</label> 
@@ -305,7 +305,7 @@
 
             <label>Número da Nota Fiscal de Compra do Veículo:</label> 
             <input id="nota-fiscal" name="nota_fiscal" type="text" maxlength="100" placeholder="Número da nota fiscal (aceita números e letras)" required>
-            <details id="sem-nota"><summary style="cursor:pointer;margin:10px 0">Caso não tenha Nota Fiscal, Clique Aqui 👆</summary><div style="text-align:left"><label style="display:block"><input style="width:auto" type="checkbox" name="origem_sem_nota" value="doacao"> Veículo foi recebido como: Doação</label><label style="display:block"><input style="width:auto" type="checkbox" name="origem_sem_nota" value="presente"> Veículo foi recebido como: Presente</label></div></details>
+            <details id="sem-nota"><summary style="cursor:pointer;margin:10px 0">Caso não tenha nota fiscal, clique aqui 👆</summary><div style="text-align:left"><label style="display:block"><input style="width:auto" type="checkbox" name="origem_sem_nota" value="doacao"> Veículo foi recebido como: Doação</label><label style="display:block"><input style="width:auto" type="checkbox" name="origem_sem_nota" value="presente"> Veículo foi recebido como: Presente</label></div></details>
 
             <label>Ano de Fabricação do Veículo:</label> 
             <input name="ano" type="text" placeholder="Ex: 2026" required>
@@ -321,7 +321,7 @@
             </select> 
             
             <div class="info-box-used"> 
-                ⚠️ AVISO IMPORTANTE sobre TRANSFERÊNCIA do VEÍCULO CADASTRADO na CADMIV:<br> Em caso de venda ou doação, o cadastro deve deixar de identificar o antigo titular como proprietário. O titular pode excluir seu cadastro pela área do cliente quando deixar de possuir o veículo. 
+                ⚠️ AVISO IMPORTANTE sobre TRANSFERÊNCIA do VEÍCULO CADASTRADO na CADMIV:<br> Em caso de Venda ou Doação, o cadastro deve deixar de identificar o antigo Titular como proprietário. O Titular pode Excluir seu cadastro pela área do cliente quando deixar de possuir o Veículo. 
             </div> 
             
             <label>Este veículo já foi  CADASTRADO  anteriormente no CADMIV?</label> 
@@ -333,7 +333,7 @@
             
             <div id="alerta-trava" class="alert-box">⚠️ BLOQUEIO DE SEGURANÇA JURÍDICA NACIONAL:<br>Este veículo já possui um Cadastro ativo no sistema.</div> 
 
-            <section class="info-box-used"><h3>Cancelamento e valores pagos</h3><p>O cancelamento por desistência, após o prazo legal de arrependimento e a prestação regular do serviço, não gera devolução automática dos valores pagos. Permanecem assegurados os reembolsos previstos em lei, inclusive por arrependimento no prazo aplicável, cobrança indevida ou falha na prestação do serviço. Nesta etapa de testes, não há cobrança.</p><h3>Empréstimo do veículo a terceiros</h3><p>Ao emprestar o veículo, o CADMIV recomenda que o titular forneça ao condutor uma autorização escrita, com identificação das partes, identificação do veículo, período de uso e assinatura do titular. Ela pode auxiliar na conferência durante uma abordagem, mas não substitui os documentos legalmente exigidos nem garante a liberação do veículo.</p></section><div class="section-title">3. Concretização do Cadastro Corporativo</div> 
+            <section class="info-box-used"><h3>Cancelamento e Valores Pagos</h3><p>O cancelamento por desistência, após o prazo legal de arrependimento e a prestação regular do serviço, não gera devolução automática dos valores pagos. Permanecem assegurados os reembolsos previstos em lei, inclusive por arrependimento no prazo aplicável, cobrança indevida ou falha na prestação do serviço. Nesta etapa de testes, não há cobrança.</p><h3>Empréstimo do Veículo a Terceiros</h3><p>Ao emprestar o veículo, o CADMIV recomenda que o Titular forneça ao condutor uma autorização escrita, com identificação das partes, identificação do veículo, período de uso e assinatura do Titular. Ela pode auxiliar na conferência durante uma abordagem, mas não substitui os documentos legalmente exigidos nem garante a liberação do veículo.</p></section><div class="section-title">3. Concretização do Cadastro </div> 
             
             <div class="offer-box"> 
                 <strong>Concretização do Cartão Digital</strong><br><br> 
@@ -412,14 +412,14 @@
 
             <div id="secao-responsabilidade" class="dependent-container" style="background-color: #fcf3cf; border-color: #f39c12;"> 
                 <span style="font-weight: bold; color: #b7950b;">📋 DECLARAÇÃO DE RESPONSABILIDADE JURÍDICA:</span> 
-                <textarea rows="3" readonly style="margin-top:5px; background:#fff; resize:none;">Eu, na qualidade de proprietário titular cadastrado na plataforma CADMIV, vencionando para todos os fins de direito, a vinculação do meu Endereço Residencial e Contatos Telefônicos ao cadastro do dependente refirido acima, declaro ser responsável pelas informações prestadas.</textarea>
+                <textarea rows="3" readonly style="margin-top:5px; background:#fff; resize:none;">Eu, na qualidade de proprietário Titular cadastrado na plataforma CADMIV, vencionando para todos os fins de direito, a vinculação do meu Endereço Residencial e Contatos Telefônicos ao cadastro do dependente refirido acima, DECLARO ser responsável pelas informações prestadas.</textarea>
 <div style="margin-top: 10px; display: flex; align-items: center;"> 
                     <input type="checkbox" name="responsabilidade" id="responsabilidade" style="width: auto; margin-top: 0; margin-right: 10px; transform: scale(1.2);"> 
                     <strong>Confirmo e aceito os Termos de Responsabilidade Acima.</strong> 
                 </div> 
             </div>
 
-            <div id="senha-edicao" hidden><label for="senha-atual-edicao">Confirme sua senha atual para salvar as alterações:</label><div style="position:relative"><input type="password" id="senha-atual-edicao" autocomplete="current-password" maxlength="128" style="padding-right:52px;box-sizing:border-box"><button type="button" id="olho-senha-edicao" aria-label="Mostrar senha" aria-controls="senha-atual-edicao" aria-pressed="false" onclick="alternarSenhaCadastro('senha-atual-edicao',this)" style="position:absolute;right:4px;top:50%;transform:translateY(-50%);width:44px;min-height:44px;margin:0;padding:5px;background:none;border:0;font-size:20px;cursor:pointer">🙈</button></div><p>Nome, CPF, Chassi, Número da Nota Fiscal e data de registro permanecem os mesmos.</p></div>
+            <div id="senha-edicao" hidden><label for="senha-atual-edicao">Confirme sua senha atual para salvar as alterações:</label><div style="position:relative"><input type="password" id="senha-atual-edicao" autocomplete="current-password" maxlength="128" style="padding-right:52px;box-sizing:border-box"><button type="button" id="olho-senha-edicao" aria-label="Mostrar senha" aria-controls="senha-atual-edicao" aria-pressed="false" onclick="alternarSenhaCadastro('senha-atual-edicao',this)" style="position:absolute;right:4px;top:50%;transform:translateY(-50%);width:44px;min-height:44px;margin:0;padding:5px;background:none;border:0;font-size:20px;cursor:pointer">🙈</button></div><p>Nome, CPF, Chassi, Número da Nota Fiscal e Data de Registro permanecem os mesmos.</p></div>
 <!-- Início da Tarja Verde do Final do Formulário -->
         <div class="tarja-botoes">
             <button type="submit" id="btn-enviar" class="btn-next">
@@ -430,7 +430,7 @@
         
     </form>
 </div>
-<dialog id="confirmar-exclusao" aria-labelledby="titulo-exclusao"><h2 id="titulo-exclusao">Excluir definitivamente meu cadastro</h2><p>Serão apagados deste sistema seus dados, veículo, fotos e dependentes. O acesso à conta será encerrado e o QR-code antigo deixará de localizar o cadastro. Esta ação não pode ser desfeita.</p><label for="motivo-exclusao">Motivo:</label><select id="motivo-exclusao"><option value="">Selecione</option><option value="venda">Venda</option><option value="doacao">Doação</option><option value="outro">Outro motivo</option></select><label for="senha-exclusao">Senha atual:</label><input id="senha-exclusao" type="password" autocomplete="current-password" maxlength="128"><label for="texto-exclusao">Digite EXCLUIR para confirmar:</label><input id="texto-exclusao" autocomplete="off"><p id="mensagem-exclusao" role="status"></p><button type="button" id="cancelar-exclusao">Voltar sem excluir</button> <button type="button" id="executar-exclusao">Excluir definitivamente</button></dialog><style>[hidden]{display:none!important}dialog{max-width:500px;width:90%;box-sizing:border-box;border:1px solid #aaa;border-radius:8px;text-align:left}dialog::backdrop{background:#0008}dialog button{padding:12px;margin-top:15px;cursor:pointer}#executar-exclusao{background:#a52828;color:white;border:0}#acoes-cliente{margin:15px 0}input[readonly]{background:#eee}.cadastro-foto video:not([hidden]){display:block}</style></body>
+<dialog id="confirmar-exclusao" aria-labelledby="titulo-exclusao"><h2 id="titulo-exclusao">Excluir definitivamente meu Cadastro</h2><p>Serão apagados deste sistema seus dados, veículo, fotos e dependentes. O acesso à conta será encerrado e o QR-code antigo deixará de localizar o cadastro. Esta ação não pode ser Desfeita.</p><label for="motivo-exclusao">Motivo:</label><select id="motivo-exclusao"><option value="">Selecione</option><option value="venda">Venda</option><option value="doacao">Doação</option><option value="outro">Outro motivo</option></select><label for="senha-exclusao">Senha Atual:</label><input id="senha-exclusao" type="password" autocomplete="current-password" maxlength="128"><label for="texto-exclusao">Digite EXCLUIR para Confirmar:</label><input id="texto-exclusao" autocomplete="off"><p id="mensagem-exclusao" role="status"></p><button type="button" id="cancelar-exclusao">Voltar sem Excluir</button> <button type="button" id="executar-exclusao">Excluir Definitivamente</button></dialog><style>[hidden]{display:none!important}dialog{max-width:500px;width:90%;box-sizing:border-box;border:1px solid #aaa;border-radius:8px;text-align:left}dialog::backdrop{background:#0008}dialog button{padding:12px;margin-top:15px;cursor:pointer}#executar-exclusao{background:#a52828;color:white;border:0}#acoes-cliente{margin:15px 0}input[readonly]{background:#eee}.cadastro-foto video:not([hidden]){display:block}</style></body>
 </html>
 
 
