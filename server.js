@@ -67,6 +67,8 @@ function validateRegistration(b) {
   if (!['1','2','3'].includes(b.combo)) throw fail(400,'Selecione um plano.');
   d.combo=b.combo; d.privado={};
   for (const key of privateKeys) d.privado[key]=text(b[key],key,300,requiredPrivate.includes(key));
+  if(b.autorizar_saude!==undefined&&!['sim','nao'].includes(b.autorizar_saude))throw fail(400,'Escolha Sim ou Não para a divulgação dos dados de saúde.');
+  d.privado.autorizar_saude=b.autorizar_saude||'nao';
   d.dependentes=[];
   for(let i=1;i<Number(b.combo);i++) d.dependentes.push({nome:text(b['dep'+i+'_nome'],'nome do dependente'),parentesco:text(b['dep'+i+'_parentesco'],'parentesco',50)});
   if(d.dependentes.length && b.responsabilidade !== true) throw fail(400,'Confirme a responsabilidade pelos dependentes.');
@@ -124,6 +126,7 @@ function createApp(db,{production=false,origin='http://localhost:10000',sendRese
   app.post('/api/chassi/verificar',wrap(async(req,res)=>{const {rows}=await db.query('SELECT 1 FROM cadmiv_veiculos WHERE chassi_normalizado=$1',[normalizeChassi(req.body.chassi)]);res.json({cadastrado:rows.length>0});}));
   app.post('/api/cadastros',wrap(async(req,res)=>{
     const b=validateRegistration(req.body),fotos=req.body.fotos??[],imagens=[];
+    if(req.body.autorizar_saude!==undefined){b.privado.saude_escolha_em=new Date().toISOString();b.privado.saude_aviso_versao='2026-09-26';}
     if(!Array.isArray(fotos)||fotos.length>Number(b.combo))throw fail(400,'Confira as fotos do plano escolhido.');
     for(const foto of fotos){if(foto===null){imagens.push(null);continue;}try{imagens.push(await prepararFoto(foto));}catch(e){throw fail(400,e.message);}}
     const passwordHash=await hashPassword(b.senha),c=await db.connect();
@@ -221,7 +224,7 @@ function createApp(db,{production=false,origin='http://localhost:10000',sendRese
   }));
   app.patch('/api/me',wrap(async(req,res)=>{
     const id=await current(req),body=req.body;
-    const allowed=['telefone','email','nascimento','marca','modelo','cor','ano','estado_conservacao','dep1_nome','dep1_parentesco','dep2_nome','dep2_parentesco','responsabilidade','senha_atual','fotos',...privateKeys];
+    const allowed=['telefone','email','nascimento','marca','modelo','cor','ano','estado_conservacao','dep1_nome','dep1_parentesco','dep2_nome','dep2_parentesco','responsabilidade','senha_atual','fotos','autorizar_saude',...privateKeys];
     if(!body||typeof body!=='object'||Array.isArray(body)||Object.keys(body).some(k=>!allowed.includes(k)))throw fail(400,'Nome, CPF, Chassi, Nota Fiscal, plano e situação não podem ser alterados.');
     const c=await db.connect();try{
       await c.query('BEGIN');const {rows}=await c.query('SELECT c.*,v.chassi,v.marca,v.modelo,v.cor,v.nota_fiscal,v.origem_sem_nota,v.ano,v.estado_conservacao,v.combo FROM cadmiv_clientes c JOIN cadmiv_veiculos v ON v.cliente_id=c.id WHERE c.id=$1 FOR UPDATE OF c,v',[id]);
@@ -230,6 +233,10 @@ function createApp(db,{production=false,origin='http://localhost:10000',sendRese
       const base={...old.privado,nome:old.nome,cpf:old.cpf,telefone:old.telefone,email:old.email,nascimento:String(old.nascimento instanceof Date?old.nascimento.toISOString():old.nascimento).slice(0,10),marca:old.marca,modelo:old.modelo,cor:old.cor,nota_fiscal:old.nota_fiscal,origem_sem_nota:old.origem_sem_nota,ano:String(old.ano),estado_conservacao:old.estado_conservacao,combo:String(old.combo),responsabilidade:old.responsabilidade};
       old.dependentes.forEach((d,i)=>{base['dep'+(i+1)+'_nome']=d.nome;base['dep'+(i+1)+'_parentesco']=d.parentesco;});
       const d=validateRegistration({...base,...body,senha:body.senha_atual,chassi:old.chassi,cadastro_anterior:'Não'});
+      for(const key of ['saude_escolha_em','saude_aviso_versao'])if(old.privado[key])d.privado[key]=old.privado[key];
+      if(body.autorizar_saude!==undefined&&(body.autorizar_saude!==old.privado.autorizar_saude||!old.privado.saude_escolha_em)){
+        d.privado.saude_escolha_em=new Date().toISOString();d.privado.saude_aviso_versao='2026-09-26';
+      }
       const fotos=body.fotos??{};if(!fotos||typeof fotos!=='object'||Array.isArray(fotos)||Object.keys(fotos).some(k=>!(/^[0-2]$/.test(k))||Number(k)>=old.combo))throw fail(400,'Confira as fotos do seu plano.');
       const images=[];for(const [pos,value] of Object.entries(fotos)){try{images.push([Number(pos),value===null?null:await prepararFoto(value)]);}catch(e){throw fail(400,e.message);}}
       await c.query('UPDATE cadmiv_clientes SET telefone=$1,email=$2,nascimento=$3,privado=$4,dependentes=$5,responsabilidade=$6 WHERE id=$7',[d.telefone,d.email,d.nascimento,JSON.stringify(d.privado),JSON.stringify(d.dependentes),d.responsabilidade,id]);
@@ -257,10 +264,16 @@ function createApp(db,{production=false,origin='http://localhost:10000',sendRese
     if(!result.rows.length)throw fail(409,'O cadastro ainda não está ativo. Entre em contato com o suporte.');res.json({status:'ROUBO'});
   }));
   app.post('/api/consultar',wrap(async(req,res)=>{
-    const result=req.body.chassi!==undefined ? await db.query('SELECT status,ativado_em,renovado_em,marca,modelo,cor,chassi_normalizado AS chassi FROM cadmiv_veiculos WHERE chassi_normalizado=$1',[normalizeChassi(req.body.chassi)]) : await db.query('SELECT status,ativado_em,renovado_em,marca,modelo,cor,chassi_normalizado AS chassi FROM cadmiv_veiculos WHERE codigo=$1',[text(req.body.codigo,'código',64)]);
+    const porChassi=req.body.chassi!==undefined;
+    const result=await db.query('SELECT v.status,v.ativado_em,v.renovado_em,v.marca,v.modelo,v.cor,v.chassi_normalizado AS chassi,c.privado FROM cadmiv_veiculos v JOIN cadmiv_clientes c ON c.id=v.cliente_id WHERE '+(porChassi?'v.chassi_normalizado':'v.codigo')+'=$1',[porChassi?normalizeChassi(req.body.chassi):text(req.body.codigo,'código',64)]);
     if(!result.rows.length)return res.json({status:'INVALIDO',mensagem:'Veículo não localizado na base CADMIV.'});
     const messages={PENDENTE:'Cadastro em andamento — ainda não ativo.',ATIVO:'Cadastro ativo.',ROUBO:'Alerta de furto ou roubo registrado pelo titular.',DESATIVADO:'Cadastro desativado.',ADORMECIDO:'Cadastro aguardando renovação.'};
-    const r={...result.rows[0],...vigencia(result.rows[0])};res.json({status:r.status,mensagem:messages[r.status],marca:r.marca,modelo:r.modelo,cor:r.cor,chassi:r.chassi});
+    const r={...result.rows[0],...vigencia(result.rows[0])},publico={status:r.status,mensagem:messages[r.status],marca:r.marca,modelo:r.modelo,cor:r.cor,chassi:r.chassi};
+    // Nunca retornar o objeto privado inteiro. Cadastros antigos permanecem sem divulgação.
+    if(r.privado?.autorizar_saude==='sim'&&r.privado.saude_escolha_em&&r.privado.saude_aviso_versao==='2026-09-26'){
+      publico.saude={};for(const key of ['sangue','latex','medicamentos','contato_emergencia','telefone_emergencia','medico','telefone_medico'])if(typeof r.privado[key]==='string'&&r.privado[key].trim())publico.saude[key]=r.privado[key];
+    }
+    res.json(publico);
   }));
   app.get('/',(req,res)=>res.sendFile(path.join(__dirname,'index.html')));
   app.get('/validar',(req,res)=>res.redirect('/validar.html'));

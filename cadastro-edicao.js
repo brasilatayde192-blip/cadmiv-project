@@ -1,6 +1,6 @@
 'use strict';
 window.cadmivEdicao={ativo:new URLSearchParams(location.search).get('editar')==='1',pronto:false,combo:0};
-const camposEditaveis=['telefone','email','nascimento','marca','modelo','cor','ano','estado_conservacao','dep1_nome','dep1_parentesco','dep2_nome','dep2_parentesco','responsabilidade','cep','logradouro','numero','bairro','cidade','uf','contato_emergencia','telefone_emergencia','sangue','latex','medicamentos','medico','telefone_medico'];
+const camposEditaveis=['telefone','email','nascimento','marca','modelo','cor','ano','estado_conservacao','dep1_nome','dep1_parentesco','dep2_nome','dep2_parentesco','responsabilidade','cep','logradouro','numero','bairro','cidade','uf','contato_emergencia','telefone_emergencia','sangue','latex','medicamentos','medico','telefone_medico','autorizar_saude'];
 async function salvarEdicaoCadastro(b){
  const body={senha_atual:document.getElementById('senha-atual-edicao').value,fotos:{}};
  for(const key of camposEditaveis)if(Object.hasOwn(b,key))body[key]=b[key];
@@ -14,7 +14,7 @@ async function abrirCadastroExistente(){
  const form=document.getElementById('form-cadastro'),message=document.getElementById('mensagem-cadastro'),submit=document.getElementById('btn-enviar');submit.disabled=true;form.hidden=true;message.textContent='Carregando seu cadastro...';
  try{
   const response=await fetch('/api/me',{cache:'no-store'});if(!response.ok)throw Error('Entre na sua conta para editar ou excluir seu cadastro.');const d=await response.json();
-  const values={...d.privado,...d};
+  const values={autorizar_saude:'nao',...d.privado,...d};
   for(const [key,value] of Object.entries(values))for(const el of form.querySelectorAll('[name="'+key+'"]')){if(el.type==='radio')el.checked=el.value===String(value);else if(el.type==='checkbox')el.checked=!!value;else if(typeof value==='string'||typeof value==='number')el.value=value;}
   d.dependentes.forEach((dep,i)=>{form.querySelector('[name="dep'+(i+1)+'_nome"]').value=dep.nome;form.querySelector('[name="dep'+(i+1)+'_parentesco"]').value=dep.parentesco;});
   const nascimento=String(d.nascimento).slice(0,10).split('-');document.getElementById('cadmiv_ano').value=nascimento[0];document.getElementById('nasc_mes').value=String(Number(nascimento[1]));document.getElementById('nasc_dia').value=String(Number(nascimento[2]));
