@@ -238,10 +238,10 @@
             <div class="health-title">🚨 Protocolo de  SAÚDE  e  EMERGÊNCIA</div> 
             <fieldset id="autorizacao-saude" style="border:1px solid #cbd5e1;border-radius:6px;padding:16px;margin:12px 0">
                 <legend>Autorização para Exibir Dados de Saúde e Emergência</legend>
-                <p id="aviso-autorizacao-saude">Você autoriza a exibição dos seus dados de Saúde e Emergência abaixo dos Dados do Veículo na Consulta Pública da CADMIV? Ao escolher Sim, qualquer pessoa que consultar o veículo pelo QR-code ou chassi poderá ver o Tipo Sanguíneo, Alergias, Contato e Telefone de Emergência, Nome e Telefone do Médico que você informar. Esses Dados são do somente do Titular , que pode não ser a pessoa, a qual esteja conduzindo o veículo.</p>
-                <p>A autorização é Opcional. Escolher Não não impede o Cadastro. Você pode mudar sua escolha em Alterar meu Cadastro e salvar com sua Senha. A retirada da autorização impede novas exibições, mas não apaga cópias que outras pessoas já tenham feito. Informe contatos de terceiros somente com a autorização deles.</p>
+                <p id="aviso-autorizacao-saude">Você autoriza a exibição dos seus Dados de Saúde e Emergência, para ser apresentados abaixo dos Dados do Veículo na Consulta Pública da CADMIV? Ao escolher Sim, qualquer pessoa que consultar o veículo pelo QR-code ou Chassi poderá ver o Tipo Sanguíneo, Alergias, Contatos e Telefone de Emergência, Nome e Telefone do Médico de sua preferência. Esses Dados são do somente do Titular , que pode não ser a pessoa, a qual esteja conduzindo o Veículo.</p>
+                <p>A autorização é Opcional,não escolher, não impede de fazer o Cadastro. Você pode mudar sua escolha em Alterar meu Cadastro e Salvar com sua Senha. A retirada da autorização impede novas exibições, mas não apaga cópias que outras pessoas já tenham feito. Informar contatos de Terceiros no cadastro somente com a autorização do mesmo.</p>
                 <label><input type="radio" name="autorizar_saude" value="sim" required aria-describedby="aviso-autorizacao-saude" style="width:auto"> Sim, autorizo a Exibição.</label>
-                <label><input type="radio" name="autorizar_saude" value="nao" required aria-describedby="aviso-autorizacao-saude" style="width:auto"> Não autorizo a Exibição.</label>
+                <label><input type="radio" name="autorizar_saude" value="nao" required aria-describedby="aviso-autorizacao-saude" style="width:auto"> Não, autorizo a Exibição.</label>
             </fieldset>
             
             <label>Em caso de Emergência, ligar para:</label> 
@@ -277,17 +277,17 @@
             <label>Possui Alergia a Látex?</label> 
             <select name="latex" required> 
                 <option value="">Selecione...</option> 
-                <option value="nao">Não possuo Alergia</option> 
+                <option value="nao">Não, possuo Alergia</option> 
                 <option value="sim">Sim, sou Alérgico(a)</option> 
             </select> 
             
             <label>Possui Alergia a algum Medicamento?</label> 
             <input type="text" name="medicamentos" placeholder="Digite os medicamentos ou escreva 'Nenhum" required>
 
-            <label>Médico de sua preferência (Nome Completo):</label> 
+            <label>Médico de sua Preferência (Nome Completo):</label> 
             <input name="medico" type="text" placeholder="Nome do Doutor(a)">
 
-            <label>Telefone de contato do Médico:</label> 
+            <label>Telefone de Contato do Médico de sua Preferência:</label> 
             <input type="text" name="telefone_medico" placeholder="(00) 00000-0000">
 
             <div class="section-title">2. Dados do Veículo Autopropelido Cadastrado</div> 
@@ -303,12 +303,14 @@
                 <option value="bike_esportiva_alto_custo">Bicicleta Esportiva de Alto Custo</option>
                 <option value="bike_triciclo_comum">Triciclo Comum (Sem ser Elétrico)</option>
                 <option value="bike_triciclo_especial">Triciclo Especial Elétrico com Acelerador</option>
-                <option value="patinete">Patinete</option> 
-                <option value="monociclo">Monociclo</option> 
+                <option value="patinete_comum">Patinete Comum</option>
+                <option value="patinete_eletrica">Patinete Elétrica</option> 
+                <option value="monociclo_comum">Monociclo Comum</option>
+                <option value="monociclo_eletrico">Monociclo Elétrico</option>  
             </select> 
             
             <label>Número de Identificação do Veículo (Chassi / Série):</label> 
-            <input type="text" id="chassi_veiculo" name="chassi" maxlength="128" onblur="verificarChassiCadastrado()" placeholder="Digite o número do chassi" required>
+            <input type="text" id="chassi_veiculo" name="chassi" maxlength="128" onblur="verificarChassiCadastrado()" placeholder="Digite o número do chassi do Veículo" required>
 
             <label>Número da Nota Fiscal de Compra do Veículo:</label> 
             <input id="nota-fiscal" name="nota_fiscal" type="text" maxlength="100" placeholder="Número da nota fiscal (aceita números e letras)" required>
@@ -318,7 +320,7 @@
             <input name="ano" type="text" placeholder="Ex: 2026" required>
 
             <label>Cor do Veículo:</label> 
-            <input name="cor" type="text" placeholder="Cor predominante" required>
+            <input name="cor" type="text" placeholder="Cor predominante do Veículo" required>
 
             <label>Estado de Conservação do Veículo:</label> 
             <select name="estado_conservacao" id="estado_conservacao" class="form-control" required>
@@ -328,7 +330,7 @@
             </select> 
             
             <div class="info-box-used"> 
-                ⚠️ AVISO IMPORTANTE sobre TRANSFERÊNCIA do VEÍCULO CADASTRADO na CADMIV:<br> Em caso de Venda ou Doação, o cadastro deve deixar de identificar o antigo Titular como proprietário. O Titular pode excluir seu cadastro pela área do cliente quando deixar de possuir o Veículo. 
+                ⚠️ AVISO IMPORTANTE sobre TRANSFERÊNCIA do VEÍCULO CADASTRADO na CADMIV:<br> Em caso de Venda ou Doação, o cadastro deve deixar de Identificar o antigo Titular como Proprietário. O Titular pode excluir seu Cadastro pela área do cliente quando deixar de possuir o Veículo. 
             </div> 
             
             <label>Este veículo já foi  CADASTRADO  anteriormente no CADMIV?</label> 
@@ -340,7 +342,7 @@
             
             <div id="alerta-trava" class="alert-box">⚠️ BLOQUEIO DE SEGURANÇA JURÍDICA NACIONAL:<br>Este veículo já possui um Cadastro ativo no sistema.</div> 
 
-            <section class="info-box-used"><h3>Cancelamento e valores pagos</h3><p>O cancelamento por desistência, após o prazo legal de arrependimento e a prestação regular do serviço, não gera devolução automática dos valores pagos. Permanecem assegurados os reembolsos previstos em lei, inclusive por arrependimento no prazo aplicável, cobrança indevida ou falha na prestação do serviço. Nesta etapa de testes, não há cobrança.</p><h3>Empréstimo do veículo a terceiros</h3><p>Ao emprestar o veículo, o CADMIV recomenda que o titular forneça ao condutor uma autorização escrita, com identificação das partes, identificação do veículo, período de uso e assinatura do titular. Ela pode auxiliar na conferência durante uma abordagem, mas não substitui os documentos legalmente exigidos nem garante a liberação do veículo.</p></section><div class="section-title">3. Concretização do Cadastro Corporativo</div> 
+            <section class="info-box-used"><h3>Cancelamento e valores pagos</h3><p>O cancelamento por desistência, após o prazo legal de arrependimento e a prestação regular do serviço, não gera devolução automática dos valores pagos. Permanecem assegurados os reembolsos previstos em lei, inclusive por arrependimento no prazo aplicável, cobrança indevida ou falha na prestação do serviço. Nesta etapa de testes, não há cobrança.</p><h3>Empréstimo do veículo a terceiros</h3><p>Ao emprestar o veículo, o CADMIV recomenda que o Titular forneça ao condutor uma autorização Escrita, com Identificação das Partes, Identificação do Veículo, Período de Uso e Assinatura do Titular. Ela pode auxiliar na conferência durante uma abordagem, mas não substitui os documentos legalmente exigidos e não garante a Liberação do Veículo.</p></section><div class="section-title">3. Concretização do Cadastro Corporativo</div> 
             
             <div class="offer-box"> 
                 <strong>Concretização do Cartão Digital</strong><br><br> 
