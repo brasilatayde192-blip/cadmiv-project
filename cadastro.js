@@ -4,8 +4,9 @@ function alternarSenhaCadastro(id,botao){
  campo.type=mostrar?'text':'password';botao.textContent=mostrar?'🐵':'🙈';
  botao.setAttribute('aria-label',mostrar?'Ocultar senha':'Mostrar senha');botao.setAttribute('aria-pressed',String(mostrar));
 }
-function mostrarMensagemCadastro(texto,erro=false,destacar=false){
+function mostrarMensagemCadastro(texto,erro=false,destacar=false,sucesso=false){
  const el=document.getElementById('mensagem-cadastro');
+ el.classList.toggle('sucesso-cadastro',sucesso&&!erro);
  el.classList.toggle('alerta-cadastro',erro);el.setAttribute('role',erro?'alert':'status');el.setAttribute('aria-live',erro?'assertive':'polite');
  el.textContent=texto;
  if(destacar){el.focus({preventScroll:true});el.scrollIntoView({block:'center',behavior:'instant'});}
@@ -94,7 +95,7 @@ document.addEventListener('DOMContentLoaded',()=>{
  function limparAvisosTraduzidos(){
   for(const campo of avisosTraduzidos)campo.setCustomValidity('');
   avisosTraduzidos.clear();
-  if(document.getElementById('mensagem-cadastro').classList.contains('alerta-cadastro'))mostrarMensagemCadastro('');
+  if(document.getElementById('mensagem-cadastro').matches('.alerta-cadastro,.sucesso-cadastro'))mostrarMensagemCadastro('');
   atualizarSetas();
  }
  form.addEventListener('input',limparAvisosTraduzidos);

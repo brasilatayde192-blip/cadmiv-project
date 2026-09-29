@@ -8,7 +8,7 @@ async function salvarEdicaoCadastro(b){
  fecharTodasCameras();await apiCadastro('/api/me',body,'PATCH');
  for(const f of fotosCadastro.values())f.changed=false;
  document.getElementById('senha-atual-edicao').value='';
- const message=document.getElementById('mensagem-cadastro');message.textContent='Alterações salvas. Use o telefone atualizado no próximo acesso.';message.scrollIntoView({block:'center'});
+ mostrarMensagemCadastro('Alterações salvas com sucesso! Se você alterou o telefone, use o novo número no próximo acesso.',false,true,true);
 }
 async function abrirCadastroExistente(){
  const form=document.getElementById('form-cadastro'),message=document.getElementById('mensagem-cadastro'),submit=document.getElementById('btn-enviar');submit.disabled=true;form.hidden=true;message.textContent='Carregando seu cadastro...';
