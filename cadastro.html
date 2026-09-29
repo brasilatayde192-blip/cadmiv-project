@@ -118,8 +118,13 @@
     <style>.cadastro-foto{border:1px solid #cbd5e1;border-radius:6px;padding:14px;margin:14px 0;background:#fff}.cadastro-foto button{background:#936631;color:white;border:0;border-radius:5px;padding:10px 14px;margin:5px 0;cursor:pointer;font:inherit}.cadastro-foto button:disabled{opacity:.5}.foto-preview{width:110px;height:145px;border:1px dashed #aaa;display:flex;align-items:center;justify-content:center;margin:10px 0}.foto-preview img{width:100%;height:100%;object-fit:contain}.cadastro-foto video{width:100%;max-width:320px;max-height:240px}.cadastro-foto [data-aviso]{font-size:14px;line-height:1.4}.cadastro-foto [hidden]{display:none!important}</style></head><body>
 <div class="container">
         <h1>CADMIV</h1>
-        <h2>Formulário  de  CADASTRO</h2><p id="mensagem-cadastro" role="status" aria-live="polite" aria-atomic="true" tabindex="-1"></p>
+        <h2>Formulário de CADASTRO</h2><p id="mensagem-cadastro" role="status" aria-live="polite" aria-atomic="true" tabindex="-1"></p>
+        <a id="voltar-inicio-apos-salvar" href="index.html">Clique Aqui para Voltar ao Início</a>
         <style>
+        #voltar-inicio-apos-salvar{display:none;box-sizing:border-box;width:100%;margin:12px 0 24px;padding:16px;background:#927018;color:#fff;border:2px solid #785b12;border-radius:8px;font-size:18px;font-weight:700;text-align:center;text-decoration:none;line-height:1.5;overflow-wrap:anywhere}
+        #mensagem-cadastro.sucesso-cadastro + #voltar-inicio-apos-salvar{display:block}
+        #voltar-inicio-apos-salvar:hover{background:#785b12}
+        #voltar-inicio-apos-salvar:focus-visible{outline:3px solid #2563eb;outline-offset:3px}
         #mensagem-cadastro:empty{display:none}
         #mensagem-cadastro.sucesso-cadastro{display:block;box-sizing:border-box;width:100%;background:#b91c1c;color:#fff;border:2px solid #991b1b;border-radius:8px;padding:20px;font-size:20px;font-weight:700;text-align:center;line-height:1.5;overflow-wrap:anywhere;scroll-margin-top:24px}
         #mensagem-cadastro.alerta-cadastro{display:flex;align-items:center;gap:14px;background:#fff1f1;color:#8b1515;border:2px solid #b91c1c;border-radius:8px;padding:16px;font-size:18px;font-weight:700;text-align:left;line-height:1.5;scroll-margin-top:24px}
@@ -139,9 +144,9 @@
 <!-- 📜 BLOCO ISOLADO FLUTUANTE DA CADMIV - INDESTRUTÍVEL -->
 <div style="background-color: #f8fafc !important; border: 2px solid #3b82f6 !important; padding: 15px !important; border-radius: 8px !important; margin-top: 15px !important; margin-bottom: 20px !important; font-family: Arial, sans-serif !important;">
 
-    <!-- 1. DATA  ATUAL CARIMBADA E TRAVADA -->
+    <!-- 1. DATA ATUAL CARIMBADA E TRAVADA -->
     <div style="margin-bottom: 15px !important;">
-        <label style="font-weight: bold !important; color: #1e293b !important; display: block !important; margin-bottom: 5px !important;">Data do Cadastro:</label>
+        <label style="font-weight: bold !important; color: #1e293b !important; display: block !important; margin-bottom: 5px !important;">Data de Cadastro:</label>
         <input type="text" value="" id="data_emissao" style="background-color: #e2e8f0 !important; color: #1e293b !important; font-weight: bold !important; text-align: center !important; padding: 10px !important; border-radius: 4px !important; border: 1px solid #cbd5e1 !important; width: 100% !important; box-sizing: border-box !important;" readonly>
     </div>
 <!-- INICIO DA TARJA DE SEGUNDA VIA PAGA -->
@@ -159,11 +164,11 @@
 </div> 
 
     
-<section id="acoes-cliente"><a id="acesso-edicao" href="login.html">Já tenho Cadastro — Alterar ou Excluir meus Dados</a><button type="button" id="abrir-exclusao" hidden style="background:#a52828;color:white;padding:12px;border:0;border-radius:5px">Excluir meu Cadastro por Venda ou Doação</button></section>
+<section id="acoes-cliente"><a id="acesso-edicao" href="login.html">Já tenho Cadastro — Alterar ou Excluir meus Dados</a><button type="button" id="abrir-exclusao" hidden style="background:#a52828;color:white;padding:12px;border:0;border-radius:5px">Excluir meu cadastro por Venda ou Doação</button></section>
 <!-- 📜 2. DECLARAÇÃO DE RESPONSABILIDADE JURÍDICA NACIONAL -->
     <div style="background-color: #fff !important; border: 1px solid #cbd5e1 !important; padding: 12px !important; border-radius: 4px !important; margin-bottom: 15px !important; font-size: 13px !important; color: #334155 !important; line-height: 1.5 !important; max-height: 100px !important; overflow-y: auto !important;">
         <strong>TERMO DE RESPONSABILIDADE DO TITULAR (CADMIV):</strong><br>
-        Ao clicar em prosseguir, o requerente Declara sob as penas da lei penal e civil que todas as informações prestadas neste Formulário de CADASTRO veicular, incluindo os Dados de Chassis, Motorização e Dado de dependente, são verídicas, assumindo total responsabilidade jurídica sobre o Ato.
+        Ao clicar em prosseguir, o requerente DECLARA sob as penas da lei penal e civil que todas as informações prestadas neste Formulário de CADASTRO veicular, incluindo os Dados de Chassis, Motorização e Dados de Dependentes, são Verídicas, assumindo total responsabilidade Jurídica sobre o Ato.
     <!-- FIM DO TEXTO DO TERMO DE RESPONSABILIDADE -->
     </div>
 
@@ -193,7 +198,7 @@
     </div>
     <!-- Tarja de Alerta Informativo de Idade -->
     <div id="alerta-idade" style="display: none; color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; padding: 10px; margin-top: 10px; border-radius: 4px; font-weight: bold;">
-        ❌ RESTRIÇÃO DE IDADE CRONOLÓGICA: O Cadastro é permitido apenas para maiores de 18 anos de idade.
+        ❌ RESTRIÇÃO DE IDADE CRONOLÓGICA: O cadastro é permitido apenas para maiores de 18 anos de idade.
     </div>
 </div>
 <!-- FIM DA SEÇÃO DE DATA DE NASCIMENTO --> 
@@ -238,11 +243,11 @@
             
             <div class="health-title">🚨 Protocolo de  SAÚDE  e  EMERGÊNCIA</div> 
             <fieldset id="autorizacao-saude" style="border:1px solid #cbd5e1;border-radius:6px;padding:16px;margin:12px 0">
-                <legend>Autorização para Exibir Dados de Saúde e Emergência</legend>
-                <p id="aviso-autorizacao-saude">Você autoriza a exibição dos seus Dados de Saúde e Emergência abaixo dos Dados do Veículo na Consulta Pública da CADMIV? Ao escolher Sim, qualquer pessoa que consultar o veículo pelo QR-code ou Chassi poderá ver o Tipo Sanguíneo, Alergias, Contato e Telefone de Emergência, Nome e Telefone do Médico que você informar. Esses dados são do Titular, que pode não ser a pessoa que esteja conduzindo o Veículo.</p>
-                <p>A autorização é opcional. Escolher Não, não impede concluir o preechemento do Formulário do Cadastro. Você pode mudar sua escolha em Alterar meu Cadastro e Salvar com sua Senha. A retirada da autorização impede novas exibições, mas não apaga cópias que outras pessoas já tenham feito. Informe contatos de Terceiros somente com a autorização do mesmo.</p>
-                <label><input type="radio" name="autorizar_saude" value="sim" required aria-describedby="aviso-autorizacao-saude" style="width:auto"> Sim, autorizo a exibição.</label>
-                <label><input type="radio" name="autorizar_saude" value="nao" required aria-describedby="aviso-autorizacao-saude" style="width:auto"> Não autorizo a exibição.</label>
+                <legend>Autorização para exibir dados de Saúde e Emergência</legend>
+                <p id="aviso-autorizacao-saude">Você autoriza a exibição dos seus Dados de Saúde e Emergência, para ser exibidos abaixo dos Dados do Veículo na Consulta Pública da CADMIV? Ao escolher Sim, qualquer pessoa que consultar o veículo pelo QR-code ou Chassi poderá ver o Tipo Sanguíneo, Alergias, Contato e Telefone de Emergência, Nome e Telefone do Médico de sua Preferência. Esses Dados são do Titular, que pode não ser a pessoa que esteja conduzindo o veículo.</p>
+                <p>A autorização é opcional. Escolher Não, não impede concluir o preenchimento do Formulário do Cadastro. Você pode mudar sua escolha em Alterar meu Cadastro e salvar com sua Senha. A retirada da autorização impede novas exibições, mas não apaga cópias que outras pessoas já tenham feito. Informe contatos de Terceiros somente com a autorização do mesmo.</p>
+                <label><input type="radio" name="autorizar_saude" value="sim" required aria-describedby="aviso-autorizacao-saude" style="width:auto"> Sim, autorizo a Exibição.</label>
+                <label><input type="radio" name="autorizar_saude" value="nao" required aria-describedby="aviso-autorizacao-saude" style="width:auto"> Não autorizo a Exibição.</label>
             </fieldset>
             
             <label>Em caso de Emergência, ligar para:</label> 
@@ -285,7 +290,7 @@
             <label>Possui Alergia a algum Medicamento?</label> 
             <input type="text" name="medicamentos" placeholder="Digite os medicamentos ou escreva 'Nenhum" required>
 
-            <label>Médico de sua Preferência (Nome Completo):</label> 
+            <label>Médico de sua preferência (Nome Completo):</label> 
             <input name="medico" type="text" placeholder="Nome do Doutor(a)">
 
             <label>Telefone de contato do Médico de sua Preferência:</label> 
@@ -304,10 +309,9 @@
                 <option value="bike_esportiva_alto_custo">Bicicleta Esportiva de Alto Custo</option>
                 <option value="bike_triciclo_comum">Triciclo Comum (Sem ser Elétrico)</option>
                 <option value="bike_triciclo_especial">Triciclo Especial Elétrico com Acelerador</option>
-                <option value="patinete_comum">Patinete Comum</option>
-                <option value="patinete_eletrica">Patinete Elétrica</option>    
+                <option value="patinete_comum">Patinete Comum</option> 
                 <option value="monociclo_comum">Monociclo Comum</option>
-                <option value="monociclo_eletrico">Monociclo Elétrico</option> 
+                <option value="monociclo_eletrico">Monociclo Elétrico</option>
             </select> 
             
             <label>Número de Identificação do Chassi ou Série do Veículo (Chassi / Série):</label> 
@@ -331,23 +335,23 @@
             </select> 
             
             <div class="info-box-used"> 
-                ⚠️ AVISO IMPORTANTE sobre TRANSFERÊNCIA do VEÍCULO CADASTRADO na CADMIV:<br> Em caso de Venda ou Doação, o cadastro deve deixar de identificar o antigo Titular como Proprietário. O Titular pode Excluir seu Cadastro pela área do cliente quando deixar de possuir o Veículo. 
+                ⚠️ AVISO IMPORTANTE sobre TRANSFERÊNCIA do VEÍCULO CADASTRADO na CADMIV:<br> Em caso de Venda ou Doação, o cadastro deve deixar de Identificar o antigo Titular como Proprietário. O Titular pode Excluir seu Cadastro pela área do Cliente quando deixar de possuir o Veículo. 
             </div> 
             
-            <label>Este veículo já foi  CADASTRADO  anteriormente no CADMIV?</label> 
+            <label>Este veículo já foi  Cadastrado  anteriormente no CADMIV?</label> 
             <select name="cadastro_anterior" id="cadastro_anterior" class="form-control" onchange="verificarContestacaoVeiculo()" required>
     <option value="">Selecione uma opção...</option>
     <option value="Não">Não, este é o primeiro Cadastro</option>
     <option value="Sim">Sim, já possui Cadastro Anterior</option>
 </select> 
             
-            <div id="alerta-trava" class="alert-box">⚠️ BLOQUEIO DE SEGURANÇA JURÍDICA NACIONAL:<br>Este Veículo já possui um Cadastro  Ativo no Sistema.</div> 
+            <div id="alerta-trava" class="alert-box">⚠️ BLOQUEIO DE SEGURANÇA JURÍDICA NACIONAL:<br>Este veículo já possui um Cadastro ativo no sistema.</div> 
 
-            <section class="info-box-used"><h3>Cancelamento e Valores Pagos</h3><p>O cancelamento por desistência, após o prazo legal de arrependimento e a prestação regular do serviço, não gera devolução automática dos valores pagos. Permanecem assegurados os reembolsos previstos em lei, inclusive por arrependimento no prazo aplicável, cobrança indevida ou falha na prestação do serviço. Nesta etapa de testes, não há cobrança.</p><h3>Empréstimo do Veículo a Terceiros</h3><p>Ao emprestar o veículo, o CADMIV recomenda que o Titular forneça ao condutor uma Autorização Escrita, com Identificação das Partes, Identificação do Veículo, Período de Uso e Assinatura do Titular. Ela pode auxiliar na conferência durante uma abordagem, mas não substitui os documentos legalmente exigidos e não garante a Liberação do Veículo.</p></section><div class="section-title">3. Concretização do Cadastro Privato</div> 
+            <section class="info-box-used"><h3>Cancelamento e Valores Pagos</h3><p>O cancelamento por desistência, após o prazo legal de arrependimento e a prestação regular do serviço, não gera devolução automática dos valores pagos. Permanecem assegurados os reembolsos previstos em lei, inclusive por arrependimento no prazo aplicável, cobrança indevida ou falha na prestação do serviço. Nesta etapa de testes, não há cobrança.</p><h3>Empréstimo do veículo a Terceiros</h3><p>Ao emprestar o veículo, o CADMIV recomenda que o Titular forneça ao condutor uma Autorização Escrita, com Identificação das Partes, Identificação do Veículo, Período de Uso e Assinatura do Titular. Ela pode auxiliar na conferência durante uma abordagem, mas não substitui os documentos legalmente exigidos e não garante a Liberação do Veículo.</p></section><div class="section-title">3. Concretização do Cadastro Privado</div> 
             
             <div class="offer-box"> 
-                <strong><h2>Concretização do Cartão Digital</h2></strong><br> 
-                <em>Escolha abaixo o combo ideal para a proteção do seu patrimônio e ative as fichas de dependentes se necessário:</em> 
+                <strong><h1>Concretização do Cartão Digital</h1></strong><br><br> 
+                <em>Escolha abaixo o combo ideal para a proteção do seu patrimônio e ative as fichas de Dependentes se necessário:</em> 
             </div> 
             
             <div class="price-option"> 
@@ -422,14 +426,14 @@
 
             <div id="secao-responsabilidade" class="dependent-container" style="background-color: #fcf3cf; border-color: #f39c12;"> 
                 <span style="font-weight: bold; color: #b7950b;">📋 DECLARAÇÃO DE RESPONSABILIDADE JURÍDICA:</span> 
-                <textarea rows="3" readonly style="margin-top:5px; background:#fff; resize:none;">Eu, na qualidade de proprietário Titular cadastrado na plataforma CADMIV, vencionando para todos os fins de Direito, a vinculação do meu Endereço Residencial e Contatos Telefônicos ao cadastro do Dependente Refirido Acima, DECLARO ser responsável pelas informações Prestadas.</textarea>
+                <textarea rows="3" readonly style="margin-top:5px; background:#fff; resize:none;">Eu, na qualidade de proprietário Titular cadastrado na plataforma CADMIV, vencionando para Todos os fins de Direito, a vinculação do meu Endereço Residencial e Contatos Telefônicos ao Cadastro do Dependente Refirido acima, Declaro ser responsável pelas Informações Prestadas.</textarea>
 <div style="margin-top: 10px; display: flex; align-items: center;"> 
                     <input type="checkbox" name="responsabilidade" id="responsabilidade" style="width: auto; margin-top: 0; margin-right: 10px; transform: scale(1.2);"> 
-                    <strong>Confirmo e Aceito os Termos de Responsabilidade  Acima.</strong> 
+                    <strong>Confirmo e Aceito os Termos de Responsabilidade Acima.</strong> 
                 </div> 
             </div>
 
-            <div id="senha-edicao" hidden><label for="senha-atual-edicao">Confirme sua Senha Atual para Salvar as Alterações:</label><div style="position:relative"><input type="password" id="senha-atual-edicao" autocomplete="current-password" maxlength="128" style="padding-right:52px;box-sizing:border-box"><button type="button" id="olho-senha-edicao" aria-label="Mostrar senha" aria-controls="senha-atual-edicao" aria-pressed="false" onclick="var campo=document.getElementById('senha-atual-edicao'); var mostrar=campo.type==='password'; campo.type=mostrar?'text':'password'; this.textContent=mostrar?'🐵':'🙈'; this.setAttribute('aria-label',mostrar?'Ocultar senha':'Mostrar senha'); this.setAttribute('aria-pressed',String(mostrar));" style="position:absolute;right:4px;top:50%;transform:translateY(-50%);width:44px;min-height:44px;margin:0;padding:5px;background:none;border:0;font-size:20px;cursor:pointer">🙈</button></div><p>Nome, CPF, Chassi, Número da Nota Fiscal e Data de Registro permanecem os mesmos.</p></div>
+            <div id="senha-edicao" hidden><label for="senha-atual-edicao">Confirme sua Senha Atual para Salvar as Alterações:</label><div style="position:relative"><input type="password" id="senha-atual-edicao" autocomplete="current-password" maxlength="128" style="padding-right:52px;box-sizing:border-box"><button type="button" id="olho-senha-edicao" aria-label="Mostrar Senha" aria-controls="senha-atual-edicao" aria-pressed="false" onclick="var campo=document.getElementById('senha-atual-edicao'); var mostrar=campo.type==='password'; campo.type=mostrar?'text':'password'; this.textContent=mostrar?'🐵':'🙈'; this.setAttribute('aria-label',mostrar?'Ocultar Senha':'Mostrar senha'); this.setAttribute('aria-pressed',String(mostrar));" style="position:absolute;right:4px;top:50%;transform:translateY(-50%);width:44px;min-height:44px;margin:0;padding:5px;background:none;border:0;font-size:20px;cursor:pointer">🙈</button></div><p>Nome, CPF, Chassi, Número da Nota Fiscal e Data de Registro permanecem os mesmos.</p></div>
 <!-- Início da Tarja Verde do Final do Formulário -->
         <div class="tarja-botoes">
             <button type="submit" id="btn-enviar" class="btn-next">
@@ -440,7 +444,7 @@
         
     </form>
 </div>
-<dialog id="confirmar-exclusao" aria-labelledby="titulo-exclusao"><h2 id="titulo-exclusao">Excluir Definitivamente meu Cadastro</h2><p>Serão apagados deste sistema seus Dados, Veículo, Fotos e Dependentes. O acesso à Cadastro será encerrado e o QR-code antigo deixará de localizar o Cadastro. Esta ação não pode ser Desfeita.</p><label for="motivo-exclusao">Motivo:</label><select id="motivo-exclusao"><option value="">Selecione</option><option value="venda">Venda</option><option value="doacao">Doação</option><option value="outro">Outro motivo</option></select><label for="senha-exclusao">Senha Atual:</label><input id="senha-exclusao" type="password" autocomplete="current-password" maxlength="128"><label for="texto-exclusao">Digite EXCLUIR para Confirmar:</label><input id="texto-exclusao" autocomplete="off"><p id="mensagem-exclusao" role="status"></p><button type="button" id="cancelar-exclusao">Voltar sem Excluir</button> <button type="button" id="executar-exclusao">Excluir Definitivamente</button></dialog><style>[hidden]{display:none!important}dialog{max-width:500px;width:90%;box-sizing:border-box;border:1px solid #aaa;border-radius:8px;text-align:left}dialog::backdrop{background:#0008}dialog button{padding:12px;margin-top:15px;cursor:pointer}#executar-exclusao{background:#a52828;color:white;border:0}#acoes-cliente{margin:15px 0}input[readonly]{background:#eee}.cadastro-foto video:not([hidden]){display:block}</style></body>
+<dialog id="confirmar-exclusao" aria-labelledby="titulo-exclusao"><h2 id="titulo-exclusao">Excluir definitivamente meu cadastro</h2><p>Serão apagados deste sistema seus dados, veículo, fotos e dependentes. O acesso à conta será encerrado e o QR-code antigo deixará de localizar o cadastro. Esta ação não pode ser desfeita.</p><label for="motivo-exclusao">Motivo:</label><select id="motivo-exclusao"><option value="">Selecione</option><option value="venda">Venda</option><option value="doacao">Doação</option><option value="outro">Outro motivo</option></select><label for="senha-exclusao">Senha atual:</label><input id="senha-exclusao" type="password" autocomplete="current-password" maxlength="128"><label for="texto-exclusao">Digite EXCLUIR para confirmar:</label><input id="texto-exclusao" autocomplete="off"><p id="mensagem-exclusao" role="status"></p><button type="button" id="cancelar-exclusao">Voltar sem excluir</button> <button type="button" id="executar-exclusao">Excluir definitivamente</button></dialog><style>[hidden]{display:none!important}dialog{max-width:500px;width:90%;box-sizing:border-box;border:1px solid #aaa;border-radius:8px;text-align:left}dialog::backdrop{background:#0008}dialog button{padding:12px;margin-top:15px;cursor:pointer}#executar-exclusao{background:#a52828;color:white;border:0}#acoes-cliente{margin:15px 0}input[readonly]{background:#eee}.cadastro-foto video:not([hidden]){display:block}</style></body>
 </html>
 
 
