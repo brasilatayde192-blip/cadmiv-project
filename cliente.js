@@ -25,11 +25,19 @@ function mostrarSaudeConsulta(saude){
  }
  caixa.hidden=!lista.children.length;
 }
+function mostrarTelefoneConsulta(telefone){
+ const caixa=document.getElementById('contato-titular-consulta'),link=document.getElementById('telefone-titular-consulta');if(!caixa||!link)return;
+ caixa.hidden=true;link.textContent='';link.removeAttribute('href');
+ if(typeof telefone!=='string'||!/^\d{10,13}$/.test(telefone))return;
+ const local=/^55\d{10,11}$/.test(telefone)?telefone.slice(2):telefone;
+ link.textContent=local.length<=11?'('+local.slice(0,2)+') '+local.slice(2,-4)+'-'+local.slice(-4):telefone;
+ if(local.length<=11)link.href='tel:+55'+local;caixa.hidden=false;
+}
 let consultaAtual=0;
 async function consultarVeiculo(body){
- const vez=++consultaAtual;mostrarSaudeConsulta(null);
+ const vez=++consultaAtual;mostrarSaudeConsulta(null);mostrarTelefoneConsulta(null);
  const result=document.getElementById('resultado_consulta');result.style.display='block';result.className='status-result';result.textContent='Consultando...';
- try{const d=await api('/api/consultar',body);if(vez!==consultaAtual)return;result.textContent=[d.mensagem,d.marca,nomeModelo(d.modelo),d.cor,d.chassi?'Chassi: '+d.chassi:'',d.chassi?'Compare estes dados com o veículo apresentado.':''].filter(Boolean).join(' — ');if(d.status==='ROUBO')result.classList.add('status-alert-furto');mostrarSaudeConsulta(d.saude);}
+ try{const d=await api('/api/consultar',body);if(vez!==consultaAtual)return;result.textContent=[d.mensagem,d.marca,nomeModelo(d.modelo),d.cor,d.chassi?'Chassi: '+d.chassi:'',d.chassi?'Compare estes dados com o veículo apresentado.':''].filter(Boolean).join(' — ');if(d.status==='ROUBO')result.classList.add('status-alert-furto');mostrarSaudeConsulta(d.saude);if(d.status==='ROUBO')mostrarTelefoneConsulta(d.telefone);}
  catch(e){if(vez===consultaAtual){result.textContent=e.message;mostrarSaudeConsulta(null);}}
 }
 function consultarChassi(){return consultarVeiculo({chassi:document.getElementById('input_agente').value});}

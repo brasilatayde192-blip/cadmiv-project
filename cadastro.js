@@ -127,6 +127,11 @@ document.addEventListener('DOMContentLoaded',()=>{
   e.preventDefault();if(saving||!form.reportValidity())return;
   if(window.cadmivEdicao?.ativo&&!window.cadmivEdicao.pronto)return;
   const b=Object.fromEntries(new FormData(form));
+  if(!window.cadmivEdicao?.ativo){
+   let aceite;try{aceite=sessionStorage.getItem('cadmiv_aceite_contato');}catch{}
+   if(aceite!=='2026-10-09'){mostrarMensagemCadastro('Antes de cadastrar, abra os Termos de Uso e marque a concordância com o aviso de contato em caso de Furto ou Roubo.',true,true);return;}
+   b.aceite_contato=true;b.versao_contato=aceite;
+  }
   b.nascimento=document.getElementById('cadmiv_ano').value+'-'+document.getElementById('nasc_mes').value.padStart(2,'0')+'-'+document.getElementById('nasc_dia').value.padStart(2,'0');
   b.responsabilidade=document.getElementById('responsabilidade').checked&&!document.getElementById('responsabilidade').disabled;
   const message=document.getElementById('mensagem-cadastro');saving=true;

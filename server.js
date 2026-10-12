@@ -125,7 +125,9 @@ function createApp(db,{production=false,origin='http://localhost:10000',sendRese
   app.get('/healthz',wrap(async(req,res)=>{await db.query('SELECT 1');res.json({status:'ok'});}));
   app.post('/api/chassi/verificar',wrap(async(req,res)=>{const {rows}=await db.query('SELECT 1 FROM cadmiv_veiculos WHERE chassi_normalizado=$1',[normalizeChassi(req.body.chassi)]);res.json({cadastrado:rows.length>0});}));
   app.post('/api/cadastros',wrap(async(req,res)=>{
+    if(req.body?.aceite_contato!==true||req.body?.versao_contato!=='2026-10-09')throw fail(400,'Leia e aceite o aviso de contato em caso de Furto ou Roubo nos Termos de Uso antes de cadastrar.');
     const b=validateRegistration(req.body),fotos=req.body.fotos??[],imagens=[];
+    b.privado.aceite_contato={aceito:true,versao:'2026-10-09',registrado_em:new Date().toISOString()};
     if(req.body.autorizar_saude!==undefined){b.privado.saude_escolha_em=new Date().toISOString();b.privado.saude_aviso_versao='2026-09-26';}
     if(!Array.isArray(fotos)||fotos.length>Number(b.combo))throw fail(400,'Confira as fotos do plano escolhido.');
     for(const foto of fotos){if(foto===null){imagens.push(null);continue;}try{imagens.push(await prepararFoto(foto));}catch(e){throw fail(400,e.message);}}
@@ -234,6 +236,7 @@ function createApp(db,{production=false,origin='http://localhost:10000',sendRese
       old.dependentes.forEach((d,i)=>{base['dep'+(i+1)+'_nome']=d.nome;base['dep'+(i+1)+'_parentesco']=d.parentesco;});
       const d=validateRegistration({...base,...body,senha:body.senha_atual,chassi:old.chassi,cadastro_anterior:'Não'});
       for(const key of ['saude_escolha_em','saude_aviso_versao'])if(old.privado[key])d.privado[key]=old.privado[key];
+      if(old.privado.aceite_contato)d.privado.aceite_contato=old.privado.aceite_contato;
       if(body.autorizar_saude!==undefined&&(body.autorizar_saude!==old.privado.autorizar_saude||!old.privado.saude_escolha_em)){
         d.privado.saude_escolha_em=new Date().toISOString();d.privado.saude_aviso_versao='2026-09-26';
       }
@@ -265,10 +268,11 @@ function createApp(db,{production=false,origin='http://localhost:10000',sendRese
   }));
   app.post('/api/consultar',wrap(async(req,res)=>{
     const porChassi=req.body.chassi!==undefined;
-    const result=await db.query('SELECT v.status,v.ativado_em,v.renovado_em,v.marca,v.modelo,v.cor,v.chassi_normalizado AS chassi,c.privado FROM cadmiv_veiculos v JOIN cadmiv_clientes c ON c.id=v.cliente_id WHERE '+(porChassi?'v.chassi_normalizado':'v.codigo')+'=$1',[porChassi?normalizeChassi(req.body.chassi):text(req.body.codigo,'código',64)]);
+    const result=await db.query('SELECT v.status,v.ativado_em,v.renovado_em,v.marca,v.modelo,v.cor,v.chassi_normalizado AS chassi,c.telefone,c.privado FROM cadmiv_veiculos v JOIN cadmiv_clientes c ON c.id=v.cliente_id WHERE '+(porChassi?'v.chassi_normalizado':'v.codigo')+'=$1',[porChassi?normalizeChassi(req.body.chassi):text(req.body.codigo,'código',64)]);
     if(!result.rows.length)return res.json({status:'INVALIDO',mensagem:'Veículo não localizado na base CADMIV.'});
     const messages={PENDENTE:'Cadastro em andamento — ainda não ativo.',ATIVO:'Cadastro ativo.',ROUBO:'Alerta de furto ou roubo registrado pelo titular.',DESATIVADO:'Cadastro desativado.',ADORMECIDO:'Cadastro aguardando renovação.'};
     const r={...result.rows[0],...vigencia(result.rows[0])},publico={status:r.status,mensagem:messages[r.status],marca:r.marca,modelo:r.modelo,cor:r.cor,chassi:r.chassi};
+    if(r.status==='ROUBO')publico.telefone=r.telefone;
     // Nunca retornar o objeto privado inteiro. Cadastros antigos permanecem sem divulgação.
     if(r.privado?.autorizar_saude==='sim'&&r.privado.saude_escolha_em&&r.privado.saude_aviso_versao==='2026-09-26'){
       publico.saude={};for(const key of ['sangue','latex','medicamentos','contato_emergencia','telefone_emergencia','medico','telefone_medico'])if(typeof r.privado[key]==='string'&&r.privado[key].trim())publico.saude[key]=r.privado[key];
@@ -277,7 +281,7 @@ function createApp(db,{production=false,origin='http://localhost:10000',sendRese
   }));
   app.get('/',(req,res)=>res.sendFile(path.join(__dirname,'index.html')));
   app.get('/validar',(req,res)=>res.redirect('/validar.html'));
-  for(const page of ['index.html','apresentacao.html','fiscalizacao.html','termos.html','cadastro.html','login.html','alerta.html','cadastro.js','cadastro-edicao.js','cliente.js','recuperar-senha.html','redefinir-senha.html','senha.js','cartao.js','renovacao.js'])app.get('/'+page,(req,res)=>res.sendFile(path.join(__dirname,page)));
+  for(const page of ['index.html','apresentacao.html','fiscalizacao.html','termos.html','termos.js','cadastro.html','login.html','alerta.html','cadastro.js','cadastro-edicao.js','cliente.js','recuperar-senha.html','redefinir-senha.html','senha.js','cartao.js','renovacao.js'])app.get('/'+page,(req,res)=>res.sendFile(path.join(__dirname,page)));
   for(const page of ['botao.html','cartao.html','validar.html'])app.get('/'+page,wrap(async(req,res)=>{try{const id=await current(req);if((await situacao(id)).vencido)return res.redirect('/login.html?renovar=1');}catch(e){if(e.status===401)return res.redirect('/login.html');throw e;}res.sendFile(path.join(__dirname,page));}));
   app.get('/painel.html',(req,res)=>res.status(403).send('Painel administrativo indisponível nesta etapa. Os indicadores antigos eram demonstrativos.'));
   app.use((req,res)=>res.status(404).json({erro:'Página não encontrada.'}));

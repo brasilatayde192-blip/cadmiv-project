@@ -1,25 +1,35 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CADMIV - Portal de Fiscalização e Utilidade Pública</title>
     <style>
         body { font-family: Arial, sans-serif; background-color: #f4f4f9; padding: 20px; text-align: center; color: #2c3e50; margin: 0; display: flex; flex-direction: column; align-items: center; }
-        .container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); display: inline-block; width: 100%; max-width: 550px; box-sizing: border-box; text-align: left; }
+        .container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); display: inline-block; width: 100%; max-width: 680px; box-sizing: border-box; text-align: left; }
         
         /* PORTAL DO AGENTE */
-        .police-section { background-color: #ffffff; border: 2px solid #34495e; padding: 20px; border-radius: 8px; margin-bottom: 25px; position: relative; }
-        .police-header { background-color: #1a252f; color: white; padding: 12px; border-radius: 5px; text-align: center; font-weight: bold; font-size: 15px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .police-subtitle { text-align: center; font-size: 12px; color: #7f8c8d; margin-top: 8px; font-style: italic; }
+        .police-section { background-color: #1a252f; color: #ffffff; border: 2px solid #34495e; padding: 20px; border-radius: 8px; margin-bottom: 25px; position: relative; }
+        .brand-title { text-align: center; font-size: 32px; margin: 12px 0 24px; }
+        .brand-name { text-align: center; font-size: 18px; line-height: 1.5; margin: 0 0 22px; }
+        .police-section > p { font-size: 15px; line-height: 1.6; }
+        .contato-titular { margin-top: 18px; padding: 16px; background: #ffffff; color: #1a252f; border-radius: 6px; }
+        .contato-titular a { display: inline-block; color: #165b36; font-size: 22px; font-weight: bold; padding: 8px 0; overflow-wrap: anywhere; }
+        .contato-titular p { font-size: 14px; line-height: 1.5; margin: 4px 0; }
+        #saude-consulta { background: white; color: #2c3e50; }
+        @media (max-width: 480px) { body { padding: 10px; } .container { padding: 16px; } .police-section, .info-section { padding: 16px; } }
+        @media (prefers-reduced-motion: reduce) { .status-alert-furto { animation: none !important; } }
+        .police-header { background-color: #1a252f; color: white; padding: 12px; border-radius: 5px; text-align: center; font-weight: bold; font-size: 15px;  letter-spacing: 0.5px; }
+        .police-subtitle { text-align: center; font-size: 14px; color: #d6dfe5; margin-top: 8px; font-style: italic; }
         
-        .police-input { width: 100%; padding: 12px; margin-top: 15px; border: 2px solid #bdc3c7; border-radius: 5px; box-sizing: border-box; font-size: 14px; font-weight: bold; text-align: center; text-transform: uppercase; }
-        .police-btn { background-color: #2c3e50; color: white; border: none; padding: 12px; width: 100%; border-radius: 5px; font-weight: bold; font-size: 14px; margin-top: 12px; cursor: pointer; text-transform: uppercase; }
+        .police-input { width: 100%; padding: 12px; margin-top: 15px; border: 2px solid #bdc3c7; border-radius: 5px; box-sizing: border-box; font-size: 14px; font-weight: bold; text-align: center;  }
+        .police-btn { background-color: #2c3e50; color: white; border: none; padding: 12px; width: 100%; border-radius: 5px; font-weight: bold; font-size: 14px; margin-top: 12px; cursor: pointer;  }
         .police-btn:hover { background-color: #1a252f; }
         
         /* QR CODE DE FISCALIZAÇÃO */
         .qr-section { border: 1px dashed #7f8c8d; padding: 15px; border-radius: 6px; margin-top: 20px; text-align: center; background-color: #fafafa; }
-        .qr-title { font-size: 12px; font-weight: bold; color: #2c3e50; text-transform: uppercase; }
+        .qr-title { font-size: 12px; font-weight: bold; color: #2c3e50;  }
         .qr-text { font-size: 11px; color: #7f8c8d; margin: 5px 0 10px 0; line-height: 1.4; }
         .qr-box { background-color: #34495e; color: white; width: 110px; height: 110px; margin: 0 auto; display: flex; align-items: center; justify-content: center; border-radius: 5px; font-size: 10px; font-weight: bold; text-align: center; padding: 5px; box-sizing: border-box; }
         
@@ -34,17 +44,17 @@
 
         /* PAINEL INFORMATIVO */
         .info-section { background-color: #ffffff; border: 1px solid #dcdde1; padding: 20px; border-radius: 8px; margin-top: 10px; }
-        .info-header { font-size: 16px; font-weight: bold; color: #2980b9; text-align: center; margin-bottom: 12px; }
-        .info-intro { font-size: 12.5px; color: #34495e; line-height: 1.5; margin-bottom: 15px; }
+        .info-header { font-size: 20px; font-weight: bold; color: #24638c; text-align: center; margin-bottom: 12px; }
+        .info-intro { font-size: 15px; color: #34495e; line-height: 1.6; margin-bottom: 15px; }
         
         ul { padding-left: 15px; margin: 0; }
-        li { font-size: 12px; color: #2c3e50; margin-bottom: 12px; text-align: justify; line-height: 1.5; list-style-type: square; }
+        li { font-size: 15px; color: #2c3e50; margin-bottom: 16px; text-align: left; line-height: 1.6; list-style-type: square; }
         li strong { color: #34495e; }
         
         .motto-text { text-align: center; font-size: 12px; font-weight: bold; color: #27ae60; margin-top: 20px; margin-bottom: 15px; }
         
         /* 🟢 A TARJA VERDE DE ELITE ENVIANDO DIRETAMENTE PARA OS TERMOS DE USO */
-        .btn-prosseguir { background-color: #27ae60; color: white; border: none; padding: 14px; width: 100%; border-radius: 5px; font-weight: bold; font-size: 15px; cursor: pointer; text-decoration: none; display: block; box-sizing: border-box; text-align: center; text-transform: uppercase; }
+        .btn-prosseguir { background-color: #27ae60; color: white; border: none; padding: 14px; width: 100%; border-radius: 5px; font-weight: bold; font-size: 15px; cursor: pointer; text-decoration: none; display: block; box-sizing: border-box; text-align: center;  }
         .btn-prosseguir:hover { background-color: #219150; }
         
         .web-footer { font-size: 15px; font-weight: bold; color: #2c3e50; text-align: center; margin-top: 15px; }
@@ -56,34 +66,43 @@
 
     <div class="container">
         <div class="police-section">
-            <div class="police-header"><br><h1>CADMIV</h1></br><div>Cadastro Mobilidade Individual Veículo Autopropelido</div><br></br><div>👤 PORTAL de FISCALIZAÇÃO do AGENTE de TRÂNSITO</div>
-            <div class="police-subtitle">Acesso Rápido para Averiguação de Veículos Autopropelidos em Vias Públicas</div>
+            <h1 class="brand-title">CADMIV</h1>
+            <h2 class="brand-name">Cadastro Mobilidade Individual Veículo Autopropelido</h2>
+            <div class="police-header"><h2>👤 Portal de Fiscalização do Agente de Trânsito</h2></div>
+            <div class="police-subtitle"><p>Acesso rápido para averiguação de veículos autopropelidos em vias públicas</p></div>
             
-            <input type="text" id="input_agente" class="police-input" placeholder="DIGITE O Nº DE SÉRIE do VEÍCULO ou do CHASSI.">
-            <button type="button" onclick="consultarChassi()" class="police-btn">🔹 Verificar Status do Veículo Abordado<br>Clique Aqui</br></button>
+            <label for="input_agente">Digite Abaixo: Número do Chassi ou de Série do Veículo</label>
+            <input type="text" id="input_agente" class="police-input" placeholder="Digite aqui o Número do Chassi ou Número de Série do Veículo">
+            <button type="button" onclick="consultarChassi()" class="police-btn"><h2>🔹 Verificar Status do Veículo Abordado</h2><br><h2>Clique Aqui</h2></button>
             
-            <div id="resultado_consulta" class="status-result"></div>
+            <div id="resultado_consulta" class="status-result" role="status" aria-live="polite"></div>
+            <section id="contato-titular-consulta" class="contato-titular" hidden aria-live="polite">
+                <strong>Telefone de Contato do Titular</strong><br>
+                <a id="telefone-titular-consulta"></a>
+                <p>Utilize este Telefone para comunicações relacionadas ao Veículo Cadastrado. No celular, toque no número para iniciar uma Ligação.</p>
+            </section>
             <section id="saude-consulta" hidden aria-live="polite" style="text-align:left;border:2px solid #a52828;border-radius:8px;padding:18px;margin-top:20px">
-                <h3 style="color:#a52828">Saúde e emergência do titular</h3>
-                <p>Informações Declaradas pelo Titular e Exibidas com sua Autorização. O Titular pode não ser o condutor ou a pessoa atendida. Estes dados não foram verificados pela CADMIV e não substituem a avaliação dos Profissionais de Saúde.</p>
+                <h3 style="color:#a52828">Saúde e Emergência do Titular</h3>
+                <p>Informações Declaradas pelo Titular e exibidas com sua Autorização. O Titular pode não ser o condutor ou a pessoa atendida. Estes dados não foram verificados pela CADMIV e não substituem a avaliação do Profissional de Saúde.</p>
                 <dl id="dados-saude-consulta"></dl>
             </section>
 
-            <p>A Consulta informa a situação registrada no CADMIV. Compare Marca, Modelo, Cor e Chassi com o veículo apresentado. Esta consulta não confirma, a Identidade do portador nem a regularidade do Veículo no Trânsito.</p>
+            <p>A consulta informa a situação registrada na CADMIV. Compare Marca, Modelo, Cor, Chassi e Número de Série do Veículo Apresentado. Esta consulta não confirma a Identidade do Portador do Veículo e também não confirma a regularidade do Veículo no Trânsito em via Pública.</p>
         </div>
 
         <div class="info-section">
             <div class="info-header">📄 Painel Informativo de Utilidade Pública</div>
-            <div class="info-intro">Para que você compreenda a relevância deste registro privado, detalhamos abaixo o escopo de atuação e as finalidades da plataforma CADMIV=Cadastro Mobilidade Individual Veículo Autopropelido.</div>
+            <div class="info-intro">Para que você compreenda a importância deste Registro Privado. Apresentamos as finalidades da Plataforma CADMIV.<br>— Cadastro Mobilidade Individual Veículo Autopropelido.</br></div>
             
             <ul>
-                <li><strong>O que é a CADMIV?</strong> É uma plataforma de registro para proteção patrimonial  de segurança  voltada exclusivamente para Veículos  de Pequeno Porte de Mobilidade Individual Autopropelido.</li>
-                <li><strong>Qual é a nossa Finalidade Primordial?</strong> Estabelecer um vínculo Firme, Forte, Real e Definitivo entre o Legítimo Proprietário do Veículo Elétrico e Autopropelido ( Bicicletas: Comuns, Elétricas, Esportivas, Patinetes e Monociclos ) através de um banco de dado unificado.</li>
-                <li><strong>Apoio à Fiscalização de Trânsito:</strong> Em abordagens rotineiras nas vias públicas, os agentes de segurança pública utilizam este Portal acima para checar instantaneamente o status do veículo abordado, agindo de forma implacável contra o comércio de Receptação Ilícita.</li>
-                <li><strong>Protocolo de Emergência e Saúde:</strong> CPF, Endereço, Telefone e Informações de Saúde são exibidos na Consulta Pública, somente com sua  Autorização feita no formulário de Cadastro.</li>
+                <li><strong>O Que É a CADMIV?</strong> É uma plataforma de Registro Privado de Veículos de Mobilidade Individual Autopropelido, com o objetivo exclusivamente, voltada para a proteção de Veículos de Pequeno Porte: Exemplo: Bicicletas Comuns, Elétricas e Esportivas, Patinetes e Monociclos. O Cadastro reúne informações fornecidas pelo Titular para auxiliar na Identificação do Veículo e na consulta de sua situação na Plataforma Cadmiv.</li>
+                <li><strong>Qual É a Nossa Finalidade Primordial?</strong> Registrar a vinculação declarada entre o Titular e o Veículo, reunindo os Dados em uma base de Consulta. Esse registro auxilia na Identificação do Patrimônio, mas não substitui os Documentos de Propriedade nem as verificações das Autoridades Competentes.</li>
+                <li><strong>Apoio à Fiscalização de Trânsito:</strong> Durante uma abordagem em via pública, Agentes de Trânsito e Autoridades Competentes podem consultar a situação registrada na CADMIV e comparar os Dados com o Veículo Apresentado. A consulta permite identificar, entre outras situações, um Cadastro Ativo, um Alerta de Furto ou Roubo comunicado pelo Titular ou um Cadastro Adormecido, aguardando Renovação do Cartão Digital.</li>
+                <li><strong>Protocolo Requisito na Abordagem:</strong> O Número de Telefone do Titular será exibido abaixo do Alerta de Furto ou Roubo, somente enquanto esse Alerta estiver Ativo, para facilitar o contato com o Titular se houver Localização do Veículo Furtado ou Roubado e auxiliar na apuração dos fatos durante a abordagem. Sem o Alerta, esse Telefone ficará Oculto. A consulta apresenta: Marca, Modelo, Cor, Chassi ou Número de Série e a situação do Veículo na CADMIV. Os Dados de Saúde e Emergência seguem a Autorização Específica do Titular nas opções:( Sim ou Não ), feitas no Formulário de Cadastro.</li>
+                <li><strong>Conferência Durante  Abordagem:</strong> Os Dados consultados devem ser comparados com o Veículo Apresentado. A consulta não confirma a Identidade do Condutor do Veículo a Propriedade ou a Regularidade do Veículo no Trânsito e não substitui os documentos exigidos por Agente de Trânsito e Autoridades Competentes, para que haja uma identificação precisa dos documentos apresentados na abordagem em Via Pública.</li>
             </ul>
             
-            <div class="motto-text">Cidadão Consciente, Protege Patrimônio.</div>
+            <div class="motto-text"><h2>Cidadão Consciente, Protege o Patrimônio.</h2></div>
             
             <!-- 🟢 TEXTO ATUALIZADO: PROSSEGUIR PARA OS TERMOS DE USO -->
             <button type="button" onclick="avancarFluxo()" class="btn-prosseguir">Prosseguir para os Termos de Uso</button>
