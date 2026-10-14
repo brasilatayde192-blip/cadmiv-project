@@ -12,4 +12,15 @@ function createResetMailer(env=process.env,send=fetch) {
   if(!response.ok)throw Error('EMAIL_DELIVERY_FAILED');
  };
 }
-module.exports={createResetMailer};
+function createRenewalMailer(env=process.env,send=fetch){
+ if(!env.RESEND_API_KEY||!env.MAIL_FROM)return null;
+ return async({payload,key})=>{
+  const response=await send('https://api.resend.com/emails',{
+   method:'POST',signal:AbortSignal.timeout(15000),
+   headers:{Authorization:'Bearer '+env.RESEND_API_KEY,'Content-Type':'application/json','Idempotency-Key':key},
+   body:JSON.stringify(payload)
+  });
+  if(!response.ok)throw Error('EMAIL_DELIVERY_FAILED');
+ };
+}
+module.exports={createResetMailer,createRenewalMailer};

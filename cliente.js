@@ -7,9 +7,9 @@ async function api(path,body,method){
 function alternar(id,icone){const el=document.getElementById(id),botao=document.getElementById(icone),mostrar=el.type==='password';el.type=mostrar?'text':'password';botao.textContent=mostrar?'🐵':'🙈';botao.setAttribute('aria-label',mostrar?'Ocultar senha':'Mostrar senha');botao.setAttribute('aria-pressed',String(mostrar));}
 function alternarVisibilidadeSenha(){alternar('login_senha','icone_olho');}
 function alternarOlhoAlerta(){alternar('alerta_senha','icone_olho_alerta');}
-async function realizarLogin(){
+async function realizarLogin(renovar=false){
  const box=document.getElementById('alerta-login');
- try{const d=await api('/api/login',{telefone:document.getElementById('login_telefone').value,senha:document.getElementById('login_senha').value});if(d.renovar){await carregarRenovacao();return;}location.assign('botao.html');}
+ try{const d=await api('/api/login',{telefone:document.getElementById('login_telefone').value,senha:document.getElementById('login_senha').value});if(d.renovar||renovar){await carregarRenovacao();return;}location.assign('botao.html');}
  catch(e){box.textContent=e.message;box.style.display='block';}
 }
 function mostrarSaudeConsulta(saude){

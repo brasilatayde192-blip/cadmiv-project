@@ -9,7 +9,9 @@ async function carregarRenovacao(){
   const d=await api('/api/me/renovacao');
   document.querySelector('.login-container form').hidden=true;
   document.getElementById('login_senha').value='';document.getElementById('alerta-login').style.display='none';
-  if(d.vencido){
+  if(d.status==='DESATIVADO'){
+   msg.textContent='Este cadastro está desativado. A renovação não está disponível para cadastros cancelados.';
+  }else if(d.vencido){
    document.getElementById('renovacao-pendente').hidden=false;
    msg.textContent=d.status==='ROUBO'?'O alerta de furto ou roubo continua registrado. O cartão também está vencido.':'Cartão Digital vencido.';
   }else if(d.renovacao_confirmada){

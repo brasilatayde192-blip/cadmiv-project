@@ -2,7 +2,8 @@
 const express = require('express');
 const {vigencia}=require('./vigencia');
 const QRCode = require('qrcode');
-const { createResetMailer } = require('./email');
+const { createResetMailer,createRenewalMailer } = require('./email');
+const {iniciarLembretes}=require('./lembretes');
 const { prepararFoto } = require('./fotos');
 const path = require('node:path');
 const fs = require('node:fs');
@@ -263,8 +264,16 @@ function createApp(db,{production=false,origin='http://localhost:10000',sendRese
   app.post('/api/alerta',wrap(async(req,res)=>{
     const id=await current(req);const {rows}=await db.query('SELECT senha_hash FROM cadmiv_clientes WHERE id=$1',[id]);
     if(!await verifyPassword(req.body.senha,rows[0].senha_hash))throw fail(401,'Senha incorreta.');
-    const result=await db.query("UPDATE cadmiv_veiculos SET status='ROUBO' WHERE cliente_id=$1 AND status IN ('ATIVO','ROUBO') RETURNING codigo",[id]);
-    if(!result.rows.length)throw fail(409,'O cadastro ainda não está ativo. Entre em contato com o suporte.');res.json({status:'ROUBO'});
+    const c=await db.connect();
+    try{
+      await c.query('BEGIN');
+      const vehicle=await c.query('SELECT status,ativado_em,renovado_em FROM cadmiv_veiculos WHERE cliente_id=$1 FOR UPDATE',[id]);
+      const v=vehicle.rows[0];
+      if(!v||!['ATIVO','ROUBO','ADORMECIDO'].includes(v.status))throw fail(409,'O cadastro não está ativo para acionar o Alerta de Furto ou Roubo.');
+      if(vigencia(v).vencido)throw fail(409,'Seu Cartão Digital está vencido. Acesse Fazer Renovação do Cartão Digital na página de acesso.');
+      await c.query("UPDATE cadmiv_veiculos SET status='ROUBO' WHERE cliente_id=$1",[id]);
+      await c.query('COMMIT');res.json({status:'ROUBO'});
+    }catch(e){await c.query('ROLLBACK');throw e;}finally{c.release();}
   }));
   app.post('/api/consultar',wrap(async(req,res)=>{
     const porChassi=req.body.chassi!==undefined;
@@ -295,12 +304,15 @@ async function start(){
   if(!process.env.DATABASE_URL)throw Error('Configure DATABASE_URL antes de iniciar.');
   const production=process.env.NODE_ENV==='production',origin=process.env.APP_ORIGIN||'http://localhost:10000';
   if(production&&(!process.env.APP_ORIGIN||!origin.startsWith('https://')))throw Error('Configure APP_ORIGIN com a URL HTTPS do site.');
+  if(process.env.RENEWAL_REMINDERS_ENABLED==='true'&&(!process.env.RESEND_API_KEY||!process.env.MAIL_FROM||!origin.startsWith('https://')))throw Error('Configure RESEND_API_KEY, MAIL_FROM e APP_ORIGIN HTTPS antes de ativar os lembretes.');
   const db=new Pool({connectionString:process.env.DATABASE_URL,max:10,connectionTimeoutMillis:10000,idleTimeoutMillis:30000});
   db.on('error',e=>console.error('Conexão PostgreSQL interrompida:',e.code||'DATABASE'));
   await migrate(db);
+  const stopLembretes=process.env.RENEWAL_REMINDERS_ENABLED==='true'?
+    iniciarLembretes(db,{send:createRenewalMailer(),origin,from:process.env.MAIL_FROM}):()=>{};
   const server=createApp(db,{production,origin,sendResetEmail:createResetMailer()}).listen(process.env.PORT||10000,'0.0.0.0',()=>console.log('CADMIV iniciado com PostgreSQL.'));
   const cleanup=setInterval(()=>db.query('DELETE FROM cadmiv_sessoes WHERE expira<now(); DELETE FROM cadmiv_limites WHERE expira<now(); DELETE FROM cadmiv_recuperacoes WHERE expira<now()').catch(()=>{}),3600000);cleanup.unref();
-  const shutdown=()=>{clearInterval(cleanup);server.close(()=>db.end().finally(()=>process.exit(0)));setTimeout(()=>process.exit(1),10000).unref();};process.on('SIGTERM',shutdown);process.on('SIGINT',shutdown);
+  const shutdown=()=>{stopLembretes();clearInterval(cleanup);server.close(()=>db.end().finally(()=>process.exit(0)));setTimeout(()=>process.exit(1),10000).unref();};process.on('SIGTERM',shutdown);process.on('SIGINT',shutdown);
 }
 if(require.main===module)start().catch(e=>{console.error('CADMIV não iniciou:',e.code||(e.message.startsWith('Configure')?e.message:'verifique banco e configuração'));process.exit(1);});
 module.exports={createApp,migrate,normalizeChassi,validateRegistration,adult,hashPassword,verifyPassword};

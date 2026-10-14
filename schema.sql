@@ -44,3 +44,12 @@ CREATE TABLE IF NOT EXISTS cadmiv_fotos (
 ALTER TABLE cadmiv_veiculos ADD COLUMN IF NOT EXISTS ativado_em timestamptz;
 ALTER TABLE cadmiv_veiculos ADD COLUMN IF NOT EXISTS renovado_em timestamptz;
 ALTER TABLE cadmiv_veiculos ADD COLUMN IF NOT EXISTS origem_sem_nota text CHECK(origem_sem_nota IN ('doacao','presente'));
+
+CREATE TABLE IF NOT EXISTS cadmiv_lembretes (
+ chave text PRIMARY KEY,
+ cliente_id uuid NOT NULL REFERENCES cadmiv_clientes(id) ON DELETE CASCADE,
+ payload jsonb NOT NULL,
+ criado_em timestamptz NOT NULL,
+ tentar_em timestamptz NOT NULL,
+ enviado_em timestamptz
+);
