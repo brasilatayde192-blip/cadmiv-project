@@ -428,14 +428,14 @@
 
             <div id="secao-responsabilidade" class="dependent-container" style="background-color: #fcf3cf; border-color: #f39c12;"> 
                 <span style="font-weight: bold; color: #b7950b;">📋 DECLARAÇÃO DE RESPONSABILIDADE JURÍDICA DO TITULAR:</span> 
-                <textarea rows="3" readonly style="margin-top:5px; background:#fff; resize:none;">Eu, na qualidade de Proprietário Titular cadastrado na Plataforma CADMIV, vencionando para todos os Fins de Direito, a vinculação do meu Endereço Residencial e Contatos Telefônicos ao cadastro do dependente refirido Acima, Declaro ser responsável pelas informações prestadas.</textarea>
+                <textarea rows="3" readonly style="margin-top:5px; background:#fff; resize:none;">Eu, na qualidade de Proprietário Titular cadastrado na Plataforma CADMIV, vencionando para todos os Fins de Direito, a vinculação do meu Endereço Residencial e Contatos Telefônicos ao Cadastro do Dependente Refirido Acima, Declaro ser responsável pelas informações prestadas.</textarea>
 <div style="margin-top: 10px; display: flex; align-items: center;"> 
                     <input type="checkbox" name="responsabilidade" id="responsabilidade" style="width: auto; margin-top: 0; margin-right: 10px; transform: scale(1.2);"> 
                     <strong>Confirmo e Aceito os Termos de Responsabilidade Acima Descritos.</strong> 
                 </div> 
             </div>
 
-            <div id="senha-edicao" hidden><label for="senha-atual-edicao">Confirme sua Senha Atual para salvar as Alterações:</label><div style="position:relative"><input type="password" id="senha-atual-edicao" autocomplete="current-password" maxlength="128" style="padding-right:52px;box-sizing:border-box"><button type="button" id="olho-senha-edicao" aria-label="Mostrar senha" aria-controls="senha-atual-edicao" aria-pressed="false" onclick="var campo=document.getElementById('senha-atual-edicao'); var mostrar=campo.type==='password'; campo.type=mostrar?'text':'password'; this.textContent=mostrar?'🐵':'🙈'; this.setAttribute('aria-label',mostrar?'Ocultar senha':'Mostrar senha'); this.setAttribute('aria-pressed',String(mostrar));" style="position:absolute;right:4px;top:50%;transform:translateY(-50%);width:44px;min-height:44px;margin:0;padding:5px;background:none;border:0;font-size:20px;cursor:pointer">🙈</button></div><p>Nome do Titular, Número do CPF, Número do Chassi e de Série, Número da Nota Fiscal e Data de Registro permanecem os mesmos não sofrem Alterações.</p></div>
+            <div id="senha-edicao" hidden><label for="senha-atual-edicao">Confirme sua Senha Atual para salvar as Alterações:</label><div style="position:relative"><input type="password" id="senha-atual-edicao" autocomplete="current-password" maxlength="128" style="padding-right:52px;box-sizing:border-box"><button type="button" id="olho-senha-edicao" aria-label="Mostrar senha" aria-controls="senha-atual-edicao" aria-pressed="false" onclick="var campo=document.getElementById('senha-atual-edicao'); var mostrar=campo.type==='password'; campo.type=mostrar?'text':'password'; this.textContent=mostrar?'🐵':'🙈'; this.setAttribute('aria-label',mostrar?'Ocultar senha':'Mostrar senha'); this.setAttribute('aria-pressed',String(mostrar));" style="position:absolute;right:4px;top:50%;transform:translateY(-50%);width:44px;min-height:44px;margin:0;padding:5px;background:none;border:0;font-size:20px;cursor:pointer">🙈</button></div><p>Nome do Titular, Número do CPF, Número do Chassi e de Série, Número da Nota Fiscal, Data de Registro, Data de Nascimento, Tipo Sanguíneo, Marca do Veículo, Modelo do Veículo, Ano do Veículo, Estado de Conservação do Veículo e Plano do Cartão Digital permanecem os mesmos e não sofrem Alterações.</p></div>
 <!-- Início da Tarja Verde do Final do Formulário -->
         <div class="tarja-botoes">
             <button type="submit" id="btn-enviar" class="btn-next">
@@ -446,8 +446,25 @@
         
     </form>
 </div>
-<dialog id="confirmar-exclusao" aria-labelledby="titulo-exclusao"><h2 id="titulo-exclusao">Excluir Definitivamente meu Cadastro</h2><p>Serão apagados deste Sistema seus Dados, Daos do Veículo, suas Fotos e Dependentes. O acesso à conta será encerrado e o QR-code antigo deixará de localizar o Cadastro. Esta ação não pode ser Desfeita.</p><label for="motivo-exclusao">Motivo:</label><select id="motivo-exclusao"><option value="">Selecione</option><option value="venda">Venda</option><option value="doacao">Doação</option><option value="outro">Outro motivo</option></select><label for="senha-exclusao">Senha Atual:</label><input id="senha-exclusao" type="password" autocomplete="current-password" maxlength="128"><label for="texto-exclusao">Digite EXCLUIR para Confirmar:</label><input id="texto-exclusao" autocomplete="off"><p id="mensagem-exclusao" role="status"></p><button type="button" id="cancelar-exclusao">Voltar sem Excluir</button> <button type="button" id="executar-exclusao">Excluir Definitivamente</button></dialog><style>[hidden]{display:none!important}dialog{max-width:500px;width:90%;box-sizing:border-box;border:1px solid #aaa;border-radius:8px;text-align:left}dialog::backdrop{background:#0008}dialog button{padding:12px;margin-top:15px;cursor:pointer}#executar-exclusao{background:#a52828;color:white;border:0}#acoes-cliente{margin:15px 0}input[readonly]{background:#eee}.cadastro-foto video:not([hidden]){display:block}</style></body>
+<dialog id="confirmar-exclusao" aria-labelledby="titulo-exclusao"><h2 id="titulo-exclusao">Excluir Definitivamente meu Cadastro</h2><p>Serão apagados deste Sistema todos os seus Dados, ( Dados do Veículo, suas Fotos e Dependentes. O acesso à conta será encerrado e o QR-code antigo deixará de localizar o Cadastro ). Esta ação não pode ser Desfeita.</p><label for="motivo-exclusao">Motivo:</label><select id="motivo-exclusao"><option value="">Selecione</option><option value="venda">Venda</option><option value="doacao">Doação</option><option value="outro">Outro motivo</option></select><label for="senha-exclusao">Senha Atual:</label><input id="senha-exclusao" type="password" autocomplete="current-password" maxlength="128"><label for="texto-exclusao">Digite EXCLUIR para Confirmar:</label><input id="texto-exclusao" autocomplete="off"><p id="mensagem-exclusao" role="status"></p><button type="button" id="cancelar-exclusao">Voltar sem Excluir</button> <button type="button" id="executar-exclusao">Excluir Definitivamente</button></dialog><style>[hidden]{display:none!important}dialog{max-width:500px;width:90%;box-sizing:border-box;border:1px solid #aaa;border-radius:8px;text-align:left}dialog::backdrop{background:#0008}dialog button{padding:12px;margin-top:15px;cursor:pointer}#executar-exclusao{background:#a52828;color:white;border:0}#acoes-cliente{margin:15px 0}input[readonly]{background:#eee}.cadastro-foto video:not([hidden]){display:block}</style>
+<!-- Campos preservados na edição; disponíveis no primeiro cadastro. -->
+<style>
+#form-cadastro .campo-fixo-edicao{background-color:#eee;color:#34495e;opacity:1;cursor:not-allowed}
+</style>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    if (new URLSearchParams(window.location.search).get('editar') !== '1') return;
+    var form = document.getElementById('form-cadastro');
+    if (!form) return;
+    var seletor = '#nasc_dia, #nasc_mes, #cadmiv_ano, [name="sangue"], [name="marca"], [name="modelo"], [name="ano"], [name="estado_conservacao"], [name="combo"]';
+    form.querySelectorAll(seletor).forEach(function (campo) {
+        campo.disabled = true;
+        campo.setAttribute('aria-disabled', 'true');
+        campo.classList.add('campo-fixo-edicao');
+        campo.title = 'Este dado permanece como informado no cadastro original.';
+    });
+});
+</script></body>
 </html>
-
 
 
