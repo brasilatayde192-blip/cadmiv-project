@@ -9,7 +9,16 @@ function createResetMailer(env=process.env,send=fetch) {
    body:JSON.stringify({from:env.MAIL_FROM,to:[to],subject:'CADMIV — crie uma nova senha',
     text:'Recebemos um pedido para criar uma nova senha no CADMIV.\n\nAbra este link em até 30 minutos:\n'+url+'\n\nO link pode ser usado uma única vez. Se você não fez este pedido, ignore esta mensagem. Sua senha atual continua válida. Não compartilhe este link.'})
   });
-  if(!response.ok)throw Error('EMAIL_DELIVERY_FAILED');
+  if(!response.ok){
+   const error=Error('EMAIL_DELIVERY_FAILED');
+   error.emailStatus=response.status;
+   try{
+    const data=await response.json();
+    const names=['validation_error','missing_api_key','invalid_api_key','restricted_api_key','rate_limit_exceeded','daily_quota_exceeded','monthly_quota_exceeded','application_error','internal_server_error'];
+    if(names.includes(data.name))error.emailType=data.name;
+   }catch{}
+   throw error;
+  }
  };
 }
 function createRenewalMailer(env=process.env,send=fetch){

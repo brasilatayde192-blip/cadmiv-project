@@ -154,6 +154,7 @@ function createApp(db,{production=false,origin='http://localhost:10000',sendRese
     res.status(202).json({mensagem:'Se o telefone e o e-mail corresponderem ao cadastro, enviaremos um link. Confira também a pasta de spam. O link vale por 30 minutos.'});
     if(limit[0].quantidade>3)return;
     // O envio ocorre após a resposta, sem revelar a existência da conta pelo tempo do provedor.
+    let etapaRecuperacao='banco';
     const task=(async()=>{
       const token=crypto.randomBytes(32).toString('hex'),tokenHash=digest(token),c=await db.connect();let recipient;
       try{
@@ -161,10 +162,25 @@ function createApp(db,{production=false,origin='http://localhost:10000',sendRese
         if(!rows.length){await c.query('COMMIT');return;}
         recipient=rows[0].email;await c.query("INSERT INTO cadmiv_recuperacoes(token_hash,cliente_id,expira) VALUES($1,$2,now()+interval '30 minutes')",[tokenHash,rows[0].id]);await c.query('COMMIT');
       }catch(e){await c.query('ROLLBACK');throw e;}finally{c.release();}
+      etapaRecuperacao='montagem_link';
       const url=new URL('/redefinir-senha.html',origin);url.hash='token='+token;
+      etapaRecuperacao='envio_resend';
       try{await sendResetEmail({to:recipient,url:url.href});}
-      catch(e){await db.query('DELETE FROM cadmiv_recuperacoes WHERE token_hash=$1',[tokenHash]);throw e;}
-    })().catch(()=>console.error('Falha no envio de recuperação. Verifique o serviço de e-mail.'));
+      catch(e){
+        try{await db.query('DELETE FROM cadmiv_recuperacoes WHERE token_hash=$1',[tokenHash]);}
+        catch{console.error('[RECUPERACAO] Falha ao invalidar token após erro de envio.');}
+        throw e;
+      }
+    })().catch(e=>{
+      // Somente códigos conhecidos; nunca registrar mensagens livres, tokens ou credenciais.
+      const network=['ENOTFOUND','EAI_AGAIN','ECONNREFUSED','ECONNRESET','ETIMEDOUT','UND_ERR_CONNECT_TIMEOUT','CERT_HAS_EXPIRED','UNABLE_TO_VERIFY_LEAF_SIGNATURE'];
+      const raw=e?.cause?.code||e?.code;
+      const code=network.includes(raw)?raw:(etapaRecuperacao==='banco'&&/^[0-9A-Z]{5}$/.test(raw||'')?raw:'nao_identificado');
+      const status=Number.isInteger(e?.emailStatus)&&e.emailStatus>=400&&e.emailStatus<=599?e.emailStatus:'indisponivel';
+      const types=['validation_error','missing_api_key','invalid_api_key','restricted_api_key','rate_limit_exceeded','daily_quota_exceeded','monthly_quota_exceeded','application_error','internal_server_error'];
+      const type=types.includes(e?.emailType)?e.emailType:(['TimeoutError','AbortError'].includes(e?.name)?e.name:'nao_identificado');
+      console.error('[RECUPERACAO] Falha; etapa='+etapaRecuperacao+'; HTTP='+status+'; tipo='+type+'; codigo='+code);
+    });
     resetTasks.add(task);task.finally(()=>resetTasks.delete(task));
   }));
   app.post('/api/senha/redefinir',wrap(async(req,res)=>{
