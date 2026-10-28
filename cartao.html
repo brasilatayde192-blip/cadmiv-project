@@ -13,7 +13,7 @@
 </head>
 <body>
 <div class="screen-only tools">
-<select id="pessoa-cartao" aria-label="Cartão do Titular ou Dependente" disabled><option value="0">Titular</option></select>
+<select id="pessoa-cartao" aria-label="Cartão do Titular ou Dependente" disabled><option value="0"></option></select>
 <p id="cliente_status" role="status"></p><p id="mensagem-foto" role="status" aria-live="polite"></p>
 <button type="button" id="imprimir-cartao" disabled>Imprimir Segunda Via</button>
 </div>
@@ -22,7 +22,7 @@
 <h2 class="header-title">CARTÃO DIGITAL CADMIV</h2><p><p class="subtitle">Registro Privado de Veículo<p><span id="tipo-cartao"></span></p>
 <div class="corpo-dados"><div class="foto-container"><img id="foto-pessoa" alt="Foto do Titular ou Dependente" hidden><span id="sem-foto">Sem foto</span></div><div class="dados-container">
 <div class="label-grupo">Nome ( Titular ou Dependente Autorizado )</div><div class="valor-caixa" id="caixa_nome_real">Carregando...</div>
-<div class="label-grupo">Marca — Modelo —  Chassi ou Série Cadastrado no CADMIV</div><div class="valor-caixa" id="caixa_chassi_real">Carregando...</div>
+<div class="label-grupo">Marca — Modelo —  Chassi / Série ou Placa Cadastrado no CADMIV</div><div class="valor-caixa" id="caixa_chassi_real">Carregando...</div>
 <div class="label-grupo">Referência do cadastro</div><div class="valor-caixa" id="caixa_codigo_real">Carregando...</div></div></div>
 <section class="consulta"><img id="qr-veiculo" alt="QR-code de Consulta do Veículo" width="220" height="220" hidden><div><p>Use o QR-Code para obter informações do Veículo Registrado no cadastro da CADMIV e comparar com o veículo presente na abordagem. O QR-Code não confirma a Identidade do Portador do Veículo e não substitui documentos Legalmente exigidos.</p><a id="link-consulta" hidden aria-label="Abrir Consulta do Veículo">Abrir Consulta do Veículo</a></div></section>
 <section class="disposicoes"><h3>DISPOSIÇÕES LEGAIS E REGULAMENTARES</h3><ol>
