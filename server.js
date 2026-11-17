@@ -1,5 +1,7 @@
 'use strict';
 const express = require('express');
+const financeiro = require('./financeiro');
+const { criarPix } = require('./efi-pix');
 const {vigencia}=require('./vigencia');
 const QRCode = require('qrcode');
 const { createResetMailer,createRenewalMailer } = require('./email');
@@ -88,10 +90,10 @@ async function verifyPassword(password,stored) {
 }
 async function migrate(db) {
   const c=await db.connect();
-  try { await c.query('BEGIN'); await c.query('SELECT pg_advisory_xact_lock(72410831)'); await c.query(fs.readFileSync(path.join(__dirname,'schema.sql'),'utf8')); await c.query('COMMIT'); }
+  try { await c.query('BEGIN'); await c.query('SELECT pg_advisory_xact_lock(72410831)'); await c.query(fs.readFileSync(path.join(__dirname,'schema.sql'),'utf8')); await c.query(fs.readFileSync(path.join(__dirname,'financeiro.sql'),'utf8')); await c.query('COMMIT'); }
   catch(e) { await c.query('ROLLBACK'); throw e; } finally { c.release(); }
 }
-function createApp(db,{production=false,origin='http://localhost:10000',sendResetEmail=null}={}) {
+function createApp(db,{production=false,origin='http://localhost:10000',sendResetEmail=null,adminClienteId=process.env.CADMIV_ADMIN_CLIENTE_ID||'',pix=null}={}) {
   const resetTasks=new Set();
   const app=express(); app.locals.resetTasks=resetTasks; app.disable('x-powered-by'); if(production) app.set('trust proxy',1);
   app.use((req,res,next)=>{res.set({'Cache-Control':'no-store','Referrer-Policy':'no-referrer','X-Content-Type-Options':'nosniff','X-Frame-Options':'DENY'});next();});
@@ -120,6 +122,16 @@ function createApp(db,{production=false,origin='http://localhost:10000',sendRese
   }
   async function session(c,id){const token=crypto.randomBytes(32).toString('hex');await c.query("INSERT INTO cadmiv_sessoes(token_hash,cliente_id,expira) VALUES($1,$2,now()+interval '8 hours')",[digest(token),id]);return token;}
   async function situacao(id){const {rows}=await db.query('SELECT status,ativado_em,renovado_em FROM cadmiv_veiculos WHERE cliente_id=$1',[id]);if(!rows.length)throw fail(404,'Cadastro não localizado.');return {...rows[0],...vigencia(rows[0])};}
+  app.get('/api/me/pix',wrap(async(req,res)=>{
+    const id=await current(req);
+    res.json(pix ? await pix.estado(id,{qr:req.query.qr==='1'}) : {disponivel:false});
+  }));
+  app.post('/api/me/pix',wrap(async(req,res)=>{
+    const id=await current(req);
+    if(!pix)throw fail(409,'O Pix ainda não está disponível.');
+    res.json(await pix.emitir(id,req.body?.centavos));
+  }));
+  app.get('/pagamento-pix.js',(req,res)=>res.sendFile(path.join(__dirname,'pagamento-pix.js')));
   app.get('/api/me/renovacao',wrap(async(req,res)=>{const d=await situacao(await current(req));res.json({...d,pagamento_disponivel:false});}));
   app.post('/api/me/renovacao',wrap(async(req,res)=>{await current(req);throw fail(409,'A renovação por PIX ainda não está disponível. Nenhuma cobrança foi gerada.');}));
   function setCookie(res,token,maxAge=28800000){res.cookie('cadmiv_session',token,{httpOnly:true,secure:production,sameSite:'strict',maxAge,path:'/'});}
@@ -308,7 +320,21 @@ function createApp(db,{production=false,origin='http://localhost:10000',sendRese
   app.get('/validar',(req,res)=>res.redirect('/validar.html'));
   for(const page of ['index.html','apresentacao.html','fiscalizacao.html','termos.html','termos.js','cadastro.html','login.html','alerta.html','cadastro.js','cadastro-edicao.js','cliente.js','recuperar-senha.html','redefinir-senha.html','senha.js','cartao.js','renovacao.js'])app.get('/'+page,(req,res)=>res.sendFile(path.join(__dirname,page)));
   for(const page of ['botao.html','cartao.html','validar.html'])app.get('/'+page,wrap(async(req,res)=>{try{const id=await current(req);if((await situacao(id)).vencido)return res.redirect('/login.html?renovar=1');}catch(e){if(e.status===401)return res.redirect('/login.html');throw e;}res.sendFile(path.join(__dirname,page));}));
-  app.get('/painel.html',(req,res)=>res.status(403).send('Painel administrativo indisponível nesta etapa. Os indicadores antigos eram demonstrativos.'));
+  async function admin(req){
+    if(!adminClienteId)throw fail(403,'Painel privado: administrador ainda não configurado.');
+    if(await current(req)!==adminClienteId)throw fail(403,'Acesso restrito ao administrador.');
+  }
+  app.get('/api/planos',wrap(async(req,res)=>res.json({planos:await financeiro.planos(db)})));
+  app.get('/api/admin/financeiro',wrap(async(req,res)=>{await admin(req);res.json({...await financeiro.resumo(db),pix_disponivel:Boolean(pix)});}));
+  app.put('/api/admin/planos',wrap(async(req,res)=>{
+    await admin(req);
+    const values=req.body?.centavos;
+    if(!Array.isArray(values)||values.length!==3||values.some(n=>!Number.isSafeInteger(n)||n<1||n>100000000))throw fail(400,'Informe os três preços válidos em centavos.');
+    const c=await db.connect();try{await c.query('BEGIN');for(let i=0;i<3;i++)await c.query('UPDATE cadmiv_planos SET centavos=$1,atualizado_em=now() WHERE id=$2',[values[i],i+1]);await c.query('COMMIT');}catch(e){await c.query('ROLLBACK');throw e;}finally{c.release();}
+    res.json({planos:await financeiro.planos(db)});
+  }));
+  for(const file of ['painel.html','painel.js'])app.get('/'+file,wrap(async(req,res)=>{await admin(req);res.sendFile(path.join(__dirname,file));}));
+  app.get('/precos.js',(req,res)=>res.sendFile(path.join(__dirname,'precos.js')));
   app.use((req,res)=>res.status(404).json({erro:'Página não encontrada.'}));
   app.use((err,req,res,next)=>{
     if(err.code==='23505')return res.status(409).json({erro:err.constraint==='cadmiv_veiculos_chassi_unique'?'Este chassi ou número de série já está cadastrado no CADMIV. Não é permitido criar outro cadastro para este veículo.':'Já existe cadastro com estes dados. Use o acesso de cliente cadastrado.'});
@@ -322,13 +348,23 @@ async function start(){
   if(production&&(!process.env.APP_ORIGIN||!origin.startsWith('https://')))throw Error('Configure APP_ORIGIN com a URL HTTPS do site.');
   if(process.env.RENEWAL_REMINDERS_ENABLED==='true'&&(!process.env.RESEND_API_KEY||!process.env.MAIL_FROM||!origin.startsWith('https://')))throw Error('Configure RESEND_API_KEY, MAIL_FROM e APP_ORIGIN HTTPS antes de ativar os lembretes.');
   const db=new Pool({connectionString:process.env.DATABASE_URL,max:10,connectionTimeoutMillis:10000,idleTimeoutMillis:30000});
+  const pix=criarPix(db);
   db.on('error',e=>console.error('Conexão PostgreSQL interrompida:',e.code||'DATABASE'));
   await migrate(db);
   const stopLembretes=process.env.RENEWAL_REMINDERS_ENABLED==='true'?
     iniciarLembretes(db,{send:createRenewalMailer(),origin,from:process.env.MAIL_FROM}):()=>{};
-  const server=createApp(db,{production,origin,sendResetEmail:createResetMailer()}).listen(process.env.PORT||10000,'0.0.0.0',()=>console.log('CADMIV iniciado com PostgreSQL.'));
+  const server=createApp(db,{production,origin,sendResetEmail:createResetMailer(),pix}).listen(process.env.PORT||10000,'0.0.0.0',()=>console.log('CADMIV iniciado com PostgreSQL.'));
+  let consultando=false;
+  async function consultarPix(){
+    if(consultando)return;
+    consultando=true;
+    try{await pix.conciliar();}catch{console.error('CADMIV: falha na fila de consultas Pix.');}
+    finally{consultando=false;}
+  }
+  const pixTimer=pix?setInterval(consultarPix,15000):null;
+  if(pix)void consultarPix();
   const cleanup=setInterval(()=>db.query('DELETE FROM cadmiv_sessoes WHERE expira<now(); DELETE FROM cadmiv_limites WHERE expira<now(); DELETE FROM cadmiv_recuperacoes WHERE expira<now()').catch(()=>{}),3600000);cleanup.unref();
-  const shutdown=()=>{stopLembretes();clearInterval(cleanup);server.close(()=>db.end().finally(()=>process.exit(0)));setTimeout(()=>process.exit(1),10000).unref();};process.on('SIGTERM',shutdown);process.on('SIGINT',shutdown);
+  const shutdown=()=>{stopLembretes();clearInterval(cleanup);clearInterval(pixTimer);server.close(()=>db.end().finally(()=>process.exit(0)));setTimeout(()=>process.exit(1),10000).unref();};process.on('SIGTERM',shutdown);process.on('SIGINT',shutdown);
 }
 if(require.main===module)start().catch(e=>{console.error('CADMIV não iniciou:',e.code||(e.message.startsWith('Configure')?e.message:'verifique banco e configuração'));process.exit(1);});
 module.exports={createApp,migrate,normalizeChassi,validateRegistration,adult,hashPassword,verifyPassword};

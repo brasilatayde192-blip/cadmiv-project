@@ -76,11 +76,22 @@
             font-size: 1rem;
         }
     </style> 
-<script src="cliente.js" defer></script></head> 
+<script src="cliente.js" defer></script><script src="pagamento-pix.js" defer></script></head> 
 <body> 
     <div class="cadastro-container">
         <div class="header-title"><h1>CADMIV</h1></div>
         <h2>Área do Cliente</h2><p id="cliente_status" role="status"></p><p><a href="cartao.html">Visualizar cartões / Imprimir Segunda Via</a> · <button type="button" onclick="sair()">Sair</button></p> 
+        <section id="adesao-pix" hidden aria-labelledby="titulo-adesao-pix">
+            <h3 id="titulo-adesao-pix">Pagamento da adesão por Pix</h3>
+            <p id="adesao-pix-status" role="status"></p>
+            <button id="adesao-pix-gerar" type="button" hidden>Gerar cobrança Pix</button>
+            <div id="adesao-pix-codigo" hidden>
+                <img id="adesao-pix-imagem" alt="QR Code da cobrança Pix" width="220" height="220">
+                <p><label for="adesao-pix-copia">Pix Copia e Cola</label></p>
+                <input id="adesao-pix-copia" readonly>
+                <button id="adesao-pix-copiar" type="button">Copiar código</button>
+            </div>
+        </section>
         <p class="subtitulo">Abra seu cadastro para alterar endereço, contato, dados do veículo e fotos.</p> 
 
         <!-- FORMULÁRIO PRINCIPAL DE REGISTRO -->
