@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -68,41 +67,41 @@
         <div class="police-section">
             <h1 class="brand-title">CADMIV</h1>
             <h2 class="brand-name">Cadastro Mobilidade Individual Veículo Autopropelido</h2>
-            <div class="police-header"><h2>👤 Portal de Fiscalização do Agente de Trânsito</h2></div>
-            <div class="police-subtitle"><p>Acesso rápido para averiguação de veículos autopropelidos em vias públicas</p></div>
+            <div class="police-header">👤 Portal de Fiscalização do Agente de Trânsito</div>
+            <div class="police-subtitle">Acesso rápido para averiguação de veículos autopropelidos em vias públicas</div>
             
-            <label for="input_agente">Digite Abaixo: Número do Chassi ou de Série do Veículo</label>
-            <input type="text" id="input_agente" class="police-input" placeholder="Digite aqui o Número do Chassi ou Número de Série do Veículo">
-            <button type="button" onclick="consultarChassi()" class="police-btn"><h2>🔹 Verificar Status do Veículo Abordado</h2><br><h2>Clique Aqui</h2></button>
+            <label for="input_agente">Número de Série do Veículo ou Chassi</label>
+            <input type="text" id="input_agente" class="police-input" placeholder="Digite aqui o Número de Série ou Chassi">
+            <button type="button" onclick="consultarChassi()" class="police-btn">🔹 Verificar Status do Veículo Abordado<br>Clique Aqui</button>
             
             <div id="resultado_consulta" class="status-result" role="status" aria-live="polite"></div>
             <section id="contato-titular-consulta" class="contato-titular" hidden aria-live="polite">
                 <strong>Telefone de Contato do Titular</strong><br>
                 <a id="telefone-titular-consulta"></a>
-                <p>Utilize este Telefone para comunicações relacionadas ao Veículo Cadastrado. No celular, toque no número para iniciar uma Ligação.</p>
+                <p>Utilize este telefone para comunicações relacionadas ao Veículo cadastrado. No celular, toque no número para iniciar uma ligação.</p>
             </section>
             <section id="saude-consulta" hidden aria-live="polite" style="text-align:left;border:2px solid #a52828;border-radius:8px;padding:18px;margin-top:20px">
-                <h3 style="color:#a52828">Saúde e Emergência do Titular</h3>
-                <p>Informações Declaradas pelo Titular e exibidas com sua Autorização. O Titular pode não ser o condutor ou a pessoa atendida. Estes dados não foram verificados pela CADMIV e não substituem a avaliação do Profissional de Saúde.</p>
+                <h3 style="color:#a52828">Saúde e emergência do titular</h3>
+                <p>Informações declaradas pelo titular e exibidas com sua autorização. O titular pode não ser o condutor ou a pessoa atendida. Estes dados não foram verificados pela CADMIV e não substituem a avaliação dos profissionais de saúde.</p>
                 <dl id="dados-saude-consulta"></dl>
             </section>
 
-            <p>A consulta informa a situação registrada na CADMIV. Compare Marca, Modelo, Cor, Chassi e Número de Série do Veículo Apresentado. Esta consulta não confirma a Identidade do Portador do Veículo e também não confirma a regularidade do Veículo no Trânsito em via Pública.</p>
+            <p>A consulta informa a situação registrada na CADMIV. Compare Marca, Modelo, Cor e Chassi com o Veículo apresentado. Esta consulta não confirma, por si só, a identidade do portador nem a regularidade do Veículo no trânsito.</p>
         </div>
 
         <div class="info-section">
             <div class="info-header">📄 Painel Informativo de Utilidade Pública</div>
-            <div class="info-intro">Para que você compreenda a importância deste Registro Privado. Apresentamos as finalidades da Plataforma CADMIV.<br>— Cadastro Mobilidade Individual Veículo Autopropelido.</br></div>
+            <div class="info-intro">Para que você compreenda a importância deste registro privado, apresentamos as finalidades da plataforma CADMIV — Cadastro Mobilidade Individual Veículo Autopropelido.</div>
             
             <ul>
-                <li><strong>O Que É a CADMIV?</strong> É uma plataforma de Registro Privado de Veículos de Mobilidade Individual Autopropelido, com o objetivo exclusivamente, voltada para a proteção de Veículos de Pequeno Porte: Exemplo: Bicicletas Comuns, Elétricas e Esportivas, Patinetes e Monociclos. O Cadastro reúne informações fornecidas pelo Titular para auxiliar na Identificação do Veículo e na consulta de sua situação na Plataforma Cadmiv.</li>
-                <li><strong>Qual É a Nossa Finalidade Primordial?</strong> Registrar a vinculação declarada entre o Titular e o Veículo, reunindo os Dados em uma base de Consulta. Esse registro auxilia na Identificação do Patrimônio, mas não substitui os Documentos de Propriedade nem as verificações das Autoridades Competentes.</li>
-                <li><strong>Apoio à Fiscalização de Trânsito:</strong> Durante uma abordagem em via pública, Agentes de Trânsito e Autoridades Competentes podem consultar a situação registrada na CADMIV e comparar os Dados com o Veículo Apresentado. A consulta permite identificar, entre outras situações, um Cadastro Ativo, um Alerta de Furto ou Roubo comunicado pelo Titular ou um Cadastro Adormecido, aguardando Renovação do Cartão Digital.</li>
-                <li><strong>Protocolo Requisito na Abordagem:</strong> O Número de Telefone do Titular será exibido abaixo do Alerta de Furto ou Roubo, somente enquanto esse Alerta estiver Ativo, para facilitar o contato com o Titular se houver Localização do Veículo Furtado ou Roubado e auxiliar na apuração dos fatos durante a abordagem. Sem o Alerta, esse Telefone ficará Oculto. A consulta apresenta: Marca, Modelo, Cor, Chassi ou Número de Série e a situação do Veículo na CADMIV. Os Dados de Saúde e Emergência seguem a Autorização Específica do Titular nas opções:( Sim ou Não ), feitas no Formulário de Cadastro.</li>
-                <li><strong>Conferência Durante  Abordagem:</strong> Os Dados consultados devem ser comparados com o Veículo Apresentado. A consulta não confirma a Identidade do Condutor do Veículo a Propriedade ou a Regularidade do Veículo no Trânsito e não substitui os documentos exigidos por Agente de Trânsito e Autoridades Competentes, para que haja uma identificação precisa dos documentos apresentados na abordagem em Via Pública.</li>
+                <li><strong>O Que É a CADMIV?</strong> É uma plataforma de registro privado de veículos de mobilidade individual, como Bicicletas Comuns ou Elétricas, Patinetes e Monociclos. O cadastro reúne informações fornecidas pelo Titular para auxiliar na identificação do Veículo e na consulta de sua situação na plataforma.</li>
+                <li><strong>Qual É a Nossa Finalidade Primordial?</strong> Registrar a vinculação declarada entre o Titular e o Veículo, reunindo os dados em uma base de consulta. Esse registro auxilia na identificação do patrimônio, mas não substitui os documentos de propriedade nem as verificações das autoridades competentes.</li>
+                <li><strong>Apoio à Fiscalização de Trânsito:</strong> Durante uma abordagem em via pública, Agentes de Trânsito e Autoridades Competentes podem consultar a situação registrada na CADMIV e comparar os dados com o Veículo apresentado. A consulta permite identificar, entre outras situações, um Cadastro Ativo, um Alerta de Furto ou Roubo comunicado pelo Titular ou um Cadastro Adormecido, aguardando renovação.</li>
+                <li><strong>Protocolo Requisito na Abordagem:</strong> O Número de Telefone do Titular será exibido abaixo do Alerta de Furto ou Roubo somente enquanto esse alerta estiver ativo, para facilitar o contato em caso de possível localização do Veículo e auxiliar na apuração dos fatos durante a abordagem. Sem o alerta, esse telefone ficará oculto. A consulta apresenta Marca, Modelo, Cor, Chassi ou Número de Série e a situação do Veículo. Os dados de Saúde e Emergência seguem a autorização específica do Titular nas opções Sim ou Não.</li>
+                <li><strong>Conferência Durante a Abordagem:</strong> Os dados consultados devem ser comparados com o Veículo apresentado. A consulta não confirma, por si só, a identidade do condutor, a propriedade ou a regularidade do Veículo no trânsito, nem substitui os documentos exigidos e as verificações das Autoridades Competentes.</li>
             </ul>
             
-            <div class="motto-text"><h2>Cidadão Consciente, Protege o Patrimônio.</h2></div>
+            <div class="motto-text">Cidadão Consciente: Protege o Patrimônio.</div>
             
             <!-- 🟢 TEXTO ATUALIZADO: PROSSEGUIR PARA OS TERMOS DE USO -->
             <button type="button" onclick="avancarFluxo()" class="btn-prosseguir">Prosseguir para os Termos de Uso</button>
