@@ -338,7 +338,19 @@ function createApp(db,{production=false,origin='http://localhost:10000',sendRese
   app.use((req,res)=>res.status(404).json({erro:'Página não encontrada.'}));
   app.use((err,req,res,next)=>{
     if(err.code==='23505')return res.status(409).json({erro:err.constraint==='cadmiv_veiculos_chassi_unique'?'Este chassi ou número de série já está cadastrado no CADMIV. Não é permitido criar outro cadastro para este veículo.':'Já existe cadastro com estes dados. Use o acesso de cliente cadastrado.'});
-    const status=err.status||503;if(status>=500)console.error('Falha na operação CADMIV:',err.code||'INTERNAL');
+    const status=err.status||503;
+    if(status>=500){
+      console.error('Falha na operação CADMIV:',err.code||'INTERNAL');
+      if(req.path==='/api/me/pix'){
+        const tipos=['TypeError','ReferenceError','RangeError','SyntaxError','Error','AbortError'];
+        const tipo=tipos.includes(err.name)?err.name:'Erro';
+        // Somente arquivo e linha dos quadros. Mensagem e resposta podem conter dados privados.
+        const locais=String(err.stack||'').split('\n').slice(1)
+          .map(linha=>linha.match(/(?:^|[\\/])(efi-pix|financeiro|server)\.js:(\d+):(\d+)/))
+          .filter(Boolean).slice(0,5).map(match=>match[1]+'.js:'+match[2]+':'+match[3]);
+        console.error('CADMIV Pix diagnóstico:',tipo,'Local='+locais.join(','));
+      }
+    }
     res.status(status).json({erro:status>=500?'Serviço temporariamente indisponível. Tente novamente.':status===413?'Formulário muito grande.':err.type==='entity.parse.failed'?'JSON inválido.':err.message});
   });return app;
 }
