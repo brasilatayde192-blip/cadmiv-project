@@ -6,7 +6,11 @@ const { createHash } = require('node:crypto');
 const QRCode = require('qrcode');
 const { registrarCobranca, confirmarPagamentoVerificado } = require('./financeiro');
 
-const erro = (status, message) => Object.assign(new Error(message), { status });
+function erro(status, message, code = 'EFI_RESPOSTA_INVALIDA') {
+  // Mensagens definidas neste arquivo; nunca registrar o corpo retornado pelo banco.
+  console.error('CADMIV Pix:', code, message);
+  return Object.assign(new Error(message), { status, code });
+}
 const valor = centavos => (centavos / 100).toFixed(2);
 const expiracao = 86400;
 
@@ -37,6 +41,8 @@ function conectar(env) {
   function request(method, path, authorization, body) {
     const json = body === undefined ? null : JSON.stringify(body);
     return new Promise((resolve, reject) => {
+      const etapa = path === '/oauth/token' ? 'AUTENTICACAO' : method === 'PUT' ? 'EMISSAO' : 'CONSULTA';
+      const falhaConexao = () => reject(erro(502, 'Falha de conexão segura ou tempo limite na etapa ' + etapa, 'EFI_CONEXAO_' + etapa));
       const headers = { Authorization: authorization, Accept: 'application/json' };
       if (json) Object.assign(headers, {
         'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(json)
@@ -47,7 +53,7 @@ function conectar(env) {
       }, res => {
         const chunks = [];
         let size = 0;
-        res.on('error', reject);
+        res.on('error', falhaConexao);
         res.on('data', chunk => {
           size += chunk.length;
           if (size > 256 * 1024) res.destroy(erro(502, 'Resposta Efí muito grande.'));
@@ -59,7 +65,7 @@ function conectar(env) {
           resolve({ status: res.statusCode, data });
         });
       });
-      req.on('error', reject);
+      req.on('error', falhaConexao);
       req.end(json ?? undefined);
     });
   }
@@ -69,7 +75,7 @@ function conectar(env) {
     renovar ??= request('POST', '/oauth/token', 'Basic ' + basic, { grant_type: 'client_credentials' })
       .then(({ status, data }) => {
         if (status !== 200 || typeof data?.access_token !== 'string' || !data.access_token) {
-          throw erro(502, 'A autenticação Efí falhou.');
+          throw erro(502, 'A autenticação Efí falhou.', 'EFI_AUTENTICACAO_HTTP_' + status);
         }
         token = { valor: data.access_token, expira: Date.now() + Math.max(0, Number(data.expires_in) - 30) * 1000 };
         return token.valor;
@@ -89,7 +95,10 @@ function conectar(env) {
     const { status, data } = resposta;
     if (method === 'GET' && (status === 404 ||
         (status === 400 && data?.nome === 'cobranca_nao_encontrada'))) return null;
-    if (status < 200 || status >= 300 || !data) throw erro(502, 'A consulta ou emissão na Efí falhou.');
+    if (status < 200 || status >= 300 || !data) {
+      throw erro(502, 'A consulta ou emissão na Efí falhou.',
+        'EFI_' + (method === 'PUT' ? 'EMISSAO' : 'CONSULTA') + '_HTTP_' + status);
+    }
     return data;
   };
 }
