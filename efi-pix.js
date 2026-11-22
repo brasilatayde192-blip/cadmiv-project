@@ -6,45 +6,9 @@ const { createHash } = require('node:crypto');
 const QRCode = require('qrcode');
 const { registrarCobranca, confirmarPagamentoVerificado } = require('./financeiro');
 
-function erro(status, message, code = 'EFI_RESPOSTA_INVALIDA') {
-  // Mensagens definidas neste arquivo; nunca registrar o corpo retornado pelo banco.
-  console.error('CADMIV Pix:', code, message);
-  return Object.assign(new Error(message), { status, code });
-}
+const erro = (status, message) => Object.assign(new Error(message), { status });
 const valor = centavos => (centavos / 100).toFixed(2);
 const expiracao = 86400;
-
-function diagnosticoResposta(data) {
-  const nomes = new Set([
-    'chave_invalida', 'valor_invalido', 'txid_duplicado', 'cobranca_nao_encontrada',
-    'erro_aplicacao', 'documento_bloqueado', 'invalid_client', 'invalid_request', 'insufficient_scope',
-    'CobOperacaoInvalida', 'CobConsultaInvalida', 'CobNaoEncontrada',
-    'AcessoNegado', 'RequisicaoInvalida'
-  ]);
-  const texto = JSON.stringify(data ?? '').toLowerCase();
-  const sinais = [
-    ['CERTIFICADO_NAO_ENVIADO', /no required ssl certificate|client certificate (is required|required|not provided)|certificate_required/],
-    ['CERTIFICADO_RECUSADO', /ssl certificate error|bad_certificate|certificate verify failed/],
-    ['CHAVE_PIX', /chave|pix.?key/],
-    ['IDENTIFICADOR_TXID', /txid/],
-    ['VALOR', /valor|amount/],
-    ['PERMISSAO', /scope|permiss|acesso negado/],
-    ['FORMATO', /schema|propriedade|property|validation|validacao|validação/]
-  ].filter(([, pattern]) => pattern.test(texto)).map(([nome]) => nome);
-  const tipo = typeof data?.type === 'string' ? data.type.split('/').at(-1) : '';
-  const nome = [data?.nome, data?.error, tipo].find(item => nomes.has(item));
-  const camposPermitidos = new Set([
-    'chave', 'txid', 'calendario.expiracao', 'valor.original', 'valor.modalidadeAlteracao',
-    'body.chave', 'body.valor.original', 'body.valor.modalidadeAlteracao',
-    'body.calendario.expiracao', 'cob.body.chave', 'cob.body.valor.original',
-    'cob.body.valor.modalidadeAlteracao', 'cob.body.calendario.expiracao', 'cob.params.txid'
-  ]);
-  const campos = Array.isArray(data?.violacoes)
-    ? data.violacoes.map(item => item?.propriedade).filter(item => camposPermitidos.has(item))
-    : [];
-  return ' Tipo=' + (nome || 'NAO_CLASSIFICADO') + ' Campos=' + (campos.join(',') || 'NAO_INFORMADOS')
-    + ' Indicacao=' + (sinais.join(',') || 'SEM_INDICACAO');
-}
 
 function conectar(env) {
   const ambiente = env.EFI_PIX_AMBIENTE;
@@ -73,8 +37,6 @@ function conectar(env) {
   function request(method, path, authorization, body) {
     const json = body === undefined ? null : JSON.stringify(body);
     return new Promise((resolve, reject) => {
-      const etapa = path === '/oauth/token' ? 'AUTENTICACAO' : method === 'PUT' ? 'EMISSAO' : 'CONSULTA';
-      const falhaConexao = () => reject(erro(502, 'Falha de conexão segura ou tempo limite na etapa ' + etapa, 'EFI_CONEXAO_' + etapa));
       const headers = { Authorization: authorization, Accept: 'application/json' };
       if (json) Object.assign(headers, {
         'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(json)
@@ -85,7 +47,7 @@ function conectar(env) {
       }, res => {
         const chunks = [];
         let size = 0;
-        res.on('error', falhaConexao);
+        res.on('error', reject);
         res.on('data', chunk => {
           size += chunk.length;
           if (size > 256 * 1024) res.destroy(erro(502, 'Resposta Efí muito grande.'));
@@ -93,15 +55,11 @@ function conectar(env) {
         });
         res.on('end', () => {
           let data;
-          const texto = Buffer.concat(chunks).toString();
-          try { data = JSON.parse(texto); } catch {
-            // O diagnóstico classifica o texto em memória, sem imprimir sua resposta.
-            data = { respostaNaoJson: texto };
-          }
+          try { data = JSON.parse(Buffer.concat(chunks).toString()); } catch { data = null; }
           resolve({ status: res.statusCode, data });
         });
       });
-      req.on('error', falhaConexao);
+      req.on('error', reject);
       req.end(json ?? undefined);
     });
   }
@@ -111,7 +69,7 @@ function conectar(env) {
     renovar ??= request('POST', '/oauth/token', 'Basic ' + basic, { grant_type: 'client_credentials' })
       .then(({ status, data }) => {
         if (status !== 200 || typeof data?.access_token !== 'string' || !data.access_token) {
-          throw erro(502, 'A autenticação Efí falhou.', 'EFI_AUTENTICACAO_HTTP_' + status);
+          throw erro(502, 'A autenticação Efí falhou.');
         }
         token = { valor: data.access_token, expira: Date.now() + Math.max(0, Number(data.expires_in) - 30) * 1000 };
         return token.valor;
@@ -131,10 +89,7 @@ function conectar(env) {
     const { status, data } = resposta;
     if (method === 'GET' && (status === 404 ||
         (status === 400 && data?.nome === 'cobranca_nao_encontrada'))) return null;
-    if (status < 200 || status >= 300 || !data) {
-      throw erro(502, 'A consulta ou emissão na Efí falhou.' + diagnosticoResposta(data),
-        'EFI_' + (method === 'PUT' ? 'EMISSAO' : 'CONSULTA') + '_HTTP_' + status);
-    }
+    if (status < 200 || status >= 300 || !data) throw erro(502, 'A consulta ou emissão na Efí falhou.');
     return data;
   };
 }
