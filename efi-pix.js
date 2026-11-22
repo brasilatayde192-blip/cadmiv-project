@@ -14,6 +14,27 @@ function erro(status, message, code = 'EFI_RESPOSTA_INVALIDA') {
 const valor = centavos => (centavos / 100).toFixed(2);
 const expiracao = 86400;
 
+function diagnosticoResposta(data) {
+  const nomes = new Set([
+    'chave_invalida', 'valor_invalido', 'txid_duplicado', 'cobranca_nao_encontrada',
+    'erro_aplicacao', 'invalid_client', 'invalid_request', 'insufficient_scope',
+    'CobOperacaoInvalida', 'CobConsultaInvalida', 'CobNaoEncontrada',
+    'AcessoNegado', 'RequisicaoInvalida'
+  ]);
+  const tipo = typeof data?.type === 'string' ? data.type.split('/').at(-1) : '';
+  const nome = [data?.nome, data?.error, tipo].find(item => nomes.has(item));
+  const camposPermitidos = new Set([
+    'chave', 'txid', 'calendario.expiracao', 'valor.original', 'valor.modalidadeAlteracao',
+    'body.chave', 'body.valor.original', 'body.valor.modalidadeAlteracao',
+    'body.calendario.expiracao', 'cob.body.chave', 'cob.body.valor.original',
+    'cob.body.valor.modalidadeAlteracao', 'cob.body.calendario.expiracao', 'cob.params.txid'
+  ]);
+  const campos = Array.isArray(data?.violacoes)
+    ? data.violacoes.map(item => item?.propriedade).filter(item => camposPermitidos.has(item))
+    : [];
+  return ' Tipo=' + (nome || 'NAO_CLASSIFICADO') + ' Campos=' + (campos.join(',') || 'NAO_INFORMADOS');
+}
+
 function conectar(env) {
   const ambiente = env.EFI_PIX_AMBIENTE;
   const hosts = Object.freeze({
@@ -96,7 +117,7 @@ function conectar(env) {
     if (method === 'GET' && (status === 404 ||
         (status === 400 && data?.nome === 'cobranca_nao_encontrada'))) return null;
     if (status < 200 || status >= 300 || !data) {
-      throw erro(502, 'A consulta ou emissão na Efí falhou.',
+      throw erro(502, 'A consulta ou emissão na Efí falhou.' + diagnosticoResposta(data),
         'EFI_' + (method === 'PUT' ? 'EMISSAO' : 'CONSULTA') + '_HTTP_' + status);
     }
     return data;
