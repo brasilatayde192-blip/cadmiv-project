@@ -17,10 +17,20 @@ const expiracao = 86400;
 function diagnosticoResposta(data) {
   const nomes = new Set([
     'chave_invalida', 'valor_invalido', 'txid_duplicado', 'cobranca_nao_encontrada',
-    'erro_aplicacao', 'invalid_client', 'invalid_request', 'insufficient_scope',
+    'erro_aplicacao', 'documento_bloqueado', 'invalid_client', 'invalid_request', 'insufficient_scope',
     'CobOperacaoInvalida', 'CobConsultaInvalida', 'CobNaoEncontrada',
     'AcessoNegado', 'RequisicaoInvalida'
   ]);
+  const texto = JSON.stringify(data ?? '').toLowerCase();
+  const sinais = [
+    ['CERTIFICADO_NAO_ENVIADO', /no required ssl certificate|client certificate (is required|required|not provided)|certificate_required/],
+    ['CERTIFICADO_RECUSADO', /ssl certificate error|bad_certificate|certificate verify failed/],
+    ['CHAVE_PIX', /chave|pix.?key/],
+    ['IDENTIFICADOR_TXID', /txid/],
+    ['VALOR', /valor|amount/],
+    ['PERMISSAO', /scope|permiss|acesso negado/],
+    ['FORMATO', /schema|propriedade|property|validation|validacao|validação/]
+  ].filter(([, pattern]) => pattern.test(texto)).map(([nome]) => nome);
   const tipo = typeof data?.type === 'string' ? data.type.split('/').at(-1) : '';
   const nome = [data?.nome, data?.error, tipo].find(item => nomes.has(item));
   const camposPermitidos = new Set([
@@ -32,7 +42,8 @@ function diagnosticoResposta(data) {
   const campos = Array.isArray(data?.violacoes)
     ? data.violacoes.map(item => item?.propriedade).filter(item => camposPermitidos.has(item))
     : [];
-  return ' Tipo=' + (nome || 'NAO_CLASSIFICADO') + ' Campos=' + (campos.join(',') || 'NAO_INFORMADOS');
+  return ' Tipo=' + (nome || 'NAO_CLASSIFICADO') + ' Campos=' + (campos.join(',') || 'NAO_INFORMADOS')
+    + ' Indicacao=' + (sinais.join(',') || 'SEM_INDICACAO');
 }
 
 function conectar(env) {
@@ -82,7 +93,11 @@ function conectar(env) {
         });
         res.on('end', () => {
           let data;
-          try { data = JSON.parse(Buffer.concat(chunks).toString()); } catch { data = null; }
+          const texto = Buffer.concat(chunks).toString();
+          try { data = JSON.parse(texto); } catch {
+            // O diagnóstico classifica o texto em memória, sem imprimir sua resposta.
+            data = { respostaNaoJson: texto };
+          }
           resolve({ status: res.statusCode, data });
         });
       });
