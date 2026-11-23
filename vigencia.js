@@ -13,6 +13,7 @@ function vigencia(v,agora=new Date()){
  const vencido=v.status==='ADORMECIDO'||!!(valido_ate&&new Date(valido_ate)<=agora);
  // Furto/roubo e desativação nunca são apagados pelo vencimento.
  const status=vencido&&v.status==='ATIVO'?'ADORMECIDO':v.status;
- return {valido_ate,vencido,status,renovacao_confirmada:!!v.renovado_em&&!!valido_ate&&!vencido&&status==='ATIVO'};
+ const cartao_disponivel=!!valido_ate&&!vencido&&['ATIVO','ROUBO'].includes(status);
+ return {valido_ate,vencido,status,cartao_disponivel,renovacao_confirmada:!!v.renovado_em&&!!valido_ate&&!vencido&&status==='ATIVO'};
 }
 module.exports={umAnoApos,vigencia};

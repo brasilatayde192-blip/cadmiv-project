@@ -244,7 +244,9 @@ function createApp(db,{production=false,origin='http://localhost:10000',sendRese
     res.json({ok:true});
   }));
   app.get('/api/me/qr',wrap(async(req,res)=>{
-    const id=await current(req);if((await situacao(id)).vencido)throw fail(403,'Cartão vencido. Renove antes de imprimir.');
+    const id=await current(req),s=await situacao(id);
+    if(s.vencido)throw fail(403,'Cartão vencido. Renove antes de imprimir.');
+    if(!s.cartao_disponivel)throw fail(403,'Cartão indisponível. A liberação exige cadastro ativo após confirmação do pagamento.');
     const {rows}=await db.query('SELECT codigo FROM cadmiv_veiculos WHERE cliente_id=$1',[id]);
     if(!rows.length)throw fail(404,'Veículo não localizado.');
     const url=new URL('/fiscalizacao.html',origin);url.hash='codigo='+rows[0].codigo;
@@ -319,7 +321,7 @@ function createApp(db,{production=false,origin='http://localhost:10000',sendRese
   app.get('/',(req,res)=>res.sendFile(path.join(__dirname,'index.html')));
   app.get('/validar',(req,res)=>res.redirect('/validar.html'));
   for(const page of ['index.html','apresentacao.html','fiscalizacao.html','termos.html','termos.js','cadastro.html','login.html','alerta.html','cadastro.js','cadastro-edicao.js','cliente.js','recuperar-senha.html','redefinir-senha.html','senha.js','cartao.js','renovacao.js'])app.get('/'+page,(req,res)=>res.sendFile(path.join(__dirname,page)));
-  for(const page of ['botao.html','cartao.html','validar.html'])app.get('/'+page,wrap(async(req,res)=>{try{const id=await current(req);if((await situacao(id)).vencido)return res.redirect('/login.html?renovar=1');}catch(e){if(e.status===401)return res.redirect('/login.html');throw e;}res.sendFile(path.join(__dirname,page));}));
+  for(const page of ['botao.html','cartao.html','validar.html'])app.get('/'+page,wrap(async(req,res)=>{try{const id=await current(req),s=await situacao(id);if(s.vencido)return res.redirect('/login.html?renovar=1');if(page==='cartao.html'&&!s.cartao_disponivel)return res.redirect('/botao.html');}catch(e){if(e.status===401)return res.redirect('/login.html');throw e;}res.sendFile(path.join(__dirname,page));}));
   async function admin(req){
     if(!adminClienteId)throw fail(403,'Painel privado: administrador ainda não configurado.');
     if(await current(req)!==adminClienteId)throw fail(403,'Acesso restrito ao administrador.');

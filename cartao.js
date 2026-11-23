@@ -20,13 +20,15 @@ function selecionarCartao(){
  ce('tipo-cartao').textContent=i===0?'Titular':'Dependente '+i;mostrarFoto();
 }
 function iniciarCartoes(d){
+ if(!d.cartao_disponivel)return;
+ document.querySelector('.big-cartao-container').hidden=false;
  dadosCartoes=d;const select=ce('pessoa-cartao');if(!select)return;
  select.replaceChildren();[d.nome,...d.dependentes.map(p=>p.nome)].forEach((name,i)=>{const o=document.createElement('option');o.value=i;o.textContent=(i===0?'Titular':'Dependente '+i)+' — '+name;select.append(o);});select.disabled=false;
  if(!cartaoInicializado){
   cartaoInicializado=true;select.addEventListener('change',selecionarCartao);
   ce('imprimir-cartao').addEventListener('click',async()=>{
    if(fotoCarregando||fotoErro)return;
-   try{const atual=await api('/api/me/renovacao');if(atual.vencido){ce('mensagem-foto').textContent='Cartão vencido. Acesse sua conta para renovar.';ce('imprimir-cartao').disabled=true;return;}const qr=ce('qr-veiculo');if(qr.hidden||!qr.src)throw Error();await qr.decode();if(!ce('foto-pessoa').hidden)await ce('foto-pessoa').decode();await document.fonts.ready;window.print();}catch{ce('mensagem-foto').textContent='Não foi possível confirmar a validade ou carregar o cartão. Confira sua conexão e tente novamente.';}
+   try{const atual=await api('/api/me/renovacao');if(!atual.cartao_disponivel){document.querySelector('.big-cartao-container').hidden=true;ce('mensagem-foto').textContent=atual.vencido?'Cartão vencido. Acesse sua conta para renovar.':'Cartão indisponível. A liberação exige cadastro ativo após confirmação do pagamento.';ce('imprimir-cartao').disabled=true;return;}const qr=ce('qr-veiculo');if(qr.hidden||!qr.src)throw Error();await qr.decode();if(!ce('foto-pessoa').hidden)await ce('foto-pessoa').decode();await document.fonts.ready;window.print();}catch{ce('mensagem-foto').textContent='Não foi possível confirmar a validade ou carregar o cartão. Confira sua conexão e tente novamente.';}
   });
  }
  selecionarCartao();

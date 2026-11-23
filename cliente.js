@@ -58,6 +58,10 @@ function salvarAlteracoes(){location.assign('cadastro.html?editar=1');}
 async function sair(){try{await api('/api/logout',{});location.assign('login.html');}catch(e){alert(e.message);}}
 async function carregarCliente(){
  const d=await api('/api/me');if(d.vencido){location.replace('login.html?renovar=1');return;}
+ const acesso=document.getElementById('acesso-cartoes'),aviso=document.getElementById('aviso-cartoes');
+ if(acesso)acesso.hidden=!d.cartao_disponivel;
+ if(aviso){aviso.hidden=!!d.cartao_disponivel;if(d.status!=='PENDENTE')aviso.textContent='Cartão indisponível para a situação atual do cadastro.';}
+ if(document.getElementById('pessoa-cartao')&&!d.cartao_disponivel){location.replace('botao.html');return;}
  const set=(id,value)=>{const el=document.getElementById(id);if(el){if(el.tagName==='INPUT')el.value=value;else el.textContent=value;}};
  set('cliente_nome',d.nome);set('cliente_telefone',d.telefone);set('cliente_modelo',d.marca+' — '+nomeModelo(d.modelo));
  set('cartao_status','Situação: '+d.status+(d.status==='PENDENTE'?' — NÃO ATIVO':''));
