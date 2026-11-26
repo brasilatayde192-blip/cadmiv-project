@@ -40,7 +40,42 @@
             <button type="submit" class="btn-login">Entrar no Sistema de Cadastro</button> 
             <button type="submit" id="renovar-cartao" class="btn-login" style="background:#ffd54f;color:#171717;line-height:1.4">Fazer Renovação do Cartão Digital</button>
             <p><h6>Para Renovar seu Cartão Digital, Informe seu Telefone e sua Senha, Acima.</h6></p>
-        </form><p><a href="recuperar-senha.html">Esqueci Minha Senha</a></p> 
+        </form><p><a href="recuperar-senha.html">Esqueci Minha Senha</a></p>
+        <p><button type="button" id="esqueci-login" aria-expanded="false" aria-controls="recuperacao-login" style="border:0;background:none;padding:0;color:#246894;text-decoration:underline;font:inherit;cursor:pointer">Esqueci Meu Login</button></p>
+        <section id="recuperacao-login" hidden aria-labelledby="titulo-recuperacao-login">
+            <h2 id="titulo-recuperacao-login">Esqueci Meu Login</h2>
+            <p>No CADMIV, seu Login é o Telefone Cadastrado com DDD. Informe seu e-mail cadastrado para receber esse Telefone por e-mail.</p>
+            <form id="form-recuperar-login">
+                <label for="email-recuperar-login">E-mail Cadastrado:</label>
+                <input id="email-recuperar-login" name="email" type="email" autocomplete="email" maxlength="254" required>
+                <button type="submit" class="btn-login" id="enviar-recuperacao-login">Receber Meu Login por E-mail</button>
+            </form>
+            <p id="mensagem-recuperar-login" role="status" aria-live="polite" style="line-height:1.5;overflow-wrap:anywhere"></p>
+            <p>Você precisa ter acesso ao e-mail usado no cadastro. Sua Senha não será Alterada.</p>
+            <button type="button" id="fechar-recuperacao-login">Voltar ao acesso</button>
+        </section>
+        <script>
+        (()=>{
+            const abrir=document.getElementById('esqueci-login'),caixa=document.getElementById('recuperacao-login');
+            const email=document.getElementById('email-recuperar-login'),form=document.getElementById('form-recuperar-login');
+            const mensagem=document.getElementById('mensagem-recuperar-login'),enviar=document.getElementById('enviar-recuperacao-login');
+            abrir.addEventListener('click',()=>{caixa.hidden=false;abrir.setAttribute('aria-expanded','true');email.focus();});
+            document.getElementById('fechar-recuperacao-login').addEventListener('click',()=>{caixa.hidden=true;abrir.setAttribute('aria-expanded','false');abrir.focus();});
+            let ocupado=false;
+            form.addEventListener('submit',async event=>{
+                event.preventDefault();if(ocupado||!form.reportValidity())return;
+                if(location.protocol==='file:'){mensagem.textContent='A tela abriu corretamente. Para enviar o e-mail, teste esta opção no site CADMIV após publicar os arquivos.';return;}
+                ocupado=true;enviar.disabled=true;mensagem.textContent='Aguarde...';
+                try{
+                    const resposta=await fetch('/api/login/recuperar',{method:'POST',headers:{'Content-Type':'application/json','X-CADMIV':'1'},body:JSON.stringify({email:email.value.trim()})});
+                    const dados=await resposta.json();
+                    if(!resposta.ok)throw Error(dados.erro||'Não foi possível solicitar seu login. Tente novamente mais tarde.');
+                    mensagem.textContent=dados.mensagem;
+                }catch(erro){mensagem.textContent=erro instanceof TypeError?'Não foi possível conectar. Confira sua conexão e tente novamente.':erro.message;}
+                finally{ocupado=false;enviar.disabled=false;}
+            });
+        })();
+        </script>
         <div class="footer-text"><h2>Plataforma sob Conformidade de Proteção Privado.</h2></div> 
     </div> 
 <section id="renovacao" hidden aria-labelledby="titulo-renovacao" tabindex="-1"><h2 id="titulo-renovacao">Renovação do Cartão Digital</h2><p id="mensagem-renovacao" role="status" aria-live="polite"></p><div id="renovacao-pendente" hidden><p>Caro Cliente, Agradecemos por Lembrar de Renovar seu Cartão Digital. Seu Patrimônio Merece.</p><p>Seu Cartão Digital está Vencido. A Renovação por PIX ainda não está disponível. Nenhuma cobrança será gerada nesta etapa.</p><button class="tarja" type="button" disabled>Salvar Cadastro e Gerar PIX</button></div><div id="renovacao-concluida" hidden><p>Prezado Cliente, a CADMIV Agradece a Renovação do seu CARTÃO DIGITAL.</p><a class="tarja" href="cartao.html">Imprimir Cartão Digital com a Data da Renovação</a></div><a id="renovacao-acesso" class="tarja" href="botao.html" hidden>Acessar Área do Cliente</a><button type="button" onclick="carregarRenovacao()">Conferir Situação</button> <button type="button" onclick="sair()">Sair da Conta</button></section></body> 

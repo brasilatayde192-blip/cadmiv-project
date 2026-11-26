@@ -32,4 +32,16 @@ function createRenewalMailer(env=process.env,send=fetch){
   if(!response.ok)throw Error('EMAIL_DELIVERY_FAILED');
  };
 }
-module.exports={createResetMailer,createRenewalMailer};
+function createLoginMailer(env=process.env,send=fetch){
+ if(!env.RESEND_API_KEY||!env.MAIL_FROM)return null;
+ return async({to,telefones,url})=>{
+  const response=await send('https://api.resend.com/emails',{
+   method:'POST',signal:AbortSignal.timeout(15000),
+   headers:{Authorization:'Bearer '+env.RESEND_API_KEY,'Content-Type':'application/json'},
+   body:JSON.stringify({from:env.MAIL_FROM,to:[to],subject:'CADMIV — lembrete do seu login',
+    text:'No CADMIV, seu login é o telefone cadastrado com DDD.\n\nTelefone(s) associado(s) a este e-mail:\n'+telefones.join('\n')+'\n\nAcesse sua conta: '+url+'\n\nSua senha não foi alterada. Se também esqueceu a senha, use Esqueci Minha Senha na página de acesso. Se não pediu este lembrete, ignore a mensagem. Não compartilhe seus dados de acesso.'})
+  });
+  if(!response.ok)throw Error('EMAIL_DELIVERY_FAILED');
+ };
+}
+module.exports={createResetMailer,createRenewalMailer,createLoginMailer};

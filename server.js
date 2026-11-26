@@ -4,7 +4,7 @@ const financeiro = require('./financeiro');
 const { criarPix } = require('./efi-pix');
 const {vigencia}=require('./vigencia');
 const QRCode = require('qrcode');
-const { createResetMailer,createRenewalMailer } = require('./email');
+const { createResetMailer,createRenewalMailer,createLoginMailer } = require('./email');
 const {iniciarLembretes}=require('./lembretes');
 const { prepararFoto } = require('./fotos');
 const path = require('node:path');
@@ -93,7 +93,7 @@ async function migrate(db) {
   try { await c.query('BEGIN'); await c.query('SELECT pg_advisory_xact_lock(72410831)'); await c.query(fs.readFileSync(path.join(__dirname,'schema.sql'),'utf8')); await c.query(fs.readFileSync(path.join(__dirname,'financeiro.sql'),'utf8')); await c.query('COMMIT'); }
   catch(e) { await c.query('ROLLBACK'); throw e; } finally { c.release(); }
 }
-function createApp(db,{production=false,origin='http://localhost:10000',sendResetEmail=null,adminClienteId=process.env.CADMIV_ADMIN_CLIENTE_ID||'',pix=null}={}) {
+function createApp(db,{production=false,origin='http://localhost:10000',sendResetEmail=null,sendLoginEmail=null,adminClienteId=process.env.CADMIV_ADMIN_CLIENTE_ID||'',pix=null}={}) {
   const resetTasks=new Set();
   const app=express(); app.locals.resetTasks=resetTasks; app.disable('x-powered-by'); if(production) app.set('trust proxy',1);
   app.use((req,res,next)=>{res.set({'Cache-Control':'no-store','Referrer-Policy':'no-referrer','X-Content-Type-Options':'nosniff','X-Frame-Options':'DENY'});next();});
@@ -107,7 +107,7 @@ function createApp(db,{production=false,origin='http://localhost:10000',sendRese
     next();
   });
   app.use('/api',wrap(async(req,res,next)=>{
-    const sensitive=req.path==='/login'||req.path.startsWith('/senha/')||req.path==='/me/excluir'||(req.path==='/me'&&req.method==='PATCH');
+    const sensitive=req.path==='/login'||req.path.startsWith('/senha/')||req.path==='/login/recuperar'||req.path==='/me/excluir'||(req.path==='/me'&&req.method==='PATCH');
     const key=digest(req.ip+':'+(sensitive?'acesso':'api'));
     const {rows}=await db.query(`INSERT INTO cadmiv_limites(chave,quantidade,expira) VALUES($1,1,now()+interval '10 minutes')
       ON CONFLICT(chave) DO UPDATE SET quantidade=CASE WHEN cadmiv_limites.expira<now() THEN 1 ELSE cadmiv_limites.quantidade+1 END,
@@ -154,6 +154,23 @@ function createApp(db,{production=false,origin='http://localhost:10000',sendRese
       for(let i=0;i<imagens.length;i++)if(imagens[i])await c.query('INSERT INTO cadmiv_fotos(cliente_id,posicao,imagem) VALUES($1,$2,$3)',[id,i,imagens[i]]);
       const token=await session(c,id);await c.query('COMMIT');setCookie(res,token);res.status(201).json({codigo,status:'PENDENTE'});
     }catch(e){await c.query('ROLLBACK');throw e;}finally{c.release();}
+  }));
+  app.post('/api/login/recuperar',wrap(async(req,res)=>{
+    if(!sendLoginEmail)throw fail(503,'A recuperação do login por e-mail ainda não está disponível. Tente novamente mais tarde.');
+    const email=text(req.body?.email,'e-mail',254).toLowerCase();
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))throw fail(400,'Informe um e-mail válido.');
+    const key=digest('recuperacao-login:'+email);
+    const {rows:limit}=await db.query(`INSERT INTO cadmiv_limites(chave,quantidade,expira) VALUES($1,1,now()+interval '10 minutes')
+      ON CONFLICT(chave) DO UPDATE SET quantidade=CASE WHEN cadmiv_limites.expira<now() THEN 1 ELSE cadmiv_limites.quantidade+1 END,
+      expira=CASE WHEN cadmiv_limites.expira<now() THEN now()+interval '10 minutes' ELSE cadmiv_limites.expira END RETURNING quantidade`,[key]);
+    res.status(202).json({mensagem:'Se esse e-mail estiver cadastrado, enviaremos o telefone usado como login. Confira sua caixa de entrada e a pasta de spam. Se já solicitou, aguarde antes de tentar novamente.'});
+    if(limit[0].quantidade>3)return;
+    const task=(async()=>{
+      const {rows}=await db.query('SELECT telefone FROM cadmiv_clientes WHERE lower(email)=$1 ORDER BY telefone',[email]);
+      if(!rows.length)return;
+      await sendLoginEmail({to:email,telefones:rows.map(row=>row.telefone),url:new URL('/login.html',origin).href});
+    })().catch(()=>console.error('[RECUPERACAO_LOGIN] Falha ao consultar ou enviar lembrete.'));
+    resetTasks.add(task);task.finally(()=>resetTasks.delete(task));
   }));
   app.post('/api/senha/solicitar',wrap(async(req,res)=>{
     if(!sendResetEmail)throw fail(503,'A recuperação por e-mail ainda não está disponível. Tente novamente mais tarde.');
@@ -367,7 +384,7 @@ async function start(){
   await migrate(db);
   const stopLembretes=process.env.RENEWAL_REMINDERS_ENABLED==='true'?
     iniciarLembretes(db,{send:createRenewalMailer(),origin,from:process.env.MAIL_FROM}):()=>{};
-  const server=createApp(db,{production,origin,sendResetEmail:createResetMailer(),pix}).listen(process.env.PORT||10000,'0.0.0.0',()=>console.log('CADMIV iniciado com PostgreSQL.'));
+  const server=createApp(db,{production,origin,sendResetEmail:createResetMailer(),sendLoginEmail:createLoginMailer(),pix}).listen(process.env.PORT||10000,'0.0.0.0',()=>console.log('CADMIV iniciado com PostgreSQL.'));
   let consultando=false;
   async function consultarPix(){
     if(consultando)return;
