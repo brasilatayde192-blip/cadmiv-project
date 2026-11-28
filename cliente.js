@@ -9,7 +9,7 @@ function alternarVisibilidadeSenha(){alternar('login_senha','icone_olho');}
 function alternarOlhoAlerta(){alternar('alerta_senha','icone_olho_alerta');}
 async function realizarLogin(renovar=false){
  const box=document.getElementById('alerta-login');
- try{const d=await api('/api/login',{telefone:document.getElementById('login_telefone').value,senha:document.getElementById('login_senha').value});if(d.renovar||renovar){await carregarRenovacao();return;}location.assign('botao.html');}
+ try{const d=await api('/api/login',{telefone:document.getElementById('login_telefone').value,senha:document.getElementById('login_senha').value});if((d.renovar||renovar)&&!d.alerta_ativo){await carregarRenovacao();return;}location.assign('botao.html');}
  catch(e){box.textContent=e.message;box.style.display='block';}
 }
 function mostrarSaudeConsulta(saude){
@@ -51,13 +51,35 @@ async function confirmarBloqueioTotal(){
   await api('/api/alerta',{senha});document.getElementById('alerta_senha').value='';alert('Alerta de furto ou roubo salvo no CADMIV.');
  }catch(e){alert(e.message);}
 }
+let alertaCadastroAtivo=null,alertaEmAndamento=false;
+function atualizarBotaoAlerta(d){
+ const botao=document.getElementById('btn-ativar-alerta');if(!botao)return;
+ alertaCadastroAtivo=d.status==='ROUBO';
+ botao.textContent=alertaCadastroAtivo?'🔓 Desativar Botão de Alerta':'🔒 Ativar Botão de Alerta';
+ botao.disabled=alertaEmAndamento||(!alertaCadastroAtivo&&(d.status!=='ATIVO'||d.vencido));
+ const orientacao=document.getElementById('orientacao-alerta'),situacao=document.getElementById('situacao-alerta');
+ if(orientacao)orientacao.textContent=alertaCadastroAtivo?'Digite sua senha de acesso para desativar o Alerta de Furto ou Roubo.':'Digite sua senha de acesso para ativar o Alerta de Furto ou Roubo.';
+ if(situacao)situacao.textContent=alertaCadastroAtivo?'Alerta de Furto ou Roubo ativo. Se o veículo foi recuperado, você pode desativar o alerta.':d.status==='PENDENTE'?'O alerta poderá ser ativado após a ativação do cadastro.':d.status==='ATIVO'?'Alerta de Furto ou Roubo desativado.':'Alerta indisponível para a situação atual do cadastro.';
+}
 async function dispararAlertaCadmiv(){
- try{await api('/api/alerta',{senha:document.getElementById('senha-confirmacao').value});document.getElementById('senha-confirmacao').value='';alert('Alerta de furto ou roubo salvo no CADMIV.');await carregarCliente();}catch(e){alert(e.message);}
+ if(alertaEmAndamento||alertaCadastroAtivo===null)return;
+ const campo=document.getElementById('senha-confirmacao'),botao=document.getElementById('btn-ativar-alerta');
+ if(botao.disabled)return;
+ if(!campo.value){alert('Digite sua senha de acesso para confirmar.');campo.focus();return;}
+ const desativar=alertaCadastroAtivo;alertaEmAndamento=true;botao.disabled=true;
+ try{
+  const resultado=await api(desativar?'/api/alerta/desativar':'/api/alerta',{senha:campo.value});
+  atualizarBotaoAlerta({status:resultado.status,vencido:resultado.status==='ADORMECIDO'});
+  alert(desativar?'Alerta de Furto ou Roubo desativado.': 'Alerta de Furto ou Roubo salvo no CADMIV.');
+ }catch(e){alert(e.message);}
+ finally{campo.value='';alertaEmAndamento=false;botao.disabled=true;}
+ try{await carregarCliente();}catch{alertaCadastroAtivo=null;alert('Atualize a página para conferir a situação do alerta.');}
 }
 function salvarAlteracoes(){location.assign('cadastro.html?editar=1');}
 async function sair(){try{await api('/api/logout',{});location.assign('login.html');}catch(e){alert(e.message);}}
 async function carregarCliente(){
- const d=await api('/api/me');if(d.vencido){location.replace('login.html?renovar=1');return;}
+ const d=await api('/api/me');if(d.vencido&&!(d.status==='ROUBO'&&document.getElementById('btn-ativar-alerta'))){location.replace('login.html?renovar=1');return;}
+ atualizarBotaoAlerta(d);
  const acesso=document.getElementById('acesso-cartoes'),aviso=document.getElementById('aviso-cartoes');
  if(acesso)acesso.hidden=!d.cartao_disponivel;
  if(aviso){aviso.hidden=!!d.cartao_disponivel;if(d.status!=='PENDENTE')aviso.textContent='Cartão indisponível para a situação atual do cadastro.';}

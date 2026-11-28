@@ -107,7 +107,7 @@ function createApp(db,{production=false,origin='http://localhost:10000',sendRese
     next();
   });
   app.use('/api',wrap(async(req,res,next)=>{
-    const sensitive=req.path==='/login'||req.path.startsWith('/senha/')||req.path==='/login/recuperar'||req.path==='/me/excluir'||(req.path==='/me'&&req.method==='PATCH');
+    const sensitive=req.path==='/login'||req.path.startsWith('/senha/')||req.path==='/login/recuperar'||req.path==='/alerta/desativar'||req.path==='/me/excluir'||(req.path==='/me'&&req.method==='PATCH');
     const key=digest(req.ip+':'+(sensitive?'acesso':'api'));
     const {rows}=await db.query(`INSERT INTO cadmiv_limites(chave,quantidade,expira) VALUES($1,1,now()+interval '10 minutes')
       ON CONFLICT(chave) DO UPDATE SET quantidade=CASE WHEN cadmiv_limites.expira<now() THEN 1 ELSE cadmiv_limites.quantidade+1 END,
@@ -240,7 +240,7 @@ function createApp(db,{production=false,origin='http://localhost:10000',sendRese
       if(!rows.length||!valid)throw fail(401,'Telefone ou senha incorretos.');
       if(cookie(req))await c.query('DELETE FROM cadmiv_sessoes WHERE token_hash=$1',[digest(cookie(req))]);
       const v=await c.query('SELECT status,ativado_em,renovado_em FROM cadmiv_veiculos WHERE cliente_id=$1',[rows[0].id]);
-      const token=await session(c,rows[0].id);await c.query('COMMIT');setCookie(res,token);res.json({ok:true,renovar:vigencia(v.rows[0]).vencido});
+      const token=await session(c,rows[0].id);await c.query('COMMIT');setCookie(res,token);res.json({ok:true,renovar:vigencia(v.rows[0]).vencido,alerta_ativo:v.rows[0].status==='ROUBO'});
     }catch(e){await c.query('ROLLBACK');throw e;}finally{c.release();}
   }));
   app.post('/api/logout',wrap(async(req,res)=>{await db.query('DELETE FROM cadmiv_sessoes WHERE token_hash=$1',[digest(cookie(req))]);setCookie(res,'',0);res.json({ok:true});}));
@@ -322,6 +322,20 @@ function createApp(db,{production=false,origin='http://localhost:10000',sendRese
       await c.query('COMMIT');res.json({status:'ROUBO'});
     }catch(e){await c.query('ROLLBACK');throw e;}finally{c.release();}
   }));
+  app.post('/api/alerta/desativar',wrap(async(req,res)=>{
+    const id=await current(req),c=await db.connect();
+    try{
+      await c.query('BEGIN');
+      const {rows:clientes}=await c.query('SELECT senha_hash FROM cadmiv_clientes WHERE id=$1 FOR UPDATE',[id]);
+      if(!clientes.length||!await verifyPassword(req.body?.senha,clientes[0].senha_hash))throw fail(401,'Senha incorreta.');
+      const {rows}=await c.query('SELECT status,ativado_em,renovado_em FROM cadmiv_veiculos WHERE cliente_id=$1 FOR UPDATE',[id]);
+      const v=rows[0];
+      if(!v||v.status!=='ROUBO')throw fail(409,'Não há Alerta de Furto ou Roubo ativo neste cadastro.');
+      const status=vigencia(v).vencido?'ADORMECIDO':'ATIVO';
+      await c.query('UPDATE cadmiv_veiculos SET status=$2 WHERE cliente_id=$1',[id,status]);
+      await c.query('COMMIT');res.json({status});
+    }catch(e){await c.query('ROLLBACK');throw e;}finally{c.release();}
+  }));
   app.post('/api/consultar',wrap(async(req,res)=>{
     const porChassi=req.body.chassi!==undefined;
     const result=await db.query('SELECT v.status,v.ativado_em,v.renovado_em,v.marca,v.modelo,v.cor,v.chassi_normalizado AS chassi,c.telefone,c.privado FROM cadmiv_veiculos v JOIN cadmiv_clientes c ON c.id=v.cliente_id WHERE '+(porChassi?'v.chassi_normalizado':'v.codigo')+'=$1',[porChassi?normalizeChassi(req.body.chassi):text(req.body.codigo,'código',64)]);
@@ -338,7 +352,7 @@ function createApp(db,{production=false,origin='http://localhost:10000',sendRese
   app.get('/',(req,res)=>res.sendFile(path.join(__dirname,'index.html')));
   app.get('/validar',(req,res)=>res.redirect('/validar.html'));
   for(const page of ['index.html','apresentacao.html','fiscalizacao.html','termos.html','termos.js','cadastro.html','login.html','alerta.html','cadastro.js','cadastro-edicao.js','cliente.js','recuperar-senha.html','redefinir-senha.html','senha.js','cartao.js','renovacao.js'])app.get('/'+page,(req,res)=>res.sendFile(path.join(__dirname,page)));
-  for(const page of ['botao.html','cartao.html','validar.html'])app.get('/'+page,wrap(async(req,res)=>{try{const id=await current(req),s=await situacao(id);if(s.vencido)return res.redirect('/login.html?renovar=1');if(page==='cartao.html'&&!s.cartao_disponivel)return res.redirect('/botao.html');}catch(e){if(e.status===401)return res.redirect('/login.html');throw e;}res.sendFile(path.join(__dirname,page));}));
+  for(const page of ['botao.html','cartao.html','validar.html'])app.get('/'+page,wrap(async(req,res)=>{try{const id=await current(req),s=await situacao(id);if(s.vencido&&!(page==='botao.html'&&s.status==='ROUBO'))return res.redirect('/login.html?renovar=1');if(page==='cartao.html'&&!s.cartao_disponivel)return res.redirect('/botao.html');}catch(e){if(e.status===401)return res.redirect('/login.html');throw e;}res.sendFile(path.join(__dirname,page));}));
   async function admin(req){
     if(!adminClienteId)throw fail(403,'Painel privado: administrador ainda não configurado.');
     if(await current(req)!==adminClienteId)throw fail(403,'Acesso restrito ao administrador.');
